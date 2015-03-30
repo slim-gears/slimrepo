@@ -1,3 +1,6 @@
+// Copyright 2015 Denis Itskovich
+// Refer to LICENSE.txt for license details
+
 package com.slimgears.slimcode.processor;
 
 import com.slimgears.slimcode.annotations.Data;
