@@ -25,7 +25,7 @@ public class DataModelBuilderTest {
         assert_()
                 .about(javaSource())
                 .that(sourceFile)
-                .processedWith(new DataModelBuilder())
+                .processedWith(new DataAnnotationProcessor())
                 .compilesWithoutError()
                 .and()
                 .generatesSources(JavaFileObjects.forResource("TestModel.java"));

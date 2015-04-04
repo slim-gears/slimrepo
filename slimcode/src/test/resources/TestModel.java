@@ -5,8 +5,8 @@ public class TestModel extends AbstractTestModel {
     }
 
     public TestModel(String text, int number) {
-        text = text;
-        number = number;
+        this.text = text;
+        this.number = number;
     }
 
     public static Builder create() {

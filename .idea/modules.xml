@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/slimcode/slimcode.iml" filepath="$PROJECT_DIR$/slimcode/slimcode.iml" />
+      <module fileurl="file://$PROJECT_DIR$/slimorm/slimorm.iml" filepath="$PROJECT_DIR$/slimorm/slimorm.iml" />
+      <module fileurl="file://$PROJECT_DIR$/slimorm.apt/slimorm.apt.iml" filepath="$PROJECT_DIR$/slimorm.apt/slimorm.apt.iml" />
     </modules>
   </component>
 </project>

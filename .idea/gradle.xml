@@ -9,6 +9,8 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/slimcode" />
+            <option value="$PROJECT_DIR$/slimorm" />
+            <option value="$PROJECT_DIR$/slimorm.apt" />
           </set>
         </option>
       </GradleProjectSettings>
