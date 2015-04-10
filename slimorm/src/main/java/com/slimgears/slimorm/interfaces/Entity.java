@@ -3,10 +3,9 @@
 package com.slimgears.slimorm.interfaces;
 
 /**
- * Created by Denis on 02-Apr-15
+ * Created by Denis on 05-Apr-15
  * <File Description>
  */
-public interface Queryable<T> extends Iterable<T> {
-    Queryable<T> where(Predicate<T> predicate);
-    int count();
+public interface Entity<TKey> {
+    TKey getEntityId();
 }

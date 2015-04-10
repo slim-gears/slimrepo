@@ -7,7 +7,7 @@
       </configuration>
     </facet>
   </component>
-  <component name="NewModuleRootManager" inherit-compiler-output="true">
+  <component name="NewModuleRootManager" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/build/classes/main" />
     <output-test url="file://$MODULE_DIR$/build/classes/test" />
     <exclude-output />
@@ -30,6 +30,8 @@
     <orderEntry type="library" scope="TEST" name="Gradle: tools" level="project" />
     <orderEntry type="library" exported="" name="Gradle: guava-18.0" level="project" />
     <orderEntry type="module" module-name="slimcode" exported="" />
+    <orderEntry type="library" scope="TEST" name="Gradle: mockito-core-2.0.5-beta" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: objenesis-2.1" level="project" />
   </component>
 </module>
 
