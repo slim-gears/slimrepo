@@ -54,7 +54,9 @@ public class SqlQuery<TKey, TEntity extends Entity<TKey>> extends AbstractQuery<
                         .setEntityType(elementType)
                         .setPredicate(predicate)
                         .setCommandParameters(parameters)
-                        .setOrderFields(orderFields));
+                        .setOrderFields(orderFields)
+                        .setLimit(limitEntries)
+                        .setOffset(skipEntries));
         }
     }
 
@@ -65,7 +67,9 @@ public class SqlQuery<TKey, TEntity extends Entity<TKey>> extends AbstractQuery<
                     new SqlStatementBuilder.CountParameters()
                         .setEntityType(elementType)
                         .setPredicate(predicate)
-                        .setCommandParameters(parameters));
+                        .setCommandParameters(parameters)
+                        .setLimit(limitEntries)
+                        .setOffset(skipEntries));
         }
     }
 

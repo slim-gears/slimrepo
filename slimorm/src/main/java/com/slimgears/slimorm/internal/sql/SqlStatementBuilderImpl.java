@@ -36,7 +36,8 @@ public class SqlStatementBuilderImpl implements SqlStatementBuilder {
                 selectClause(params.entityType) +
                 fromClause(params.entityType) +
                 whereClause(params.predicate, params.commandParameters) +
-                orderByClause(params.orderFields);
+                orderByClause(params.orderFields) +
+                limitClause(params.limit, params.offset);
     }
 
     @Override
@@ -44,13 +45,15 @@ public class SqlStatementBuilderImpl implements SqlStatementBuilder {
         return
                 updateClause(params.entityType) +
                 setClause(params.updateFields, params.commandParameters) +
-                whereClause(params.predicate, params.commandParameters);
+                whereClause(params.predicate, params.commandParameters) +
+                limitClause(params.limit, params.offset);
     }
 
     @Override
     public String buildDeleteStatement(DeleteParameters params) {
         return "DELETE " + fromClause(params.entityType) +
-                whereClause(params.predicate, params.commandParameters);
+                whereClause(params.predicate, params.commandParameters) +
+                limitClause(params.limit, params.offset);
     }
 
     @Override
@@ -114,7 +117,7 @@ public class SqlStatementBuilderImpl implements SqlStatementBuilder {
                             public String apply(OrderFieldInfo orderField) {
                                 return fieldName(orderField.field) + " " + (orderField.ascending ? "ASC" : "DESC");
                             }
-                        }));
+                        })) + "\n";
     }
 
     private String setClause(final Collection<UpdateFieldInfo> updateFields, final SqlCommand.Parameters parameters) {

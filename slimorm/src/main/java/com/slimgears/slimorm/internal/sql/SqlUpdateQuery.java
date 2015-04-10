@@ -25,7 +25,9 @@ public class SqlUpdateQuery<TKey, TEntity extends Entity<TKey>> extends Abstract
                         .setEntityType(elementType)
                         .setPredicate(predicate)
                         .setCommandParameters(parameters)
-                        .setUpdateFields(updateFields));
+                        .setUpdateFields(updateFields)
+                        .setLimit(limitEntries)
+                        .setOffset(skipEntries));
         }
     }
 

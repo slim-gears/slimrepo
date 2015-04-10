@@ -6,7 +6,6 @@ import com.slimgears.slimorm.apt.prototype.UserRepositorySession;
 import com.slimgears.slimorm.apt.prototype.generated.UserEntity;
 import com.slimgears.slimorm.apt.prototype.generated.UserRepositoryImpl;
 import com.slimgears.slimorm.apt.prototype.slimsql.SlimSqlOrm;
-import com.slimgears.slimorm.interfaces.FieldValueLookup;
 import com.slimgears.slimorm.interfaces.Repository;
 import com.slimgears.slimorm.interfaces.RepositorySession;
 import com.slimgears.slimorm.internal.sql.SqlCommand;
@@ -37,12 +36,38 @@ public class PrototypeTest {
     @Mock private SqlCommandExecutorFactory factoryMock;
     @Mock private SqlCommandExecutor executorMock;
 
+    static class TracingAnswer<T> implements Answer<T> {
+        private final T answer;
+
+        public TracingAnswer(T answer) {
+            this.answer = answer;
+        }
+
+        @Override
+        public T answer(InvocationOnMock invocation) throws Throwable {
+            SqlCommand command = (SqlCommand)invocation.getArguments()[0];
+            System.out.println(command.getStatement());
+            System.out.println(command.getParameters().getAll());
+            return answer;
+        }
+
+        public static <T> TracingAnswer<T> create(T returnValue) {
+            return new TracingAnswer<>(returnValue);
+        }
+    }
+
     @Before
-    public void setup() {
+    public void setup() throws IOException {
         MockitoAnnotations.initMocks(this);
         when(factoryMock.createCommandExecutor(any(Repository.class), any(RepositorySession.class)))
                 .thenReturn(executorMock);
         SlimSqlOrm.setCommandExecutorFactory(factoryMock);
+
+        when(executorMock.select(any(SqlCommand.class)))
+                .thenAnswer(TracingAnswer.create(new ArrayList<>()));
+        when(executorMock.count(any(SqlCommand.class)))
+                .thenAnswer(TracingAnswer.create(0));
+        doAnswer(TracingAnswer.create(null)).when(executorMock).execute(any(SqlCommand.class));
     }
 
     @Test
@@ -52,7 +77,7 @@ public class PrototypeTest {
             public Integer execute(UserRepositorySession connection) throws IOException {
                 return connection.users().query()
                         .where(UserEntity.Fields.UserFirstName.contains("Denis"))
-                        .skip(1)
+                        .skip(2)
                         .limit(10)
                         .count();
             }
@@ -66,9 +91,11 @@ public class PrototypeTest {
             @Override
             public UserEntity[] execute(UserRepositorySession connection) throws IOException {
                 return connection.users().query()
-                        .where(UserEntity.Fields.UserFirstName.contains("Denis"))
+                        .where(UserEntity.Fields.UserFirstName.contains("Denis")
+                            .and(UserEntity.Fields.UserId.greaterThan(20))
+                            .or(UserEntity.Fields.UserLastName.startsWith("Itsko")))
                         .orderAsc(UserEntity.Fields.UserLastName, UserEntity.Fields.UserFirstName, UserEntity.Fields.UserId)
-                        .skip(1)
+                        .skip(3)
                         .limit(10)
                         .toArray();
             }
@@ -76,29 +103,7 @@ public class PrototypeTest {
         verify(executorMock).select(any(SqlCommand.class));
     }
 
-    private void printCommand(SqlCommand command) {
-        System.out.println(command.getStatement());
-        System.out.println(command.getParameters().getAll());
-    }
-
     private <T> T testQuery(Repository.QueryAction<UserRepositorySession, T> queryAction) throws IOException {
-        when(executorMock.select(any(SqlCommand.class)))
-                .thenAnswer(new Answer<Iterable<FieldValueLookup>>() {
-                    @Override
-                    public Iterable<FieldValueLookup> answer(InvocationOnMock invocation) throws Throwable {
-                        printCommand((SqlCommand)invocation.getArguments()[0]);
-                        return new ArrayList<>();
-                    }
-                });
-
-        when(executorMock.count(any(SqlCommand.class)))
-                .thenAnswer(new Answer<Integer>() {
-                    @Override
-                    public Integer answer(InvocationOnMock invocation) throws Throwable {
-                        printCommand((SqlCommand)invocation.getArguments()[0]);
-                        return 0;
-                    }
-                });
 
         Repository<UserRepositorySession> repo = new UserRepositoryImpl();
         T result = repo.query(queryAction);
