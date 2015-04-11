@@ -19,8 +19,8 @@ public class UserRepositorySessionImpl extends AbstractSqlRepositorySession impl
 
     public UserRepositorySessionImpl(Repository<UserRepositorySession> repository) {
         super(SlimSqlOrm.INSTANCE, SlimSqlOrm.INSTANCE.getStatementBuilder(), repository);
-        usersEntitySet = new SqlLazyEntitySet<>(this, SlimSqlOrm.INSTANCE, UserEntity.Fields.EntityMetaType);
-        rolesEntitySet = new SqlLazyEntitySet<>(this, SlimSqlOrm.INSTANCE, RoleEntity.Fields.EntityMetaType);
+        usersEntitySet = new SqlLazyEntitySet<>(this, SlimSqlOrm.INSTANCE, UserEntity.EntityMetaType);
+        rolesEntitySet = new SqlLazyEntitySet<>(this, SlimSqlOrm.INSTANCE, RoleEntity.EntityMetaType);
     }
 
     @Override

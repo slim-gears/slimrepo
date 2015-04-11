@@ -2,7 +2,7 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimorm.internal;
 
-import com.slimgears.slimorm.interfaces.Field;
+import com.slimgears.slimorm.interfaces.fields.Field;
 
 /**
  * Created by Denis on 08-Apr-15

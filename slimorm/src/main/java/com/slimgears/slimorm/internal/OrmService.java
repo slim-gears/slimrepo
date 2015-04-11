@@ -6,5 +6,5 @@ package com.slimgears.slimorm.internal;
  * Created by Denis on 06-Apr-15
  * <File Description>
  */
-public interface OrmService extends MetaDataFactory, QueryFactory {
+public interface OrmService extends QueryFactory {
 }

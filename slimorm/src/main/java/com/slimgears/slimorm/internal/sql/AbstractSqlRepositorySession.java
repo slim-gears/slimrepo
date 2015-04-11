@@ -12,21 +12,21 @@ import java.io.IOException;
  * <File Description>
  */
 public class AbstractSqlRepositorySession extends AbstractRepositorySession implements com.slimgears.slimorm.internal.sql.SqlRepositorySession {
-    private SqlCommandExecutor commandExecutor;
-    private final SqlCommandExecutorFactory commandExecutorFactory;
+    private SqlCommandExecutor sqlExecutor;
+    private final SqlCommandExecutorFactory sqlExecutorFactory;
     private final SqlStatementBuilder statementBuilder;
     private final Repository repository;
 
-    public AbstractSqlRepositorySession(SqlCommandExecutorFactory commandExecutorFactory, SqlStatementBuilder statementBuilder, Repository repository) {
-        this.commandExecutorFactory = commandExecutorFactory;
+    public AbstractSqlRepositorySession(SqlCommandExecutorFactory sqlExecutorFactory, SqlStatementBuilder statementBuilder, Repository repository) {
+        this.sqlExecutorFactory = sqlExecutorFactory;
         this.statementBuilder = statementBuilder;
         this.repository = repository;
     }
 
     @Override
     public SqlCommandExecutor getExecutor() {
-        if (commandExecutor != null) return commandExecutor;
-        return commandExecutor = commandExecutorFactory.createCommandExecutor(repository, this);
+        if (!isOpen()) open();
+        return sqlExecutor;
     }
 
     @Override
@@ -45,10 +45,22 @@ public class AbstractSqlRepositorySession extends AbstractRepositorySession impl
     }
 
     @Override
+    protected void cancelTransaction() throws IOException {
+        getExecutor().cancelTransaction();
+    }
+
+    protected boolean isOpen() {
+        return sqlExecutor != null;
+    }
+
+    protected void open() {
+        sqlExecutor = sqlExecutorFactory.createCommandExecutor(repository, this);
+    }
+
+    @Override
     public void close() throws IOException {
-        if (commandExecutor != null) {
-            commandExecutor.close();
-            commandExecutor = null;
+        if (isOpen()) {
+            sqlExecutor.close();
         }
     }
 }

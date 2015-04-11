@@ -3,50 +3,52 @@
 package com.slimgears.slimorm.apt.prototype.generated;
 
 import com.slimgears.slimorm.apt.prototype.AbstractUserEntity;
-import com.slimgears.slimorm.apt.prototype.slimsql.SlimSqlOrm;
 import com.slimgears.slimorm.interfaces.Entity;
 import com.slimgears.slimorm.interfaces.EntityType;
-import com.slimgears.slimorm.interfaces.FieldValueMap;
-import com.slimgears.slimorm.interfaces.NumberField;
-import com.slimgears.slimorm.interfaces.StringField;
 import com.slimgears.slimorm.interfaces.FieldValueLookup;
-import com.slimgears.slimorm.internal.sql.AbstractSqlEntityType;
+import com.slimgears.slimorm.interfaces.FieldValueMap;
+import com.slimgears.slimorm.interfaces.fields.Fields;
+import com.slimgears.slimorm.interfaces.fields.NumberField;
+import com.slimgears.slimorm.interfaces.fields.StringField;
+import com.slimgears.slimorm.internal.AbstractEntityType;
 
-/**
- * Created by Denis on 05-Apr-15
- * <File Description>
- */
 public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
-    public static class Fields {
-        public static final EntityType<Integer, UserEntity> EntityMetaType;
-        public static final NumberField<UserEntity, Integer> UserId = SlimSqlOrm.INSTANCE.createNumberField(UserEntity.class, "userId", Integer.class);
-        public static final StringField<UserEntity> UserFirstName = SlimSqlOrm.INSTANCE.createStringField(UserEntity.class, "userFirstName");
-        public static final StringField<UserEntity> UserLastName = SlimSqlOrm.INSTANCE.createStringField(UserEntity.class, "userLastName");
-
-        static {
-            EntityMetaType = new AbstractSqlEntityType<Integer, UserEntity>("UserEntity", UserEntity.class, UserId, UserId, UserFirstName, UserLastName) {
-                @Override
-                public UserEntity newInstance() {
-                    return new UserEntity();
-                }
-
-                @Override
-                public UserEntity newInstance(FieldValueLookup<UserEntity> lookup) {
-                    return newInstance()
-                            .setUserId(lookup.getValue(UserId))
-                            .setUserFirstName(lookup.getValue(UserFirstName))
-                            .setUserLastName(lookup.getValue(UserLastName));
-                }
-
-                @Override
-                public void entityToMap(UserEntity entity, FieldValueMap<UserEntity> map) {
-                    map
-                            .putValue(UserId, entity.getUserId())
-                            .putValue(UserFirstName, entity.getUserFirstName())
-                            .putValue(UserLastName, entity.getUserLastName());
-                }
-            };
+    static class MetaType extends AbstractEntityType<Integer, UserEntity> {
+        public MetaType() {
+            super("UserEntity", UserEntity.class, UserId);
         }
+
+        @Override
+        public UserEntity newInstance() {
+            return new UserEntity();
+        }
+
+        @Override
+        public UserEntity newInstance(FieldValueLookup<UserEntity> lookup) {
+            return newInstance()
+                    .setUserId(lookup.getValue(UserId))
+                    .setUserFirstName(lookup.getValue(UserFirstName))
+                    .setUserLastName(lookup.getValue(UserLastName));
+        }
+
+        @Override
+        public void entityToMap(UserEntity entity, FieldValueMap<UserEntity> map) {
+            map
+                    .putValue(UserId, entity.getUserId())
+                    .putValue(UserFirstName, entity.getUserFirstName())
+                    .putValue(UserLastName, entity.getUserLastName());
+        }
+    }
+
+    public static final EntityType<Integer, UserEntity> EntityMetaType;
+    public static final NumberField<UserEntity, Integer> UserId = Fields.numberField(UserEntity.class, "userId", Integer.class);
+    public static final StringField<UserEntity> UserFirstName = Fields.stringField(UserEntity.class, "userFirstName");
+    public static final StringField<UserEntity> UserLastName = Fields.stringField(UserEntity.class, "userLastName");
+
+    static {
+        EntityMetaType = new MetaType()
+                .addFields(UserFirstName, UserLastName)
+                .addRelatedEntities();
     }
 
     @Override

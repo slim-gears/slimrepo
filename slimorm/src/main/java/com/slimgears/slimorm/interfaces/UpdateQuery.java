@@ -2,6 +2,9 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimorm.interfaces;
 
+import com.slimgears.slimorm.interfaces.fields.Field;
+import com.slimgears.slimorm.interfaces.predicates.Predicate;
+
 import java.io.IOException;
 
 /**

@@ -2,17 +2,15 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimorm.internal;
 
-import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 import com.slimgears.slimorm.interfaces.Entity;
 import com.slimgears.slimorm.interfaces.EntityType;
-import com.slimgears.slimorm.interfaces.Predicate;
-import com.slimgears.slimorm.interfaces.Field;
+import com.slimgears.slimorm.interfaces.fields.Field;
 import com.slimgears.slimorm.interfaces.Query;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -38,11 +36,11 @@ public abstract class AbstractQuery<TKey, TEntity extends Entity<TKey>> extends 
         super(cache, elementType);
     }
 
-    protected abstract Iterator<TEntity> execute() throws IOException;
+    protected abstract CloseableIterator<TEntity> execute() throws IOException;
     protected abstract int executeCount() throws IOException;
 
     @Override
-    public Iterator<TEntity> iterator() {
+    public CloseableIterator<TEntity> iterator() {
         try {
             return execute();
         } catch (IOException e) {
@@ -64,8 +62,8 @@ public abstract class AbstractQuery<TKey, TEntity extends Entity<TKey>> extends 
 
     @Override
     public TEntity firstOrDefault() throws IOException {
-        try {
-            return Iterables.getFirst(this, null);
+        try (CloseableIterator<TEntity> iterator = execute()) {
+            return (iterator.hasNext()) ? iterator.next() : null;
         } catch (RuntimeException e) {
             if (e.getCause() instanceof IOException) throw (IOException)e.getCause();
             throw e;
@@ -84,8 +82,8 @@ public abstract class AbstractQuery<TKey, TEntity extends Entity<TKey>> extends 
 
     @Override
     public TEntity[] toArray() throws IOException {
-        try {
-            return Iterables.toArray(this, elementType.getEntityClass());
+        try (CloseableIterator<TEntity> entities = iterator()) {
+            return Iterators.toArray(entities, elementType.getEntityClass());
         } catch (RuntimeException e) {
             if (e.getCause() instanceof IOException) throw (IOException)e.getCause();
             throw e;

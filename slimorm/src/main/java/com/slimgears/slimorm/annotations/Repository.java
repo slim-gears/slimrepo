@@ -13,5 +13,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.CLASS)
-public @interface RepositoryConnection{
+public @interface Repository {
+    String name() default "";
+    int version();
 }

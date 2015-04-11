@@ -23,9 +23,11 @@ public abstract class AbstractRepositorySession implements RepositorySession {
             for (OnSaveChangesListener listener : onSaveChangesListeners) {
                 listener.onSavingChanges(this);
             }
-        } finally {
-            commitTransaction();
+        } catch (Throwable e) {
+            cancelTransaction();
+            throw e;
         }
+        commitTransaction();
     }
 
     @Override
@@ -57,4 +59,5 @@ public abstract class AbstractRepositorySession implements RepositorySession {
 
     protected abstract void beginTransaction() throws IOException;
     protected abstract void commitTransaction() throws IOException;
+    protected abstract void cancelTransaction() throws IOException;
 }

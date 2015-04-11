@@ -3,7 +3,8 @@
 package com.slimgears.slimorm.internal.sql;
 
 import com.slimgears.slimorm.interfaces.EntityType;
-import com.slimgears.slimorm.interfaces.Predicate;
+import com.slimgears.slimorm.interfaces.fields.Field;
+import com.slimgears.slimorm.interfaces.predicates.Predicate;
 import com.slimgears.slimorm.interfaces.FieldValueLookup;
 import com.slimgears.slimorm.internal.OrderFieldInfo;
 import com.slimgears.slimorm.internal.UpdateFieldInfo;
@@ -15,9 +16,15 @@ import java.util.Collection;
  * <File Description>
  */
 public interface SqlStatementBuilder {
+    interface SyntaxProvider {
+        String fieldName(Field field);
+        String tableName(EntityType entityType);
+        String parameterReference(int index, String name);
+        String valueToString(Object value);
+    }
 
     interface PredicateBuilder {
-        String build(SqlCommand.Parameters parameters);
+        <T> String build(Predicate<T> predicate, SqlCommand.Parameters parameters);
     }
 
     class BaseParameters<TParams extends BaseParameters<TParams>> {
@@ -96,9 +103,17 @@ public interface SqlStatementBuilder {
         }
     }
 
+    class CreateTableParameters extends BaseParameters<CreateTableParameters> {
+    }
+
+    class DropTableParameters extends BaseParameters<DropTableParameters> {
+    }
+
     String buildCountStatement(CountParameters params);
     String buildSelectStatement(SelectParameters params);
     String buildUpdateStatement(UpdateParameters params);
     String buildDeleteStatement(DeleteParameters params);
     String buildInsertStatement(InsertParameters params);
+    String buildCreateTableStatement(CreateTableParameters params);
+    String buildDropTableStatement(DropTableParameters params);
 }

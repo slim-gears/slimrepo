@@ -24,7 +24,17 @@ class SqlCommandParameters implements SqlCommand.Parameters {
     }
 
     @Override
-    public Map<String, Object> getAll() {
+    public int getCount() {
+        return parameters.size();
+    }
+
+    @Override
+    public Map<String, Object> getMap() {
         return parameterMap;
+    }
+
+    @Override
+    public Object[] getValues() {
+        return parameters.toArray();
     }
 }

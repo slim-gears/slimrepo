@@ -49,9 +49,15 @@ public abstract class AbstractEntitySet<TKey, TEntity extends Entity<TKey>> impl
     }
 
     @Override
-    public void add(TEntity entity) {
+    public TEntity addNew() {
+        return add(entityType.newInstance());
+    }
+
+    @Override
+    public TEntity add(TEntity entity) {
         entityCache.put(entity);
         stateTracker.entityAdded(entity);
+        return entity;
     }
 
     @Override

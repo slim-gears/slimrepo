@@ -4,8 +4,8 @@ package com.slimgears.slimorm.internal;
 
 import com.slimgears.slimorm.interfaces.Entity;
 import com.slimgears.slimorm.interfaces.EntityType;
-import com.slimgears.slimorm.interfaces.Predicate;
-import com.slimgears.slimorm.interfaces.Query;
+import com.slimgears.slimorm.interfaces.predicates.Predicate;
+import com.slimgears.slimorm.interfaces.predicates.Predicates;
 
 /**
  * Created by Denis on 07-Apr-15
@@ -27,7 +27,7 @@ public abstract class AbstractQueryBase<TKey, TEntity extends Entity<TKey>, TQue
 
     protected void addPredicate(Predicate predicate) {
         this.predicate = (this.predicate != null)
-                ? this.predicate.and(predicate)
+                ? Predicates.and(this.predicate, predicate)
                 : predicate;
     }
 

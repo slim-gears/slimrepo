@@ -6,10 +6,10 @@ import com.slimgears.slimorm.interfaces.Entity;
 import com.slimgears.slimorm.interfaces.EntityType;
 import com.slimgears.slimorm.interfaces.FieldValueLookup;
 import com.slimgears.slimorm.internal.AbstractQuery;
+import com.slimgears.slimorm.internal.CloseableIterator;
 import com.slimgears.slimorm.internal.EntityCache;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.concurrent.Callable;
 
 /**
@@ -21,10 +21,10 @@ public class SqlQuery<TKey, TEntity extends Entity<TKey>> extends AbstractQuery<
     private final SqlCommand countCommand;
     private final SqlCommandExecutor executor;
 
-    class EntityIterator implements Iterator<TEntity> {
-        private final Iterator<FieldValueLookup<TEntity>> rowIterator;
+    class EntityIterator implements CloseableIterator<TEntity> {
+        private final CloseableIterator<FieldValueLookup<TEntity>> rowIterator;
 
-        public EntityIterator(Iterator<FieldValueLookup<TEntity>> rowIterator) {
+        public EntityIterator(CloseableIterator<FieldValueLookup<TEntity>> rowIterator) {
             this.rowIterator = rowIterator;
         }
 
@@ -43,6 +43,11 @@ public class SqlQuery<TKey, TEntity extends Entity<TKey>> extends AbstractQuery<
                     return elementType.newInstance(row);
                 }
             });
+        }
+
+        @Override
+        public void close() throws IOException {
+            rowIterator.close();
         }
     }
 
@@ -81,9 +86,9 @@ public class SqlQuery<TKey, TEntity extends Entity<TKey>> extends AbstractQuery<
     }
 
     @Override
-    protected Iterator<TEntity> execute() throws IOException {
-        Iterable<FieldValueLookup<TEntity>> rows = executor.select(selectCommand);
-        return new EntityIterator(rows.iterator());
+    protected CloseableIterator<TEntity> execute() throws IOException {
+        CloseableIterator<FieldValueLookup<TEntity>> rows = executor.select(selectCommand);
+        return new EntityIterator(rows);
     }
 
     @Override

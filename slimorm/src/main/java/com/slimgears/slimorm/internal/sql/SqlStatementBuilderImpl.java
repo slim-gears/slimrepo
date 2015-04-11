@@ -5,13 +5,12 @@ package com.slimgears.slimorm.internal.sql;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.slimgears.slimorm.interfaces.EntityType;
-import com.slimgears.slimorm.interfaces.Field;
-import com.slimgears.slimorm.interfaces.Predicate;
+import com.slimgears.slimorm.interfaces.fields.Field;
 import com.slimgears.slimorm.interfaces.FieldValueLookup;
+import com.slimgears.slimorm.interfaces.predicates.Predicate;
 import com.slimgears.slimorm.internal.OrderFieldInfo;
 import com.slimgears.slimorm.internal.UpdateFieldInfo;
 
-import java.util.Arrays;
 import java.util.Collection;
 
 import static com.google.common.collect.Iterables.transform;
@@ -21,6 +20,14 @@ import static com.google.common.collect.Iterables.transform;
  * <File Description>
  */
 public class SqlStatementBuilderImpl implements SqlStatementBuilder {
+    private final PredicateBuilder predicateBuilder;
+    private final SyntaxProvider syntaxProvider;
+
+    public SqlStatementBuilderImpl(PredicateBuilder predicateBuilder, SyntaxProvider syntaxProvider) {
+        this.predicateBuilder = predicateBuilder;
+        this.syntaxProvider = syntaxProvider;
+    }
+
     @Override
     public String buildCountStatement(CountParameters params) {
         return
@@ -63,6 +70,16 @@ public class SqlStatementBuilderImpl implements SqlStatementBuilder {
                 valuesClause(params.entityType, params.commandParameters, params.rows);
     }
 
+    @Override
+    public String buildCreateTableStatement(CreateTableParameters params) {
+        return null;
+    }
+
+    @Override
+    public String buildDropTableStatement(DropTableParameters params) {
+        return null;
+    }
+
     protected String insertClause(EntityType entityType) {
         return "INSERT INTO " +
                 tableName(entityType) +
@@ -75,10 +92,11 @@ public class SqlStatementBuilderImpl implements SqlStatementBuilder {
                     @Override
                     public String apply(final FieldValueLookup row) {
                         return "(" +
-                                Joiner.on(", ").join(transform(Arrays.asList(entityType.getFields()),
+                                Joiner.on(", ").join(transform(entityType.getFields(),
                                         new Function<Field, String>() {
                                             @Override
                                             public String apply(Field field) {
+                                                //noinspection unchecked
                                                 return parameters.add(row.getValue(field));
                                             }
                         }));
@@ -96,7 +114,7 @@ public class SqlStatementBuilderImpl implements SqlStatementBuilder {
 
     private String whereClause(Predicate predicate, SqlCommand.Parameters parameters) {
         if (predicate == null) return "";
-        String strPredicate = ((PredicateBuilder)predicate).build(parameters);
+        String strPredicate = predicateBuilder.build(predicate, parameters);
         return "WHERE " + strPredicate + "\n";
     }
 
@@ -141,15 +159,16 @@ public class SqlStatementBuilderImpl implements SqlStatementBuilder {
     }
 
     private String valueToString(Object value) {
-        return String.valueOf(value);
+        return syntaxProvider.valueToString(value);
     }
 
     private String tableName(EntityType entityType) {
-        return "[" + entityType.getName() + "]";
+        return syntaxProvider.tableName(entityType);
     }
 
     private Iterable<String> fieldNames(EntityType entityType) {
-        return fieldNames(Arrays.asList(entityType.getFields()));
+        //noinspection unchecked
+        return fieldNames(entityType.getFields());
     }
 
     private Iterable<String> fieldNames(Iterable<Field> fields) {
@@ -162,6 +181,6 @@ public class SqlStatementBuilderImpl implements SqlStatementBuilder {
     }
 
     private String fieldName(Field field) {
-        return "[" + field.getName() + "]";
+        return syntaxProvider.fieldName(field);
     }
 }

@@ -4,7 +4,7 @@ package com.slimgears.slimorm.internal;
 
 import com.slimgears.slimorm.interfaces.Entity;
 import com.slimgears.slimorm.interfaces.EntityType;
-import com.slimgears.slimorm.interfaces.Field;
+import com.slimgears.slimorm.interfaces.fields.Field;
 import com.slimgears.slimorm.interfaces.FieldValueMap;
 
 import java.util.HashMap;

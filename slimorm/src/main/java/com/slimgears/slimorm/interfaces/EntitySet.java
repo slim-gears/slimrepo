@@ -11,6 +11,7 @@ public interface EntitySet<TKey, TEntity extends Entity<TKey>> {
     DeleteQuery<TEntity> deleteQuery();
     UpdateQuery<TEntity> updateQuery();
 
-    void add(TEntity entity);
+    TEntity addNew();
+    TEntity add(TEntity entity);
     void remove(TEntity entity);
 }

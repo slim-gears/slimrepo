@@ -5,9 +5,7 @@ package com.slimgears.slimorm.internal;
 import com.slimgears.slimorm.interfaces.Entity;
 import com.slimgears.slimorm.interfaces.EntityType;
 import com.slimgears.slimorm.interfaces.FieldValueMap;
-import com.slimgears.slimorm.interfaces.Predicate;
-import com.slimgears.slimorm.interfaces.Field;
-import com.slimgears.slimorm.interfaces.Query;
+import com.slimgears.slimorm.interfaces.fields.Field;
 import com.slimgears.slimorm.interfaces.UpdateQuery;
 
 import java.util.ArrayList;

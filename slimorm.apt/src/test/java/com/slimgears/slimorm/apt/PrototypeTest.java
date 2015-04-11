@@ -6,8 +6,10 @@ import com.slimgears.slimorm.apt.prototype.UserRepositorySession;
 import com.slimgears.slimorm.apt.prototype.generated.UserEntity;
 import com.slimgears.slimorm.apt.prototype.generated.UserRepositoryImpl;
 import com.slimgears.slimorm.apt.prototype.slimsql.SlimSqlOrm;
+import com.slimgears.slimorm.interfaces.FieldValueLookup;
 import com.slimgears.slimorm.interfaces.Repository;
 import com.slimgears.slimorm.interfaces.RepositorySession;
+import com.slimgears.slimorm.internal.CloseableIterator;
 import com.slimgears.slimorm.internal.sql.SqlCommand;
 import com.slimgears.slimorm.internal.sql.SqlCommandExecutor;
 import com.slimgears.slimorm.internal.sql.SqlCommandExecutorFactory;
@@ -25,6 +27,8 @@ import org.mockito.stubbing.Answer;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import static com.slimgears.slimorm.interfaces.predicates.Predicates.and;
+import static com.slimgears.slimorm.interfaces.predicates.Predicates.or;
 import static org.mockito.Mockito.*;
 
 /**
@@ -35,6 +39,7 @@ import static org.mockito.Mockito.*;
 public class PrototypeTest {
     @Mock private SqlCommandExecutorFactory factoryMock;
     @Mock private SqlCommandExecutor executorMock;
+    @Mock private CloseableIterator<FieldValueLookup> rowsMock;
 
     static class TracingAnswer<T> implements Answer<T> {
         private final T answer;
@@ -47,7 +52,7 @@ public class PrototypeTest {
         public T answer(InvocationOnMock invocation) throws Throwable {
             SqlCommand command = (SqlCommand)invocation.getArguments()[0];
             System.out.println(command.getStatement());
-            System.out.println(command.getParameters().getAll());
+            System.out.println(command.getParameters().getMap());
             return answer;
         }
 
@@ -64,7 +69,7 @@ public class PrototypeTest {
         SlimSqlOrm.setCommandExecutorFactory(factoryMock);
 
         when(executorMock.select(any(SqlCommand.class)))
-                .thenAnswer(TracingAnswer.create(new ArrayList<>()));
+                .thenAnswer(TracingAnswer.create(rowsMock));
         when(executorMock.count(any(SqlCommand.class)))
                 .thenAnswer(TracingAnswer.create(0));
         doAnswer(TracingAnswer.create(null)).when(executorMock).execute(any(SqlCommand.class));
@@ -76,7 +81,7 @@ public class PrototypeTest {
             @Override
             public Integer execute(UserRepositorySession connection) throws IOException {
                 return connection.users().query()
-                        .where(UserEntity.Fields.UserFirstName.contains("Denis"))
+                        .where(UserEntity.UserFirstName.contains("Denis"))
                         .skip(2)
                         .limit(10)
                         .count();
@@ -91,10 +96,15 @@ public class PrototypeTest {
             @Override
             public UserEntity[] execute(UserRepositorySession connection) throws IOException {
                 return connection.users().query()
-                        .where(UserEntity.Fields.UserFirstName.contains("Denis")
-                            .and(UserEntity.Fields.UserId.greaterThan(20))
-                            .or(UserEntity.Fields.UserLastName.startsWith("Itsko")))
-                        .orderAsc(UserEntity.Fields.UserLastName, UserEntity.Fields.UserFirstName, UserEntity.Fields.UserId)
+                        .where(
+                                or(
+                                        and(
+                                                UserEntity.UserFirstName.contains("Denis"),
+                                                UserEntity.UserId.greaterThan(20)
+                                        ),
+                                        UserEntity.UserLastName.startsWith("Itsko")
+                                ))
+                        .orderAsc(UserEntity.UserLastName, UserEntity.UserFirstName, UserEntity.UserId)
                         .skip(3)
                         .limit(10)
                         .toArray();

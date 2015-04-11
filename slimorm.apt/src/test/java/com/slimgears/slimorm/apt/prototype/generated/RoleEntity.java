@@ -3,45 +3,50 @@
 package com.slimgears.slimorm.apt.prototype.generated;
 
 import com.slimgears.slimorm.apt.prototype.AbstractRoleEntity;
-import com.slimgears.slimorm.apt.prototype.slimsql.SlimSqlOrm;
 import com.slimgears.slimorm.interfaces.Entity;
 import com.slimgears.slimorm.interfaces.EntityType;
 import com.slimgears.slimorm.interfaces.FieldValueMap;
-import com.slimgears.slimorm.interfaces.NumberField;
-import com.slimgears.slimorm.interfaces.StringField;
+import com.slimgears.slimorm.interfaces.fields.Fields;
+import com.slimgears.slimorm.interfaces.fields.NumberField;
+import com.slimgears.slimorm.interfaces.fields.StringField;
 import com.slimgears.slimorm.interfaces.FieldValueLookup;
-import com.slimgears.slimorm.internal.sql.AbstractSqlEntityType;
+import com.slimgears.slimorm.internal.AbstractEntityType;
 
 /**
  * Created by Denis on 05-Apr-15
  * <File Description>
  */
 public class RoleEntity extends AbstractRoleEntity implements Entity<Integer> {
-    public static class Fields {
-        public static final EntityType<Integer, RoleEntity> EntityMetaType;
-        public static final NumberField<RoleEntity, Integer> RoleId = SlimSqlOrm.INSTANCE.createNumberField(RoleEntity.class, "roleId", Integer.class);
-        public static final StringField<RoleEntity> RoleDescription = SlimSqlOrm.INSTANCE.createStringField(RoleEntity.class, "roleDescription");
-        static {
-            EntityMetaType = new AbstractSqlEntityType<Integer, RoleEntity>("RoleEntity", RoleEntity.class, RoleId, RoleId, RoleDescription) {
-                @Override
-                public RoleEntity newInstance() {
-                    return new RoleEntity();
-                }
+    public static final EntityType<Integer, RoleEntity> EntityMetaType;
+    public static final NumberField<RoleEntity, Integer> RoleId = Fields.numberField(RoleEntity.class, "roleId", Integer.class);
+    public static final StringField<RoleEntity> RoleDescription = Fields.stringField(RoleEntity.class, "roleDescription");
 
-                @Override
-                public RoleEntity newInstance(FieldValueLookup<RoleEntity> lookup) {
-                    return newInstance()
-                        .setRoleId(lookup.getValue(RoleId))
-                        .setRoleDescription(lookup.getValue(RoleDescription));
-                }
+    static {
+        EntityMetaType = new MetaType().addFields(RoleDescription).addRelatedEntities();
+    }
 
-                @Override
-                public void entityToMap(RoleEntity entity, FieldValueMap<RoleEntity> map) {
-                    map
-                            .putValue(RoleId, entity.getRoleId())
-                            .putValue(RoleDescription, entity.getRoleDescription());
-                }
-            };
+    static class MetaType extends AbstractEntityType<Integer, RoleEntity> {
+        protected MetaType() {
+            super("RoleEntity", RoleEntity.class, RoleId);
+        }
+
+        @Override
+        public RoleEntity newInstance() {
+            return new RoleEntity();
+        }
+
+        @Override
+        public RoleEntity newInstance(FieldValueLookup<RoleEntity> lookup) {
+            return newInstance()
+                    .setRoleId(lookup.getValue(RoleId))
+                    .setRoleDescription(lookup.getValue(RoleDescription));
+        }
+
+        @Override
+        public void entityToMap(RoleEntity entity, FieldValueMap<RoleEntity> map) {
+            map
+                    .putValue(RoleId, entity.getRoleId())
+                    .putValue(RoleDescription, entity.getRoleDescription());
         }
     }
 
