@@ -4,7 +4,7 @@ package com.slimgears.slimorm.android.prototype.core;
 
 import android.database.sqlite.SQLiteDatabase;
 
-import com.slimgears.slimorm.internal.interfaces.TransactionProvider;
+import com.slimgears.slimorm.core.internal.interfaces.TransactionProvider;
 
 import java.io.IOException;
 

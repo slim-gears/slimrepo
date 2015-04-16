@@ -4,9 +4,9 @@ package com.slimgears.slimorm.android.prototype;
 
 import com.slimgears.slimorm.android.prototype.generated.RoleEntity;
 import com.slimgears.slimorm.android.prototype.generated.UserEntity;
-import com.slimgears.slimorm.annotations.RepositoryTemplate;
-import com.slimgears.slimorm.interfaces.entities.EntitySet;
-import com.slimgears.slimorm.interfaces.RepositorySession;
+import com.slimgears.slimorm.core.annotations.RepositoryTemplate;
+import com.slimgears.slimorm.core.interfaces.entities.EntitySet;
+import com.slimgears.slimorm.core.interfaces.RepositorySession;
 
 /**
  * Created by Denis on 05-Apr-15

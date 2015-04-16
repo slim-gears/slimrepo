@@ -3,14 +3,14 @@
 package com.slimgears.slimorm.apt.prototype.generated;
 
 import com.slimgears.slimorm.apt.prototype.AbstractUserEntity;
-import com.slimgears.slimorm.interfaces.entities.Entity;
-import com.slimgears.slimorm.interfaces.entities.EntityType;
-import com.slimgears.slimorm.interfaces.entities.FieldValueLookup;
-import com.slimgears.slimorm.interfaces.entities.FieldValueMap;
-import com.slimgears.slimorm.interfaces.fields.Fields;
-import com.slimgears.slimorm.interfaces.fields.NumberField;
-import com.slimgears.slimorm.interfaces.fields.StringField;
-import com.slimgears.slimorm.internal.AbstractEntityType;
+import com.slimgears.slimorm.core.interfaces.entities.Entity;
+import com.slimgears.slimorm.core.interfaces.entities.EntityType;
+import com.slimgears.slimorm.core.interfaces.entities.FieldValueLookup;
+import com.slimgears.slimorm.core.interfaces.entities.FieldValueMap;
+import com.slimgears.slimorm.core.interfaces.fields.Fields;
+import com.slimgears.slimorm.core.interfaces.fields.NumberField;
+import com.slimgears.slimorm.core.interfaces.fields.StringField;
+import com.slimgears.slimorm.core.internal.AbstractEntityType;
 
 public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
     static class MetaType extends AbstractEntityType<Integer, UserEntity> {

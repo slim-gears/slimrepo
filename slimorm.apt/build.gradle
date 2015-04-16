@@ -42,7 +42,7 @@ publishing {
 dependencies {
     compile 'com.squareup:javapoet:1.0.0'
     compile 'com.google.guava:guava:18.0'
-    compile project(':slimorm')
+    compile project(':slimorm.core')
     compile project(':slimcode')
 
     testCompile 'junit:junit:4.12'

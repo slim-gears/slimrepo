@@ -3,10 +3,10 @@
 package com.slimgears.slimorm.android.prototype.generated;
 
 import com.slimgears.slimorm.android.prototype.UserRepositorySession;
-import com.slimgears.slimorm.interfaces.Repository;
-import com.slimgears.slimorm.internal.AbstractRepository;
-import com.slimgears.slimorm.internal.interfaces.OrmServiceProvider;
-import com.slimgears.slimorm.internal.interfaces.SessionServiceProvider;
+import com.slimgears.slimorm.core.interfaces.Repository;
+import com.slimgears.slimorm.core.internal.AbstractRepository;
+import com.slimgears.slimorm.core.internal.interfaces.OrmServiceProvider;
+import com.slimgears.slimorm.core.internal.interfaces.SessionServiceProvider;
 
 /**
  * Created by Denis on 09-Apr-15

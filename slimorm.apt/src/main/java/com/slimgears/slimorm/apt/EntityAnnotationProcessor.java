@@ -13,7 +13,7 @@ import javax.lang.model.element.TypeElement;
  * Created by Denis on 02-Apr-15
  * <File Description>
  */
-@SupportedAnnotationTypes("com.slimgears.slimorm.annotations.EntityTemplate")
+@SupportedAnnotationTypes("com.slimgears.slimorm.core.annotations.EntityTemplate")
 public class EntityAnnotationProcessor extends AnnotationProcessorBase {
     @Override
     protected boolean processType(TypeElement typeElement) throws IOException {

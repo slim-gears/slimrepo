@@ -8,7 +8,7 @@
     </facet>
     <facet type="android-gradle" name="Android-Gradle">
       <configuration>
-        <option name="GRADLE_PROJECT_PATH" value=":slimorm" />
+        <option name="GRADLE_PROJECT_PATH" value=":slimorm.core" />
       </configuration>
     </facet>
   </component>

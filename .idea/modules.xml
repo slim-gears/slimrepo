@@ -4,9 +4,10 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/slimcode/slimcode.iml" filepath="$PROJECT_DIR$/slimcode/slimcode.iml" />
       <module fileurl="file://$PROJECT_DIR$/slimorm-root.iml" filepath="$PROJECT_DIR$/slimorm-root.iml" />
-      <module fileurl="file://$PROJECT_DIR$/slimorm.core/slimorm.core.iml" filepath="$PROJECT_DIR$/slimorm.core/slimorm.core.iml" />
       <module fileurl="file://$PROJECT_DIR$/slimorm.android/slimorm.android.iml" filepath="$PROJECT_DIR$/slimorm.android/slimorm.android.iml" />
       <module fileurl="file://$PROJECT_DIR$/slimorm.apt/slimorm.apt.iml" filepath="$PROJECT_DIR$/slimorm.apt/slimorm.apt.iml" />
+      <module fileurl="file://$PROJECT_DIR$/slimorm.core/slimorm.core.iml" filepath="$PROJECT_DIR$/slimorm.core/slimorm.core.iml" />
     </modules>
   </component>
 </project>
+

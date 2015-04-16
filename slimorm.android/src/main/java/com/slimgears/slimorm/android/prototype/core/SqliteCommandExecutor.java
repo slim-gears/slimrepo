@@ -7,12 +7,12 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.slimgears.slimorm.interfaces.fields.Field;
-import com.slimgears.slimorm.interfaces.entities.FieldValueLookup;
-import com.slimgears.slimorm.internal.interfaces.CloseableIterator;
-import com.slimgears.slimorm.internal.interfaces.TransactionProvider;
-import com.slimgears.slimorm.internal.sql.SqlCommand;
-import com.slimgears.slimorm.internal.sql.SqlCommandExecutor;
+import com.slimgears.slimorm.core.interfaces.fields.Field;
+import com.slimgears.slimorm.core.interfaces.entities.FieldValueLookup;
+import com.slimgears.slimorm.core.internal.interfaces.CloseableIterator;
+import com.slimgears.slimorm.core.internal.interfaces.TransactionProvider;
+import com.slimgears.slimorm.core.internal.sql.SqlCommand;
+import com.slimgears.slimorm.core.internal.sql.SqlCommandExecutor;
 
 import java.io.IOException;
 import java.util.Date;

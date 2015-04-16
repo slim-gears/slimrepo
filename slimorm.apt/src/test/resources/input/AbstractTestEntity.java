@@ -1,4 +1,4 @@
-import com.slimgears.slimorm.annotations.EntityTemplate;
+import com.slimgears.slimorm.core.annotations.EntityTemplate;
 
 @EntityTemplate
 public class AbstractTestEntity {

@@ -4,10 +4,10 @@ package com.slimgears.slimorm.android.prototype.core;
 
 import android.database.sqlite.SQLiteDatabase;
 
-import com.slimgears.slimorm.internal.interfaces.TransactionProvider;
-import com.slimgears.slimorm.internal.sql.AbstractSqlSessionServiceProvider;
-import com.slimgears.slimorm.internal.sql.SqlCommandExecutor;
-import com.slimgears.slimorm.internal.sql.SqlOrmServiceProvider;
+import com.slimgears.slimorm.core.internal.interfaces.TransactionProvider;
+import com.slimgears.slimorm.core.internal.sql.AbstractSqlSessionServiceProvider;
+import com.slimgears.slimorm.core.internal.sql.SqlCommandExecutor;
+import com.slimgears.slimorm.core.internal.sql.SqlOrmServiceProvider;
 
 /**
  * Created by Denis on 15-Apr-15

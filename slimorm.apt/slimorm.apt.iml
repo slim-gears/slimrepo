@@ -26,7 +26,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="slimorm" exported="" />
+    <orderEntry type="module" module-name="slimorm.core" exported="" />
     <orderEntry type="module" module-name="slimcode" exported="" />
     <orderEntry type="library" exported="" name="javapoet-1.0.0" level="project" />
     <orderEntry type="library" exported="" name="guava-18.0" level="project" />

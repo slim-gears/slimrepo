@@ -6,9 +6,9 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.slimgears.slimorm.internal.interfaces.RepositoryModel;
-import com.slimgears.slimorm.internal.interfaces.SessionServiceProvider;
-import com.slimgears.slimorm.internal.sql.sqlite.AbstractSqliteOrmServiceProvider;
+import com.slimgears.slimorm.core.internal.interfaces.RepositoryModel;
+import com.slimgears.slimorm.core.internal.interfaces.SessionServiceProvider;
+import com.slimgears.slimorm.core.internal.sql.sqlite.AbstractSqliteOrmServiceProvider;
 
 import java.io.IOException;
 

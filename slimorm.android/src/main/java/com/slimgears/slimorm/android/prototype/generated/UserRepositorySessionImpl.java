@@ -3,12 +3,12 @@
 package com.slimgears.slimorm.android.prototype.generated;
 
 import com.slimgears.slimorm.android.prototype.UserRepositorySession;
-import com.slimgears.slimorm.interfaces.entities.EntitySet;
-import com.slimgears.slimorm.interfaces.entities.EntityType;
-import com.slimgears.slimorm.internal.AbstractRepositorySession;
-import com.slimgears.slimorm.internal.DefaultRepositoryModel;
-import com.slimgears.slimorm.internal.interfaces.RepositoryModel;
-import com.slimgears.slimorm.internal.interfaces.SessionServiceProvider;
+import com.slimgears.slimorm.core.interfaces.entities.EntitySet;
+import com.slimgears.slimorm.core.interfaces.entities.EntityType;
+import com.slimgears.slimorm.core.internal.AbstractRepositorySession;
+import com.slimgears.slimorm.core.internal.DefaultRepositoryModel;
+import com.slimgears.slimorm.core.internal.interfaces.RepositoryModel;
+import com.slimgears.slimorm.core.internal.interfaces.SessionServiceProvider;
 
 /**
  * Created by Denis on 09-Apr-15
