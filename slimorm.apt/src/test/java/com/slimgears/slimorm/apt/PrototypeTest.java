@@ -163,7 +163,8 @@ public class PrototypeTest {
         return iteratorMock(rows);
     }
 
-    private <T> CloseableIterator<T> iteratorMock(T... entries) {
+    @SafeVarargs
+    private final <T> CloseableIterator<T> iteratorMock(T... entries) {
         final Iterator<T> iterator = Arrays.asList(entries).iterator();
         return new CloseableIterator<T>() {
             @Override
