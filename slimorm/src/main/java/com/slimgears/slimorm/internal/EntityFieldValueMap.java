@@ -2,10 +2,10 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimorm.internal;
 
-import com.slimgears.slimorm.interfaces.Entity;
-import com.slimgears.slimorm.interfaces.EntityType;
+import com.slimgears.slimorm.interfaces.entities.Entity;
+import com.slimgears.slimorm.interfaces.entities.EntityType;
 import com.slimgears.slimorm.interfaces.fields.Field;
-import com.slimgears.slimorm.interfaces.FieldValueMap;
+import com.slimgears.slimorm.interfaces.entities.FieldValueMap;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +28,7 @@ public class EntityFieldValueMap<TKey, TEntity extends Entity<TKey>> implements 
     }
 
     @Override
-    public <T> FieldValueMap putValue(Field<TEntity, T> field, T value) {
+    public <T> FieldValueMap<TEntity> putValue(Field<TEntity, T> field, T value) {
         valueMap.put(field.getName(), value);
         return this;
     }

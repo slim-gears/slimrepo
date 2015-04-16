@@ -8,12 +8,14 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.slimgears.slimorm.interfaces.fields.Field;
-import com.slimgears.slimorm.interfaces.FieldValueLookup;
-import com.slimgears.slimorm.internal.CloseableIterator;
+import com.slimgears.slimorm.interfaces.entities.FieldValueLookup;
+import com.slimgears.slimorm.internal.interfaces.CloseableIterator;
+import com.slimgears.slimorm.internal.interfaces.TransactionProvider;
 import com.slimgears.slimorm.internal.sql.SqlCommand;
 import com.slimgears.slimorm.internal.sql.SqlCommandExecutor;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,11 +44,14 @@ public class SqliteCommandExecutor implements SqlCommandExecutor {
                 Class fieldType = field.getType();
 
                 if (fieldType == Integer.class) return (T1)(Integer)mCursor.getInt(columnIndex);
+                if (fieldType == String.class) return (T1)mCursor.getString(columnIndex);
+                if (fieldType == Boolean.class) return (T1)(Boolean)(mCursor.getShort(columnIndex) != 0);
+                if (fieldType == Float.class) return (T1)(Float)mCursor.getFloat(columnIndex);
+                if (fieldType == Byte.class) return (T1)(Byte)(byte)mCursor.getShort(columnIndex);
+                if (fieldType == Date.class) return (T1)new Date(mCursor.getLong(columnIndex));
                 if (fieldType == Short.class) return (T1)(Short)mCursor.getShort(columnIndex);
                 if (fieldType == Long.class) return (T1)(Long)mCursor.getLong(columnIndex);
-                if (fieldType == Float.class) return (T1)(Float)mCursor.getFloat(columnIndex);
                 if (fieldType == Double.class) return (T1)(Double)mCursor.getDouble(columnIndex);
-                if (fieldType == String.class) return (T1)mCursor.getString(columnIndex);
 
                 return null;
             }
@@ -96,22 +101,6 @@ public class SqliteCommandExecutor implements SqlCommandExecutor {
     @Override
     public void execute(SqlCommand command) throws IOException {
         mSqliteDatabase.execSQL(command.getStatement(), toStringArguments(command.getParameters()));
-    }
-
-    @Override
-    public void beginTransaction() throws IOException {
-        mSqliteDatabase.beginTransaction();
-    }
-
-    @Override
-    public void cancelTransaction() throws IOException {
-        mSqliteDatabase.endTransaction();
-    }
-
-    @Override
-    public void commitTransaction() throws IOException {
-        mSqliteDatabase.setTransactionSuccessful();
-        mSqliteDatabase.endTransaction();
     }
 
     @Override

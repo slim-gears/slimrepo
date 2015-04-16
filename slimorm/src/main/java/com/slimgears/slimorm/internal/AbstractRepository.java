@@ -4,6 +4,9 @@ package com.slimgears.slimorm.internal;
 
 import com.slimgears.slimorm.interfaces.Repository;
 import com.slimgears.slimorm.interfaces.RepositorySession;
+import com.slimgears.slimorm.internal.interfaces.OrmServiceProvider;
+import com.slimgears.slimorm.internal.interfaces.RepositoryModel;
+import com.slimgears.slimorm.internal.interfaces.SessionServiceProvider;
 
 import java.io.IOException;
 
@@ -12,6 +15,14 @@ import java.io.IOException;
  * <File Description>
  */
 public abstract class AbstractRepository<TSession extends RepositorySession> implements Repository<TSession> {
+    private final OrmServiceProvider ormServiceProvider;
+    private final RepositoryModel repositoryModel;
+
+    protected AbstractRepository(OrmServiceProvider ormServiceProvider, RepositoryModel repositoryModel) {
+        this.ormServiceProvider = ormServiceProvider;
+        this.repositoryModel = repositoryModel;
+    }
+
     @Override
     public void update(UpdateAction<TSession> action) throws IOException {
         try (TSession session = open()) {
@@ -25,4 +36,15 @@ public abstract class AbstractRepository<TSession extends RepositorySession> imp
             return action.execute(session);
         }
     }
+
+    @Override
+    public TSession open() {
+        return createSession(createSessionServiceProvider(repositoryModel));
+    }
+
+    protected SessionServiceProvider createSessionServiceProvider(RepositoryModel model) {
+        return ormServiceProvider.createSessionServiceProvider(model);
+    }
+
+    protected abstract TSession createSession(SessionServiceProvider sessionServiceProvider);
 }

@@ -1,6 +1,6 @@
-import com.slimgears.slimorm.annotations.Entity;
+import com.slimgears.slimorm.annotations.EntityTemplate;
 
-@Entity
+@EntityTemplate
 public class AbstractTestEntity {
     protected int id;
     protected String name;

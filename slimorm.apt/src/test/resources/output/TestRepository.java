@@ -1,4 +1,3 @@
-import com.slimgears.slimorm.interfaces.EntitySet;
 import com.slimgears.slimorm.interfaces.Repository;
 
 public interface TestRepository extends Repository<TestRepositoryConnection> {

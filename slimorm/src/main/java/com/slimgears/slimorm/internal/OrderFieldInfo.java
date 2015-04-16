@@ -4,6 +4,8 @@ package com.slimgears.slimorm.internal;
 
 import com.slimgears.slimorm.interfaces.fields.Field;
 
+import java.util.Collection;
+
 /**
 * Created by Denis on 08-Apr-15
 * <File Description>

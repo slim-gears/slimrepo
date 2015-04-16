@@ -2,7 +2,8 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimorm.internal;
 
-import com.slimgears.slimorm.interfaces.Entity;
+import com.slimgears.slimorm.interfaces.entities.Entity;
+import com.slimgears.slimorm.internal.interfaces.EntityStateTracker;
 
 import java.util.Collections;
 import java.util.Set;

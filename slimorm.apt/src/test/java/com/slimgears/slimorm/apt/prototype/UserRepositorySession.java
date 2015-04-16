@@ -4,7 +4,7 @@ package com.slimgears.slimorm.apt.prototype;
 
 import com.slimgears.slimorm.apt.prototype.generated.RoleEntity;
 import com.slimgears.slimorm.apt.prototype.generated.UserEntity;
-import com.slimgears.slimorm.interfaces.EntitySet;
+import com.slimgears.slimorm.interfaces.entities.EntitySet;
 import com.slimgears.slimorm.interfaces.RepositorySession;
 
 /**

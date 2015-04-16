@@ -2,9 +2,7 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimorm.interfaces.fields;
 
-import com.slimgears.slimorm.interfaces.predicates.BinaryPredicate;
-import com.slimgears.slimorm.interfaces.predicates.CollectionPredicate;
-import com.slimgears.slimorm.interfaces.predicates.UnaryPredicate;
+import com.slimgears.slimorm.interfaces.predicates.Predicate;
 
 import java.util.Collection;
 
@@ -13,10 +11,10 @@ import java.util.Collection;
  * <File Description>
  */
 public interface ValueField<TEntity, T> extends Field<TEntity, T> {
-    BinaryPredicate<TEntity, T> equal(T value);
-    BinaryPredicate<TEntity, T> notEqual(T value);
-    CollectionPredicate<TEntity, T> in(T... values);
-    CollectionPredicate<TEntity, T> in(Collection<T> values);
-    CollectionPredicate<TEntity, T> notIn(T... values);
-    CollectionPredicate<TEntity, T> notIn(Collection<T> values);
+    Predicate<TEntity> equal(T value);
+    Predicate<TEntity> notEqual(T value);
+    Predicate<TEntity> in(T... values);
+    Predicate<TEntity> in(Collection<T> values);
+    Predicate<TEntity> notIn(T... values);
+    Predicate<TEntity> notIn(Collection<T> values);
 }

@@ -2,7 +2,7 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimorm.apt.prototype.slimsql;
 
-import com.slimgears.slimorm.interfaces.EntityType;
+import com.slimgears.slimorm.interfaces.entities.EntityType;
 import com.slimgears.slimorm.interfaces.Repository;
 import com.slimgears.slimorm.interfaces.RepositorySession;
 import com.slimgears.slimorm.interfaces.fields.Field;
@@ -12,7 +12,7 @@ import com.slimgears.slimorm.internal.sql.SqlCommandExecutorFactory;
 import com.slimgears.slimorm.internal.sql.SqlOrmService;
 import com.slimgears.slimorm.internal.sql.SqlPredicateBuilder;
 import com.slimgears.slimorm.internal.sql.SqlStatementBuilder;
-import com.slimgears.slimorm.internal.sql.SqlStatementBuilderImpl;
+import com.slimgears.slimorm.internal.sql.DefaultSqlStatementBuilder;
 
 /**
  * Created by Denis on 06-Apr-15
@@ -48,7 +48,7 @@ public class SlimSqlOrm extends AbstractSqlOrmService {
     private static SqlStatementBuilder createSqlBuilder() {
         SqlStatementBuilder.SyntaxProvider syntaxProvider = new SyntaxProvider();
         SqlStatementBuilder.PredicateBuilder predicateBuilder = new SqlPredicateBuilder(syntaxProvider);
-        return new SqlStatementBuilderImpl(predicateBuilder, syntaxProvider);
+        return new DefaultSqlStatementBuilder(predicateBuilder, syntaxProvider);
     }
 
     public SlimSqlOrm() {

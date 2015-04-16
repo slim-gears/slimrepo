@@ -3,6 +3,8 @@
 package com.slimgears.slimorm.internal;
 
 import com.slimgears.slimorm.interfaces.RepositorySession;
+import com.slimgears.slimorm.internal.interfaces.SessionServiceProvider;
+import com.slimgears.slimorm.internal.interfaces.TransactionProvider;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,22 +14,29 @@ import java.util.List;
  * Created by Denis on 09-Apr-15
  * <File Description>
  */
-public abstract class AbstractRepositorySession implements RepositorySession {
+public class AbstractRepositorySession implements RepositorySession {
     private final List<OnSaveChangesListener> onSaveChangesListeners = new ArrayList<>();
     private final List<OnDiscardChangesListener> onDiscardChangesListeners = new ArrayList<>();
+    private final TransactionProvider transactionProvider;
+    private final SessionServiceProvider sessionServiceProvider;
+
+    protected AbstractRepositorySession(SessionServiceProvider sessionServiceProvider) {
+        this.sessionServiceProvider = sessionServiceProvider;
+        this.transactionProvider = sessionServiceProvider.getTransactionProvider();
+    }
 
     @Override
     public void saveChanges() throws IOException {
-        beginTransaction();
+        transactionProvider.beginTransaction();
         try {
             for (OnSaveChangesListener listener : onSaveChangesListeners) {
                 listener.onSavingChanges(this);
             }
         } catch (Throwable e) {
-            cancelTransaction();
+            transactionProvider.cancelTransaction();
             throw e;
         }
-        commitTransaction();
+        transactionProvider.commitTransaction();
     }
 
     @Override
@@ -57,7 +66,8 @@ public abstract class AbstractRepositorySession implements RepositorySession {
         onDiscardChangesListeners.remove(listener);
     }
 
-    protected abstract void beginTransaction() throws IOException;
-    protected abstract void commitTransaction() throws IOException;
-    protected abstract void cancelTransaction() throws IOException;
+    @Override
+    public void close() throws IOException {
+        sessionServiceProvider.close();
+    }
 }

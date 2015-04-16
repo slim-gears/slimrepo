@@ -3,10 +3,10 @@
 package com.slimgears.slimorm.android.prototype.generated;
 
 import com.slimgears.slimorm.android.prototype.AbstractUserEntity;
-import com.slimgears.slimorm.interfaces.Entity;
-import com.slimgears.slimorm.interfaces.EntityType;
-import com.slimgears.slimorm.interfaces.FieldValueLookup;
-import com.slimgears.slimorm.interfaces.FieldValueMap;
+import com.slimgears.slimorm.interfaces.entities.Entity;
+import com.slimgears.slimorm.interfaces.entities.EntityType;
+import com.slimgears.slimorm.interfaces.entities.FieldValueLookup;
+import com.slimgears.slimorm.interfaces.entities.FieldValueMap;
 import com.slimgears.slimorm.interfaces.fields.Fields;
 import com.slimgears.slimorm.interfaces.fields.NumberField;
 import com.slimgears.slimorm.interfaces.fields.StringField;

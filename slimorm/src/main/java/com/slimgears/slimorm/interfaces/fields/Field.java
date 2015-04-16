@@ -2,6 +2,7 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimorm.interfaces.fields;
 
+import com.slimgears.slimorm.interfaces.predicates.Predicate;
 import com.slimgears.slimorm.interfaces.predicates.UnaryPredicate;
 
 /**
@@ -12,7 +13,7 @@ public interface Field<TEntity, T> {
     Class<TEntity> getEntityClass();
     String getName();
     Class<T> getType();
-    UnaryPredicate<TEntity, T> isNull();
-    UnaryPredicate<TEntity, T> isNotNull();
+    Predicate<TEntity> isNull();
+    Predicate<TEntity> isNotNull();
 }
 

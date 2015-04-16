@@ -2,7 +2,7 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimorm.internal.sql.sqlite;
 
-import com.slimgears.slimorm.interfaces.EntityType;
+import com.slimgears.slimorm.interfaces.entities.EntityType;
 import com.slimgears.slimorm.interfaces.fields.Field;
 import com.slimgears.slimorm.internal.sql.SqlStatementBuilder;
 

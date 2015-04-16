@@ -63,7 +63,7 @@ public class SqlPredicateBuilder implements SqlStatementBuilder.PredicateBuilder
         this.syntaxProvider = syntaxProvider;
     }
 
-    private String operator(PredicateType predicateType, String... args) {
+    private String operator(PredicateType predicateType, Object... args) {
         String format = OPERATOR_FORMATS.get(predicateType);
         if (format == null) throw new RuntimeException("Not support predicate type: " + predicateType);
         return String.format(format, args);
