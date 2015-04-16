@@ -9,6 +9,19 @@ version = '0.2'
 sourceCompatibility = JavaVersion.VERSION_1_7
 targetCompatibility = JavaVersion.VERSION_1_7
 
+task copyTestResources(type: Copy) {
+    from "${projectDir}/src/test/resources"
+    into "${buildDir}/classes/test"
+}
+
+task copyResources(type: Copy) {
+    from "${projectDir}/src/main/resources"
+    into "${buildDir}/classes/main"
+}
+
+processTestResources.dependsOn copyTestResources
+processResources.dependsOn copyResources
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
