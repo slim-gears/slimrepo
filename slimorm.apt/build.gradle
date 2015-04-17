@@ -33,8 +33,10 @@ publishing {
 
 publishing {
     repositories {
-        maven {
-            url localMavenRepoPath
+        if (hasProperty('localMavenRepoPath')) {
+            maven {
+                url localMavenRepoPath
+            }
         }
     }
 }
