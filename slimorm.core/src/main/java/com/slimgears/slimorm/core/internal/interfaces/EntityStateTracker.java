@@ -4,21 +4,21 @@ package com.slimgears.slimorm.core.internal.interfaces;
 
 import com.slimgears.slimorm.core.interfaces.entities.Entity;
 
-import java.util.Set;
+import java.util.Collection;
 
 /**
  * Created by Denis on 09-Apr-15
  * <File Description>
  */
 public interface EntityStateTracker<TKey, TEntity extends Entity<TKey>> {
-    Set<TEntity> getModifiedEntities();
-    Set<TEntity> getAddedEntities();
-    Set<TEntity> getDeletedEntities();
+    Collection<TEntity> getModifiedEntities();
+    Collection<TEntity> getAddedEntities();
+    Collection<TEntity> getDeletedEntities();
 
     void entityModified(TEntity entity);
     void entityDeleted(TEntity entity);
     void entityAdded(TEntity entity);
 
-    void discardChanges();
+    void clearChanges();
     boolean hasChanges();
 }

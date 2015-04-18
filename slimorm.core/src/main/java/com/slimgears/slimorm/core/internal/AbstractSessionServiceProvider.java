@@ -5,13 +5,19 @@ package com.slimgears.slimorm.core.internal;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Iterables;
+import com.slimgears.slimorm.core.interfaces.RepositorySession;
 import com.slimgears.slimorm.core.interfaces.entities.Entity;
 import com.slimgears.slimorm.core.interfaces.entities.EntitySet;
 import com.slimgears.slimorm.core.interfaces.entities.EntityType;
 import com.slimgears.slimorm.core.internal.interfaces.RepositoryCreator;
+import com.slimgears.slimorm.core.internal.interfaces.RepositorySessionNotifier;
 import com.slimgears.slimorm.core.internal.interfaces.SessionEntityServiceProvider;
 import com.slimgears.slimorm.core.internal.interfaces.SessionServiceProvider;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -19,6 +25,7 @@ import java.util.concurrent.ExecutionException;
  * <File Description>
  */
 public abstract class AbstractSessionServiceProvider implements SessionServiceProvider {
+    private final List<RepositorySessionNotifier.Listener> sessionListeners = new ArrayList<>();
     private RepositoryCreator repositoryCreator;
 
     private final LoadingCache<EntityType, SessionEntityServiceProvider> entityServiceProviderCache = CacheBuilder.newBuilder()
@@ -71,5 +78,36 @@ public abstract class AbstractSessionServiceProvider implements SessionServicePr
         return repositoryCreator != null
                 ? repositoryCreator
                 : (repositoryCreator = createRepositoryCreator());
+    }
+
+    @Override
+    public void addListener(RepositorySessionNotifier.Listener listener) {
+        sessionListeners.add(listener);
+    }
+
+    @Override
+    public void removeListener(RepositorySessionNotifier.Listener listener) {
+        sessionListeners.remove(listener);
+    }
+
+    @Override
+    public void onSavingChanges(RepositorySession session) throws IOException {
+        for (RepositorySessionNotifier.Listener listener : sessionListeners) {
+            listener.onSavingChanges(session);
+        }
+    }
+
+    @Override
+    public void onDiscardingChanges(RepositorySession session) {
+        for (RepositorySessionNotifier.Listener listener : sessionListeners) {
+            listener.onDiscardingChanges(session);
+        }
+    }
+
+    @Override
+    public void onClosing(RepositorySession session) {
+        for (RepositorySessionNotifier.Listener listener : sessionListeners) {
+            listener.onClosing(session);
+        }
     }
 }

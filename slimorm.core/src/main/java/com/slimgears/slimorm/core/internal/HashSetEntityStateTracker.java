@@ -6,6 +6,7 @@ import com.slimgears.slimorm.core.interfaces.entities.Entity;
 import com.slimgears.slimorm.core.internal.interfaces.EntityStateTracker;
 
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -14,9 +15,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * <File Description>
  */
 public class HashSetEntityStateTracker<TKey, TEntity extends Entity<TKey>> implements EntityStateTracker<TKey, TEntity> {
-    private final Set<TEntity> modifiedEntities = Collections.newSetFromMap(new ConcurrentHashMap<TEntity, Boolean>());
-    private final Set<TEntity> addedEntities = Collections.newSetFromMap(new ConcurrentHashMap<TEntity, Boolean>());
-    private final Set<TEntity> deletedEntities = Collections.newSetFromMap(new ConcurrentHashMap<TEntity, Boolean>());
+    private final Set<TEntity> modifiedEntities = new LinkedHashSet<>();
+    private final Set<TEntity> addedEntities = new LinkedHashSet<>();
+    private final Set<TEntity> deletedEntities = new LinkedHashSet<>();
 
     @Override
     public Set<TEntity> getModifiedEntities() {
@@ -59,7 +60,7 @@ public class HashSetEntityStateTracker<TKey, TEntity extends Entity<TKey>> imple
     }
 
     @Override
-    public void discardChanges() {
+    public void clearChanges() {
         addedEntities.clear();
         deletedEntities.clear();
         modifiedEntities.clear();

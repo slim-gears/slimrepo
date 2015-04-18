@@ -19,25 +19,17 @@ public abstract class AbstractSqlSessionServiceProvider extends AbstractSessionS
     private final SqlStatementBuilder sqlBuilder;
     private SqlCommandExecutor sqlExecutor;
     private TransactionProvider transactionProvider;
+    private SqlOrmServiceProvider ormServiceProvider;
 
     public AbstractSqlSessionServiceProvider(SqlOrmServiceProvider serviceProvider) {
         this.sqlBuilder = serviceProvider.getStatementBuilder();
-    }
-
-    protected boolean isOpen() {
-        return sqlExecutor != null;
-    }
-
-    protected void open() {
-        sqlExecutor = createCommandExecutor();
+        this.ormServiceProvider = serviceProvider;
     }
 
     @Override
     public void close() throws IOException {
-        if (isOpen()) {
-            sqlExecutor.close();
-            sqlExecutor = null;
-        }
+        sqlExecutor = null;
+        transactionProvider = null;
     }
 
     protected abstract SqlCommandExecutor createCommandExecutor();
@@ -70,5 +62,10 @@ public abstract class AbstractSqlSessionServiceProvider extends AbstractSessionS
     @Override
     public RepositoryCreator createRepositoryCreator() {
         return new SqlRepositoryCreator(this);
+    }
+
+    @Override
+    public SqlStatementBuilder.SyntaxProvider getSyntaxProvider() {
+        return ormServiceProvider.getSyntaxProvider();
     }
 }

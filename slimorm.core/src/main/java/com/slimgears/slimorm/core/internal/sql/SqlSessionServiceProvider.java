@@ -11,4 +11,5 @@ import com.slimgears.slimorm.core.internal.interfaces.SessionServiceProvider;
 public interface SqlSessionServiceProvider extends SessionServiceProvider {
     SqlCommandExecutor getExecutor();
     SqlStatementBuilder getStatementBuilder();
+    SqlStatementBuilder.SyntaxProvider getSyntaxProvider();
 }

@@ -6,6 +6,8 @@ import com.slimgears.slimorm.core.interfaces.queries.DeleteQuery;
 import com.slimgears.slimorm.core.interfaces.queries.Query;
 import com.slimgears.slimorm.core.interfaces.queries.UpdateQuery;
 
+import java.util.Iterator;
+
 /**
  * Created by Denis on 02-Apr-15
  * <File Description>
@@ -21,5 +23,6 @@ public interface EntitySet<TKey, TEntity extends Entity<TKey>> {
 
     TEntity addNew();
     TEntity add(TEntity entity);
+    void add(Iterable<TEntity> entities);
     void remove(TEntity entity);
 }

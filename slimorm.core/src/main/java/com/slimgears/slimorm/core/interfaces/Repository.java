@@ -10,11 +10,11 @@ import java.io.IOException;
  */
 public interface Repository<TSession extends RepositorySession> {
     interface UpdateAction<TSession extends RepositorySession> {
-        void execute(TSession connection) throws IOException;
+        void execute(TSession session) throws IOException;
     }
 
     interface QueryAction<TSession extends RepositorySession, R> {
-        R execute(TSession connection) throws IOException;
+        R execute(TSession session) throws IOException;
     }
 
     TSession open();

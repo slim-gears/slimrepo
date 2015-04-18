@@ -10,4 +10,5 @@ import com.slimgears.slimorm.core.internal.interfaces.OrmServiceProvider;
  */
 public interface SqlOrmServiceProvider extends OrmServiceProvider {
     SqlStatementBuilder getStatementBuilder();
+    SqlStatementBuilder.SyntaxProvider getSyntaxProvider();
 }

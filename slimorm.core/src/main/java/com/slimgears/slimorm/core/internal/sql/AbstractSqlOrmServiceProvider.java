@@ -8,6 +8,7 @@ package com.slimgears.slimorm.core.internal.sql;
  */
 public abstract class AbstractSqlOrmServiceProvider implements SqlOrmServiceProvider {
     private SqlStatementBuilder sqlBuilder;
+    private SqlStatementBuilder.SyntaxProvider syntaxProvider;
 
     @Override
     public SqlStatementBuilder getStatementBuilder() {
@@ -16,8 +17,15 @@ public abstract class AbstractSqlOrmServiceProvider implements SqlOrmServiceProv
                 : (sqlBuilder = createStatementBuilder());
     }
 
+    @Override
+    public SqlStatementBuilder.SyntaxProvider getSyntaxProvider() {
+        return syntaxProvider != null
+                ? syntaxProvider
+                : (syntaxProvider = createSyntaxProvider());
+    }
+
     protected SqlStatementBuilder createStatementBuilder() {
-        SqlStatementBuilder.SyntaxProvider syntaxProvider = createSyntaxProvider();
+        SqlStatementBuilder.SyntaxProvider syntaxProvider = getSyntaxProvider();
         SqlStatementBuilder.PredicateBuilder predicateBuilder = createPredicateBuilder(syntaxProvider);
         return createStatementBuilder(syntaxProvider, predicateBuilder);
     }

@@ -15,8 +15,8 @@ import com.slimgears.slimorm.core.internal.query.QueryProvider;
 public class SqlSessionEntityServiceProvider<TKey, TEntity extends Entity<TKey>>
         extends AbstractSessionEntityServiceProvider<TKey, TEntity>
         implements SessionEntityServiceProvider<TKey, TEntity> {
-    private final SqlSessionServiceProvider serviceProvider;
-    private final EntityType<TKey, TEntity> entityType;
+    protected final SqlSessionServiceProvider serviceProvider;
+    protected final EntityType<TKey, TEntity> entityType;
     private QueryProvider<TKey, TEntity> queryProvider;
 
     public SqlSessionEntityServiceProvider(SqlSessionServiceProvider serviceProvider, EntityType<TKey, TEntity> entityType) {
@@ -28,6 +28,10 @@ public class SqlSessionEntityServiceProvider<TKey, TEntity extends Entity<TKey>>
     public QueryProvider<TKey, TEntity> getQueryProvider() {
         return queryProvider != null
                 ? queryProvider
-                : (queryProvider = new SqlQueryProvider<>(serviceProvider, entityType));
+                : (queryProvider = createQueryProvider());
+    }
+
+    protected QueryProvider<TKey, TEntity> createQueryProvider() {
+        return new SqlQueryProvider<>(serviceProvider, entityType);
     }
 }

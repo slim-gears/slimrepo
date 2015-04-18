@@ -2,7 +2,7 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimorm.core.interfaces.fields;
 
-import com.slimgears.slimorm.core.interfaces.predicates.Predicate;
+import com.slimgears.slimorm.core.interfaces.conditions.Condition;
 
 import java.util.Collection;
 
@@ -11,10 +11,10 @@ import java.util.Collection;
  * <File Description>
  */
 public interface ValueField<TEntity, T> extends Field<TEntity, T> {
-    Predicate<TEntity> equal(T value);
-    Predicate<TEntity> notEqual(T value);
-    Predicate<TEntity> in(T... values);
-    Predicate<TEntity> in(Collection<T> values);
-    Predicate<TEntity> notIn(T... values);
-    Predicate<TEntity> notIn(Collection<T> values);
+    Condition<TEntity> equal(T value);
+    Condition<TEntity> notEqual(T value);
+    Condition<TEntity> in(T... values);
+    Condition<TEntity> in(Collection<T> values);
+    Condition<TEntity> notIn(T... values);
+    Condition<TEntity> notIn(Collection<T> values);
 }

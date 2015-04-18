@@ -1,6 +1,6 @@
 // Copyright 2015 Denis Itskovich
 // Refer to LICENSE.txt for license details
-package com.slimgears.slimorm.android.prototype.core;
+package com.slimgears.slimorm.android.core;
 
 import android.database.sqlite.SQLiteDatabase;
 

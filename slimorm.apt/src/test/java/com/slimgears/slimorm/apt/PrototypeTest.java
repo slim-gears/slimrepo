@@ -2,13 +2,18 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimorm.apt;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import com.slimgears.slimorm.apt.prototype.UserRepositorySession;
 import com.slimgears.slimorm.apt.prototype.generated.UserEntity;
 import com.slimgears.slimorm.apt.prototype.generated.UserRepositoryImpl;
+import com.slimgears.slimorm.apt.prototype.generated.UserRepositorySessionImpl;
 import com.slimgears.slimorm.core.interfaces.Repository;
 import com.slimgears.slimorm.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimorm.core.internal.EntityFieldValueMap;
 import com.slimgears.slimorm.core.internal.interfaces.CloseableIterator;
+import com.slimgears.slimorm.core.internal.interfaces.RepositoryCreator;
 import com.slimgears.slimorm.core.internal.interfaces.RepositoryModel;
 import com.slimgears.slimorm.core.internal.interfaces.SessionServiceProvider;
 import com.slimgears.slimorm.core.internal.interfaces.TransactionProvider;
@@ -18,6 +23,7 @@ import com.slimgears.slimorm.core.internal.sql.SqlCommandExecutor;
 import com.slimgears.slimorm.core.internal.sql.SqlOrmServiceProvider;
 import com.slimgears.slimorm.core.internal.sql.sqlite.AbstractSqliteOrmServiceProvider;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,11 +35,14 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
-import static com.slimgears.slimorm.core.interfaces.predicates.Predicates.and;
-import static com.slimgears.slimorm.core.interfaces.predicates.Predicates.or;
+import static com.slimgears.slimorm.core.interfaces.conditions.Conditions.and;
+import static com.slimgears.slimorm.core.interfaces.conditions.Conditions.or;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
@@ -50,8 +59,9 @@ public class PrototypeTest {
 
     private SessionServiceProvider sessionServiceProviderMock;
     private SqlOrmServiceProvider ormServiceProviderMock;
+    private List<String> sqlStatements;
 
-    static class TracingAnswer<T> implements Answer<T> {
+    class TracingAnswer<T> implements Answer<T> {
         private final T answer;
 
         public TracingAnswer(T answer) {
@@ -61,19 +71,24 @@ public class PrototypeTest {
         @Override
         public T answer(InvocationOnMock invocation) throws Throwable {
             SqlCommand command = (SqlCommand)invocation.getArguments()[0];
-            System.out.println(command.getStatement());
-            System.out.println(command.getParameters().getMap());
+            String sql = command.getStatement();
+            String params = command.getParameters().getMap().toString();
+            String sqlWithParams = sql + "\n[Params: " + params + "]";
+            sqlStatements.add(sqlWithParams);
+            System.out.println(sqlWithParams);
             return answer;
         }
+    }
 
-        public static <T> TracingAnswer<T> create(T returnValue) {
-            return new TracingAnswer<>(returnValue);
-        }
+    private <T> TracingAnswer<T> answer(T returnValue) {
+        return new TracingAnswer<>(returnValue);
     }
 
     @Before
     public void setup() throws IOException {
         MockitoAnnotations.initMocks(this);
+
+        sqlStatements = new ArrayList<>();
 
         ormServiceProviderMock = new AbstractSqliteOrmServiceProvider() {
             @Override
@@ -96,19 +111,19 @@ public class PrototypeTest {
         };
 
         when(executorMock.select(any(SqlCommand.class)))
-                .thenAnswer(TracingAnswer.create(rowsMock(10)));
+                .thenAnswer(answer(rowsMock(10)));
         when(executorMock.count(any(SqlCommand.class)))
-                .thenAnswer(TracingAnswer.create(0));
-        doAnswer(TracingAnswer.create(null)).when(executorMock).execute(any(SqlCommand.class));
+                .thenAnswer(answer(0));
+        doAnswer(answer(null)).when(executorMock).execute(any(SqlCommand.class));
     }
 
     @Test
     public void queryCountWhereStringFieldContains() throws IOException {
-        testQuery(new Repository.QueryAction<UserRepositorySession, Integer>() {
+        testQuery(new Repository.QueryAction<UserRepositorySession, Long>() {
             @Override
-            public Integer execute(UserRepositorySession connection) throws IOException {
+            public Long execute(UserRepositorySession connection) throws IOException {
                 return connection.users().query()
-                        .where(UserEntity.UserFirstName.contains("Denis"))
+                        .where(UserEntity.UserFirstName.contains("John"))
                         .skip(2)
                         .limit(10)
                         .prepare()
@@ -116,6 +131,7 @@ public class PrototypeTest {
             }
         });
         verify(executorMock).count(any(SqlCommand.class));
+        assertSqlEquals("query-count-users.sql");
     }
 
     @Test
@@ -127,10 +143,10 @@ public class PrototypeTest {
                         .where(
                                 or(
                                         and(
-                                                UserEntity.UserFirstName.contains("Denis"),
+                                                UserEntity.UserFirstName.contains("John"),
                                                 UserEntity.UserId.greaterThan(20)
                                         ),
-                                        UserEntity.UserLastName.startsWith("Itsko")
+                                        UserEntity.UserLastName.startsWith("Smi")
                                 ))
                         .orderAsc(UserEntity.UserLastName, UserEntity.UserFirstName, UserEntity.UserId)
                         .skip(3)
@@ -140,6 +156,16 @@ public class PrototypeTest {
             }
         });
         verify(executorMock).select(any(SqlCommand.class));
+        assertSqlEquals("query-users.sql");
+    }
+
+    @Test
+    public void repositoryCreation() throws IOException {
+        RepositoryCreator creator = ormServiceProviderMock
+                .createSessionServiceProvider(UserRepositorySessionImpl.Model.Instance)
+                .getRepositoryCreator();
+        creator.createRepository(UserRepositorySessionImpl.Model.Instance);
+        assertSqlEquals("create-tables.sql");
     }
 
     private <T> T testQuery(Repository.QueryAction<UserRepositorySession, T> queryAction) throws IOException {
@@ -182,5 +208,19 @@ public class PrototypeTest {
                 return iterator.next();
             }
         };
+    }
+
+    private void assertSqlEquals(String resourceId) throws IOException {
+        Assert.assertNotNull(sqlStatements);
+        Assert.assertNotEquals(0, sqlStatements.size());
+        String actualSql = Joiner.on("\n").join(sqlStatements);
+        List<String> actualLines = Lists.newArrayList(Splitter.on("\n").split(actualSql));
+        try (InputStream stream = getClass().getResourceAsStream("/sql/" + resourceId)) {
+            List<String> expectedLines = IOUtils.readLines(stream);
+            Assert.assertEquals(expectedLines.size(), actualLines.size());
+            for (int i = 0; i < expectedLines.size(); ++i) {
+                Assert.assertEquals("Line mismatch", expectedLines.get(i), actualLines.get(i));
+            }
+        }
     }
 }

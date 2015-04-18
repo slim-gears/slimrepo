@@ -4,7 +4,7 @@ package com.slimgears.slimorm.core.internal.query;
 
 import com.slimgears.slimorm.core.interfaces.entities.Entity;
 import com.slimgears.slimorm.core.interfaces.entities.EntityType;
-import com.slimgears.slimorm.core.interfaces.predicates.Predicate;
+import com.slimgears.slimorm.core.interfaces.conditions.Condition;
 import com.slimgears.slimorm.core.internal.OrderFieldInfo;
 
 import java.util.Collection;
@@ -16,8 +16,8 @@ import java.util.Collection;
 public class SelectQueryParams<TKey, TEntity extends Entity<TKey>> extends ConditionalQueryParams<TKey, TEntity, SelectQueryParams<TKey, TEntity>> {
     public Collection<OrderFieldInfo> order;
 
-    public SelectQueryParams(EntityType<TKey, TEntity> entityType, Predicate<TEntity> predicate, Collection<OrderFieldInfo> order, QueryPagination pagination) {
-        super(entityType, predicate, pagination);
+    public SelectQueryParams(EntityType<TKey, TEntity> entityType, Condition<TEntity> condition, Collection<OrderFieldInfo> order, QueryPagination pagination) {
+        super(entityType, condition, pagination);
         this.order = order;
     }
 
@@ -25,7 +25,7 @@ public class SelectQueryParams<TKey, TEntity extends Entity<TKey>> extends Condi
     public SelectQueryParams<TKey, TEntity> fork() {
         return new SelectQueryParams<>(
                 entityType,
-                predicate,
+                condition,
                 cloneCollection(order),
                 clonePagination());
     }

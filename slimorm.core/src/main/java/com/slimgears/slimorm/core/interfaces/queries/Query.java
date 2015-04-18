@@ -22,6 +22,6 @@ public interface Query<T> {
     T singleOrDefault() throws IOException;
     List<T> toList() throws IOException;
     T[] toArray() throws IOException;
-    int count() throws IOException;
+    long count() throws IOException;
     CloseableIterator<T> iterator();
 }

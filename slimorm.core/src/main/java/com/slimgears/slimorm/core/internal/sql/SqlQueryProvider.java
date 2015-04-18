@@ -16,6 +16,7 @@ import com.slimgears.slimorm.core.internal.query.SelectQueryParams;
 import com.slimgears.slimorm.core.internal.query.UpdateQueryParams;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.Callable;
 
@@ -24,8 +25,8 @@ import java.util.concurrent.Callable;
  * <File Description>
  */
 public class SqlQueryProvider<TKey, TEntity extends Entity<TKey>> implements QueryProvider<TKey, TEntity> {
-    private final EntityType<TKey, TEntity> entityType;
-    private final SqlSessionServiceProvider serviceProvider;
+    protected final EntityType<TKey, TEntity> entityType;
+    protected final SqlSessionServiceProvider serviceProvider;
     private SqlStatementBuilder sqlBuilder;
     private SqlCommandExecutor sqlExecutor;
 
@@ -103,16 +104,16 @@ public class SqlQueryProvider<TKey, TEntity extends Entity<TKey>> implements Que
     }
 
     @Override
-    public PreparedQuery<Integer> prepareCount(final SelectQueryParams<TKey, TEntity> query) {
+    public PreparedQuery<Long> prepareCount(final SelectQueryParams<TKey, TEntity> query) {
         final SqlCommand command = new SqlLazyCommand(getBuilder(), new SqlLazyCommand.CommandBuilder() {
             @Override
             public String buildCommand(SqlStatementBuilder sqlBuilder, SqlCommand.Parameters parameters) {
                 return sqlBuilder.countStatement(query, parameters);
             }
         });
-        return new PreparedQuery<Integer>() {
+        return new PreparedQuery<Long>() {
             @Override
-            public Integer execute() throws IOException {
+            public Long execute() throws IOException {
                 return getExecutor().count(command);
             }
         };

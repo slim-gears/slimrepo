@@ -4,7 +4,7 @@ package com.slimgears.slimorm.core.internal.query;
 
 import com.slimgears.slimorm.core.interfaces.entities.Entity;
 import com.slimgears.slimorm.core.interfaces.entities.EntityType;
-import com.slimgears.slimorm.core.interfaces.predicates.Predicate;
+import com.slimgears.slimorm.core.interfaces.conditions.Condition;
 
 /**
 * Created by Denis on 13-Apr-15
@@ -12,12 +12,12 @@ import com.slimgears.slimorm.core.interfaces.predicates.Predicate;
 */
 public abstract class ConditionalQueryParams<TKey, TEntity extends Entity<TKey>, TQueryParams extends ConditionalQueryParams<TKey, TEntity, TQueryParams>>
         extends AbstractQueryParams<TKey, TEntity, TQueryParams> {
-    public Predicate<TEntity> predicate;
+    public Condition<TEntity> condition;
     public QueryPagination pagination;
 
-    public ConditionalQueryParams(EntityType<TKey, TEntity> entityType, Predicate<TEntity> predicate, QueryPagination pagination) {
+    public ConditionalQueryParams(EntityType<TKey, TEntity> entityType, Condition<TEntity> condition, QueryPagination pagination) {
         super(entityType);
-        this.predicate = predicate;
+        this.condition = condition;
         this.pagination = pagination;
     }
 

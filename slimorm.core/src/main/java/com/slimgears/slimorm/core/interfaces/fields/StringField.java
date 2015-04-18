@@ -2,17 +2,17 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimorm.core.interfaces.fields;
 
-import com.slimgears.slimorm.core.interfaces.predicates.Predicate;
+import com.slimgears.slimorm.core.interfaces.conditions.Condition;
 
 /**
  * Created by Denis on 06-Apr-15
  * <File Description>
  */
 public interface StringField<TEntity> extends ValueField<TEntity, String> {
-    Predicate<TEntity> contains(String substr);
-    Predicate<TEntity> notContains(String substr);
-    Predicate<TEntity> startsWith(String substr);
-    Predicate<TEntity> endsWith(String substr);
-    Predicate<TEntity> notStartsWith(String substr);
-    Predicate<TEntity> notEndsWith(String substr);
+    Condition<TEntity> contains(String substr);
+    Condition<TEntity> notContains(String substr);
+    Condition<TEntity> startsWith(String substr);
+    Condition<TEntity> endsWith(String substr);
+    Condition<TEntity> notStartsWith(String substr);
+    Condition<TEntity> notEndsWith(String substr);
 }

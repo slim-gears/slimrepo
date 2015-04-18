@@ -19,7 +19,7 @@ public interface QueryProvider<TKey, TEntity extends Entity<TKey>> {
     }
 
     PreparedQuery<CloseableIterator<TEntity>> prepareSelect(SelectQueryParams<TKey, TEntity> query);
-    PreparedQuery<Integer> prepareCount(SelectQueryParams<TKey, TEntity> query);
+    PreparedQuery<Long> prepareCount(SelectQueryParams<TKey, TEntity> query);
     PreparedQuery<Void> prepareUpdate(UpdateQueryParams<TKey, TEntity> query);
     PreparedQuery<Void> prepareDelete(DeleteQueryParams<TKey, TEntity> query);
     PreparedQuery<Void> prepareInsert(Collection<TEntity> entities);

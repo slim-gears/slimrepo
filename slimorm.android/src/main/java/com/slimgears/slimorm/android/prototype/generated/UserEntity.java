@@ -3,12 +3,14 @@
 package com.slimgears.slimorm.android.prototype.generated;
 
 import com.slimgears.slimorm.android.prototype.AbstractUserEntity;
+import com.slimgears.slimorm.core.interfaces.conditions.Condition;
+import com.slimgears.slimorm.core.interfaces.conditions.Conditions;
 import com.slimgears.slimorm.core.interfaces.entities.Entity;
 import com.slimgears.slimorm.core.interfaces.entities.EntityType;
 import com.slimgears.slimorm.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimorm.core.interfaces.entities.FieldValueMap;
 import com.slimgears.slimorm.core.interfaces.fields.Fields;
-import com.slimgears.slimorm.core.interfaces.fields.NumberField;
+import com.slimgears.slimorm.core.interfaces.fields.NumericField;
 import com.slimgears.slimorm.core.interfaces.fields.StringField;
 import com.slimgears.slimorm.core.internal.AbstractEntityType;
 
@@ -42,12 +44,17 @@ public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
                     .putValue(UserFirstName, entity.getUserFirstName())
                     .putValue(UserLastName, entity.getUserLastName());
         }
+
+        @Override
+        public void setKey(UserEntity entity, Integer key) {
+            entity.setUserId(key);
+        }
     }
 
     public static final EntityType<Integer, UserEntity> EntityMetaType;
-    public static final NumberField<UserEntity, Integer> UserId = Fields.numberField(UserEntity.class, "userId", Integer.class);
-    public static final StringField<UserEntity> UserFirstName = Fields.stringField(UserEntity.class, "userFirstName");
-    public static final StringField<UserEntity> UserLastName = Fields.stringField(UserEntity.class, "userLastName");
+    public static final NumericField<UserEntity, Integer> UserId = Fields.numberField(UserEntity.class, "userId", Integer.class, false);
+    public static final StringField<UserEntity> UserFirstName = Fields.stringField(UserEntity.class, "userFirstName", true);
+    public static final StringField<UserEntity> UserLastName = Fields.stringField(UserEntity.class, "userLastName", true);
 
     static {
         EntityMetaType = new MetaType()

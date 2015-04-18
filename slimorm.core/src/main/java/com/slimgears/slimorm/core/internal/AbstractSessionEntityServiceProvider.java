@@ -2,6 +2,7 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimorm.core.internal;
 
+import com.slimgears.slimorm.core.interfaces.RepositorySession;
 import com.slimgears.slimorm.core.interfaces.entities.Entity;
 import com.slimgears.slimorm.core.internal.interfaces.EntityCache;
 import com.slimgears.slimorm.core.internal.interfaces.EntityStateTracker;

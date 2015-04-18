@@ -58,6 +58,11 @@ public abstract class AbstractEntityType<TKey, TEntity extends Entity<TKey>> imp
         return relatedEntities;
     }
 
+    @Override
+    public TKey getKey(TEntity entity) {
+        return entity.getEntityId();
+    }
+
     public AbstractEntityType<TKey, TEntity> addFields(Field<TEntity, ?>... fields) {
         this.fields.addAll(Arrays.asList(fields));
         return this;

@@ -24,12 +24,12 @@ public class EntityFieldValueMap<TKey, TEntity extends Entity<TKey>> implements 
     @Override
     public <T> T getValue(Field<TEntity, T> field) {
         //noinspection unchecked
-        return (T)valueMap.getOrDefault(field.getName(), null);
+        return (T)valueMap.getOrDefault(field.metaInfo().getName(), null);
     }
 
     @Override
     public <T> FieldValueMap<TEntity> putValue(Field<TEntity, T> field, T value) {
-        valueMap.put(field.getName(), value);
+        valueMap.put(field.metaInfo().getName(), value);
         return this;
     }
 }

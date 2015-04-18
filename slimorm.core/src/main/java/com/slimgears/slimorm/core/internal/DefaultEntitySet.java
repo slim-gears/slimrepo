@@ -13,6 +13,7 @@ import com.slimgears.slimorm.core.interfaces.RepositorySession;
 import com.slimgears.slimorm.core.interfaces.queries.UpdateQuery;
 import com.slimgears.slimorm.core.internal.interfaces.EntityCache;
 import com.slimgears.slimorm.core.internal.interfaces.EntityStateTracker;
+import com.slimgears.slimorm.core.internal.interfaces.RepositorySessionNotifier;
 import com.slimgears.slimorm.core.internal.interfaces.SessionEntityServiceProvider;
 import com.slimgears.slimorm.core.internal.interfaces.SessionServiceProvider;
 import com.slimgears.slimorm.core.internal.query.EntityDeleteQuery;
@@ -30,9 +31,9 @@ import static com.google.common.collect.Collections2.transform;
  * <File Description>
  */
 public class DefaultEntitySet<TKey, TEntity extends Entity<TKey>> implements EntitySet<TKey, TEntity>,
-        RepositorySession.OnSaveChangesListener,
-        RepositorySession.OnDiscardChangesListener {
+        RepositorySessionNotifier.Listener {
     private final SessionEntityServiceProvider<TKey, TEntity> sessionEntityServiceProvider;
+    private final SessionServiceProvider sessionServiceProvider;
     private final EntityType<TKey, TEntity> entityType;
     private EntityCache<TKey, TEntity> entityCache;
     private EntityStateTracker<TKey, TEntity> stateTracker;
@@ -53,14 +54,17 @@ public class DefaultEntitySet<TKey, TEntity extends Entity<TKey>> implements Ent
             if (entitySet != null) return entitySet;
             synchronized (syncRoot) {
                 if (entitySet != null) return entitySet;
-                return entitySet = new DefaultEntitySet<>(sessionServiceProvider.getEntityServiceProvider(entityType), entityType);
+                return entitySet = new DefaultEntitySet<>(sessionServiceProvider, entityType);
             }
         }
     }
 
-    private DefaultEntitySet(SessionEntityServiceProvider<TKey, TEntity> sessionEntityServiceProvider, EntityType<TKey, TEntity> entityType) {
-        this.sessionEntityServiceProvider = sessionEntityServiceProvider;
+    private DefaultEntitySet(SessionServiceProvider sessionServiceProvider, EntityType<TKey, TEntity> entityType) {
+        this.sessionServiceProvider = sessionServiceProvider;
+        this.sessionEntityServiceProvider = sessionServiceProvider.getEntityServiceProvider(entityType);
         this.entityType = entityType;
+
+        sessionServiceProvider.addListener(this);
     }
 
     @Override
@@ -85,9 +89,15 @@ public class DefaultEntitySet<TKey, TEntity extends Entity<TKey>> implements Ent
 
     @Override
     public TEntity add(TEntity entity) {
-        getCache().put(entity);
         getStateTracker().entityAdded(entity);
         return entity;
+    }
+
+    @Override
+    public void add(Iterable<TEntity> entities) {
+        for (TEntity entity : entities) {
+            add(entity);
+        }
     }
 
     @Override
@@ -102,6 +112,7 @@ public class DefaultEntitySet<TKey, TEntity extends Entity<TKey>> implements Ent
         insert(tracker.getAddedEntities());
         delete(tracker.getDeletedEntities());
         update(tracker.getModifiedEntities());
+        tracker.clearChanges();
     }
 
     @Override
@@ -114,18 +125,20 @@ public class DefaultEntitySet<TKey, TEntity extends Entity<TKey>> implements Ent
                 tracker.getModifiedEntities())) {
             cache.invalidate(entity.getEntityId());
         }
-        tracker.discardChanges();
+        tracker.clearChanges();
+    }
+
+    @Override
+    public void onClosing(RepositorySession session) {
     }
 
     private void insert(Collection<TEntity> entities) throws IOException {
-        if (!entities.isEmpty()) {
-            getQueryProvider()
-                    .prepareInsert(entities)
-                    .execute();
-        }
+        if (entities.isEmpty()) return;
+        getQueryProvider().prepareInsert(entities).execute();
     }
 
     private void delete(Collection<TEntity> entities) throws IOException {
+        if (entities.isEmpty()) return;
         deleteQuery()
                 .where(entityType.getKeyField().in(entitiesToIds(entities)))
                 .prepare()
@@ -133,6 +146,7 @@ public class DefaultEntitySet<TKey, TEntity extends Entity<TKey>> implements Ent
     }
 
     private void update(Collection<TEntity> entities) throws IOException {
+        if (entities.isEmpty()) return;
         for (TEntity entity : entities) {
             updateQuery()
                     .where(entityType.getKeyField().equal(entity.getEntityId()))

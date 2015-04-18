@@ -20,4 +20,6 @@ public interface EntityType<TKey, TEntity extends Entity<TKey>> {
     TEntity newInstance();
     TEntity newInstance(FieldValueLookup<TEntity> lookup);
     void entityToMap(TEntity entity, FieldValueMap<TEntity> map);
+    TKey getKey(TEntity entity);
+    void setKey(TEntity entity, TKey key);
 }

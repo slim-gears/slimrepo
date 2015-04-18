@@ -3,8 +3,8 @@
 package com.slimgears.slimorm.core.internal.query;
 
 import com.slimgears.slimorm.core.interfaces.entities.Entity;
-import com.slimgears.slimorm.core.interfaces.predicates.Predicate;
-import com.slimgears.slimorm.core.interfaces.predicates.Predicates;
+import com.slimgears.slimorm.core.interfaces.conditions.Condition;
+import com.slimgears.slimorm.core.interfaces.conditions.Conditions;
 import com.slimgears.slimorm.core.interfaces.queries.QueryBuilder;
 
 /**
@@ -30,10 +30,10 @@ public abstract class AbstractEntityQuery<
     }
 
     @Override
-    public TBuilder where(Predicate<TEntity> predicate) {
-        queryParams.predicate = queryParams.predicate != null
-                ? Predicates.and(queryParams.predicate, predicate)
-                : predicate;
+    public TBuilder where(Condition<TEntity> condition) {
+        queryParams.condition = queryParams.condition != null
+                ? Conditions.and(queryParams.condition, condition)
+                : condition;
         return builder();
     }
 

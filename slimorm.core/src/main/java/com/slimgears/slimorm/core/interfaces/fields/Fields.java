@@ -2,11 +2,11 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimorm.core.interfaces.fields;
 
-import com.slimgears.slimorm.core.interfaces.predicates.BinaryPredicate;
-import com.slimgears.slimorm.core.interfaces.predicates.CollectionPredicate;
-import com.slimgears.slimorm.core.interfaces.predicates.Predicates;
-import com.slimgears.slimorm.core.interfaces.predicates.TernaryPredicate;
-import com.slimgears.slimorm.core.interfaces.predicates.UnaryPredicate;
+import com.slimgears.slimorm.core.interfaces.conditions.BinaryCondition;
+import com.slimgears.slimorm.core.interfaces.conditions.CollectionCondition;
+import com.slimgears.slimorm.core.interfaces.conditions.Conditions;
+import com.slimgears.slimorm.core.interfaces.conditions.TernaryCondition;
+import com.slimgears.slimorm.core.interfaces.conditions.UnaryCondition;
 
 import java.util.Collection;
 import java.util.Date;
@@ -16,15 +16,17 @@ import java.util.Date;
  * <File Description>
  */
 public class Fields {
-    static class AbstractField<TEntity, T> implements Field<TEntity, T> {
+    static class AbstractField<TEntity, T> implements Field<TEntity, T>, Field.MetaInfo<TEntity, T> {
         private final Class<TEntity> entityClass;
         private final String name;
         private final Class<T> type;
+        private final boolean nullable;
 
-        AbstractField(Class<TEntity> entityClass, String name, Class<T> type) {
+        AbstractField(Class<TEntity> entityClass, String name, Class<T> type, boolean nullable) {
             this.entityClass = entityClass;
             this.name = name;
             this.type = type;
+            this.nullable = nullable;
         }
 
         @Override
@@ -43,138 +45,148 @@ public class Fields {
         }
 
         @Override
-        public UnaryPredicate<TEntity, T> isNull() {
-            return Predicates.isNull(this);
+        public boolean isNullable() {
+            return nullable;
         }
 
         @Override
-        public UnaryPredicate<TEntity, T> isNotNull() {
-            return Predicates.isNotNull(this);
+        public MetaInfo<TEntity, T> metaInfo() {
+            return this;
+        }
+
+        @Override
+        public UnaryCondition<TEntity, T> isNull() {
+            return Conditions.isNull(this);
+        }
+
+        @Override
+        public UnaryCondition<TEntity, T> isNotNull() {
+            return Conditions.isNotNull(this);
         }
     }
 
     static class AbstractValueField<TEntity, T> extends AbstractField<TEntity, T> implements ValueField<TEntity, T> {
-        AbstractValueField(Class<TEntity> entityClass, String name, Class<T> type) {
-            super(entityClass, name, type);
+        AbstractValueField(Class<TEntity> entityClass, String name, Class<T> type, boolean nullable) {
+            super(entityClass, name, type, nullable);
         }
 
         @Override
-        public BinaryPredicate<TEntity, T> equal(T value) {
-            return Predicates.equals(this, value);
+        public BinaryCondition<TEntity, T> equal(T value) {
+            return Conditions.equals(this, value);
         }
 
         @Override
-        public BinaryPredicate<TEntity, T> notEqual(T value) {
-            return Predicates.notEquals(this, value);
-        }
-
-        @SafeVarargs
-        @Override
-        public final CollectionPredicate<TEntity, T> in(T... values) {
-            return Predicates.in(this, values);
-        }
-
-        @Override
-        public CollectionPredicate<TEntity, T> in(Collection<T> values) {
-            //noinspection unchecked
-            return Predicates.in(this, (T[]) values.toArray());
+        public BinaryCondition<TEntity, T> notEqual(T value) {
+            return Conditions.notEquals(this, value);
         }
 
         @SafeVarargs
         @Override
-        public final CollectionPredicate<TEntity, T> notIn(T... values) {
-            return Predicates.notIn(this, values);
+        public final CollectionCondition<TEntity, T> in(T... values) {
+            return Conditions.in(this, values);
         }
 
         @Override
-        public CollectionPredicate<TEntity, T> notIn(Collection<T> values) {
+        public CollectionCondition<TEntity, T> in(Collection<T> values) {
             //noinspection unchecked
-            return Predicates.notIn(this, (T[])values.toArray());
+            return Conditions.in(this, (T[]) values.toArray());
+        }
+
+        @SafeVarargs
+        @Override
+        public final CollectionCondition<TEntity, T> notIn(T... values) {
+            return Conditions.notIn(this, values);
+        }
+
+        @Override
+        public CollectionCondition<TEntity, T> notIn(Collection<T> values) {
+            //noinspection unchecked
+            return Conditions.notIn(this, (T[]) values.toArray());
         }
     }
 
-    static class NumberFieldImplementation<TEntity, T> extends AbstractValueField<TEntity, T> implements NumberField<TEntity, T> {
-        NumberFieldImplementation(Class<TEntity> entityClass, String name, Class<T> type) {
-            super(entityClass, name, type);
+    static class NumericFieldImplementation<TEntity, T> extends AbstractValueField<TEntity, T> implements NumericField<TEntity, T> {
+        NumericFieldImplementation(Class<TEntity> entityClass, String name, Class<T> type, boolean nullable) {
+            super(entityClass, name, type, nullable);
         }
 
         @Override
-        public BinaryPredicate<TEntity, T> greaterThan(T value) {
-            return Predicates.greaterThan(this, value);
+        public BinaryCondition<TEntity, T> greaterThan(T value) {
+            return Conditions.greaterThan(this, value);
         }
 
         @Override
-        public BinaryPredicate<TEntity, T> lessThan(T value) {
-            return Predicates.lessThan(this, value);
+        public BinaryCondition<TEntity, T> lessThan(T value) {
+            return Conditions.lessThan(this, value);
         }
 
         @Override
-        public BinaryPredicate<TEntity, T> greaterOrEqual(T value) {
-            return Predicates.greaterOrEqual(this, value);
+        public BinaryCondition<TEntity, T> greaterOrEqual(T value) {
+            return Conditions.greaterOrEqual(this, value);
         }
 
         @Override
-        public BinaryPredicate<TEntity, T> lessOrEqual(T value) {
-            return Predicates.lessOrEqual(this, value);
+        public BinaryCondition<TEntity, T> lessOrEqual(T value) {
+            return Conditions.lessOrEqual(this, value);
         }
 
         @Override
-        public TernaryPredicate<TEntity, T> between(T min, T max) {
-            return Predicates.between(this, min, max);
+        public TernaryCondition<TEntity, T> between(T min, T max) {
+            return Conditions.between(this, min, max);
         }
     }
 
     static class StringFieldImplementation<TEntity> extends AbstractValueField<TEntity, String> implements StringField<TEntity> {
-        StringFieldImplementation(Class<TEntity> entityClass, String name) {
-            super(entityClass, name, String.class);
+        StringFieldImplementation(Class<TEntity> entityClass, String name, boolean nullable) {
+            super(entityClass, name, String.class, nullable);
         }
 
         @Override
-        public BinaryPredicate<TEntity, String> contains(String substr) {
-            return Predicates.contains(this, substr);
+        public BinaryCondition<TEntity, String> contains(String substr) {
+            return Conditions.contains(this, substr);
         }
 
         @Override
-        public BinaryPredicate<TEntity, String> notContains(String substr) {
-            return Predicates.notContains(this, substr);
+        public BinaryCondition<TEntity, String> notContains(String substr) {
+            return Conditions.notContains(this, substr);
         }
 
         @Override
-        public BinaryPredicate<TEntity, String> startsWith(String substr) {
-            return Predicates.startsWith(this, substr);
+        public BinaryCondition<TEntity, String> startsWith(String substr) {
+            return Conditions.startsWith(this, substr);
         }
 
         @Override
-        public BinaryPredicate<TEntity, String> endsWith(String substr) {
-            return Predicates.endsWith(this, substr);
+        public BinaryCondition<TEntity, String> endsWith(String substr) {
+            return Conditions.endsWith(this, substr);
         }
 
         @Override
-        public BinaryPredicate<TEntity, String> notStartsWith(String substr) {
-            return Predicates.notStartsWith(this, substr);
+        public BinaryCondition<TEntity, String> notStartsWith(String substr) {
+            return Conditions.notStartsWith(this, substr);
         }
 
         @Override
-        public BinaryPredicate<TEntity, String> notEndsWith(String substr) {
-            return Predicates.notEndsWith(this, substr);
+        public BinaryCondition<TEntity, String> notEndsWith(String substr) {
+            return Conditions.notEndsWith(this, substr);
         }
     }
 
     static class BlobFieldImplementation<TEntity, T> extends AbstractField<TEntity, T> implements BlobField<TEntity, T> {
-        BlobFieldImplementation(Class<TEntity> entityClass, String name, Class<T> type) {
-            super(entityClass, name, type);
+        BlobFieldImplementation(Class<TEntity> entityClass, String name, Class<T> type, boolean nullable) {
+            super(entityClass, name, type, nullable);
         }
     }
 
-    public static <TEntity, T> NumberField<TEntity, T> numberField(Class<TEntity> entityClass, String name, Class<T> fieldType) {
-        return new NumberFieldImplementation<>(entityClass, name, fieldType);
+    public static <TEntity, T> NumericField<TEntity, T> numberField(Class<TEntity> entityClass, String name, Class<T> fieldType, boolean nullable) {
+        return new NumericFieldImplementation<>(entityClass, name, fieldType, nullable);
     }
 
-    public static <TEntity> StringField<TEntity> stringField(Class<TEntity> entityClass, String name) {
-        return new StringFieldImplementation<>(entityClass, name);
+    public static <TEntity> StringField<TEntity> stringField(Class<TEntity> entityClass, String name, boolean nullable) {
+        return new StringFieldImplementation<>(entityClass, name, nullable);
     }
 
-    public static <TEntity> NumberField<TEntity, Date> dateField(Class<TEntity> entityClass, String name) {
-        return numberField(entityClass, name, Date.class);
+    public static <TEntity> NumericField<TEntity, Date> dateField(Class<TEntity> entityClass, String name, boolean nullable) {
+        return numberField(entityClass, name, Date.class, nullable);
     }
 }

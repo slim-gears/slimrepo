@@ -5,14 +5,14 @@ package com.slimgears.slimorm.core.internal.sql;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterators;
 import com.slimgears.slimorm.core.interfaces.fields.Field;
-import com.slimgears.slimorm.core.interfaces.predicates.BinaryPredicate;
-import com.slimgears.slimorm.core.interfaces.predicates.CollectionPredicate;
-import com.slimgears.slimorm.core.interfaces.predicates.CompositePredicate;
-import com.slimgears.slimorm.core.interfaces.predicates.FieldPredicate;
-import com.slimgears.slimorm.core.interfaces.predicates.Predicate;
-import com.slimgears.slimorm.core.interfaces.predicates.PredicateType;
-import com.slimgears.slimorm.core.interfaces.predicates.TernaryPredicate;
-import com.slimgears.slimorm.core.interfaces.predicates.UnaryPredicate;
+import com.slimgears.slimorm.core.interfaces.conditions.BinaryCondition;
+import com.slimgears.slimorm.core.interfaces.conditions.CollectionCondition;
+import com.slimgears.slimorm.core.interfaces.conditions.CompositeCondition;
+import com.slimgears.slimorm.core.interfaces.conditions.FieldCondition;
+import com.slimgears.slimorm.core.interfaces.conditions.Condition;
+import com.slimgears.slimorm.core.interfaces.conditions.PredicateType;
+import com.slimgears.slimorm.core.interfaces.conditions.TernaryCondition;
+import com.slimgears.slimorm.core.interfaces.conditions.UnaryCondition;
 import com.slimgears.slimorm.core.internal.PredicateVisitor;
 
 import java.util.HashMap;
@@ -88,42 +88,42 @@ public class SqlPredicateBuilder implements SqlStatementBuilder.PredicateBuilder
             return substitutedArgs;
         }
 
-        private String fieldOperator(FieldPredicate<T, ?> predicate, Object... args) {
+        private String fieldOperator(FieldCondition<T, ?> predicate, Object... args) {
             PredicateType type = predicate.getType();
             return fieldName(predicate.getField()) + " " + operator(type, substituteArgs(type, args));
         }
 
         @Override
-        protected String visitBinary(BinaryPredicate<T, ?> predicate) {
+        protected String visitBinary(BinaryCondition<T, ?> predicate) {
             return fieldOperator(predicate, predicate.getValue());
         }
 
         @Override
-        protected String visitTernary(TernaryPredicate<T, ?> predicate) {
+        protected String visitTernary(TernaryCondition<T, ?> predicate) {
             return fieldOperator(predicate, predicate.getFirst(), predicate.getSecond());
         }
 
         @Override
-        protected String visitCollection(CollectionPredicate<T, ?> predicate) {
+        protected String visitCollection(CollectionCondition<T, ?> predicate) {
             return fieldOperator(predicate, joinValues(predicate.getType(), predicate.getValues()));
         }
 
         @Override
-        protected String visitUnary(UnaryPredicate<T, ?> predicate) {
+        protected String visitUnary(UnaryCondition<T, ?> predicate) {
             return fieldOperator(predicate);
         }
 
         @Override
-        protected String visitComposite(CompositePredicate<T> predicate) {
+        protected String visitComposite(CompositeCondition<T> predicate) {
             return combine(predicate.getType(), Iterators.forArray(predicate.getArguments()));
         }
 
         @Override
-        protected String visitUnknown(Predicate<T> predicate) {
-            throw new RuntimeException("Not supported predicate class: " + predicate.getClass().getName());
+        protected String visitUnknown(Condition<T> condition) {
+            throw new RuntimeException("Not supported predicate class: " + condition.getClass().getName());
         }
 
-        private String combine(PredicateType type, Iterator<Predicate<T>> predicateIterator) {
+        private String combine(PredicateType type, Iterator<Condition<T>> predicateIterator) {
             String first = visit(predicateIterator.next());
             if (!predicateIterator.hasNext()) return first;
             String second = combine(type, predicateIterator);
@@ -132,9 +132,9 @@ public class SqlPredicateBuilder implements SqlStatementBuilder.PredicateBuilder
     }
 
     @Override
-    public <T> String build(Predicate<T> predicate, SqlCommand.Parameters parameters) {
+    public <T> String build(Condition<T> condition, SqlCommand.Parameters parameters) {
         BuilderVisitor<T> visitor = new BuilderVisitor<>(parameters);
-        return visitor.visit(predicate);
+        return visitor.visit(condition);
     }
 
     protected String substituteArg(SqlCommand.Parameters params, PredicateType type, Object value) {
@@ -146,9 +146,11 @@ public class SqlPredicateBuilder implements SqlStatementBuilder.PredicateBuilder
     }
 
     protected String valueToString(PredicateType type, Object value) {
-        String str = syntaxProvider.valueToString(value);
-        String argFormat = ARGUMENT_FORMATS.getOrDefault(type, null);
-        return argFormat != null ? String.format(argFormat, str) : str;
+        if (value instanceof String) {
+            String argFormat = ARGUMENT_FORMATS.getOrDefault(type, null);
+            if (argFormat != null) value = String.format(argFormat, value);
+        }
+        return syntaxProvider.valueToString(value);
     }
 
     protected String joinValues(PredicateType type, Object... values) {

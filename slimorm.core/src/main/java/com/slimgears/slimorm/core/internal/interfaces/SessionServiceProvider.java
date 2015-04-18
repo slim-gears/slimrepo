@@ -12,7 +12,7 @@ import java.io.Closeable;
  * Created by Denis on 14-Apr-15
  * <File Description>
  */
-public interface SessionServiceProvider extends Closeable {
+public interface SessionServiceProvider extends RepositorySessionNotifier, RepositorySessionNotifier.Listener, Closeable {
     <TKey, TEntity extends Entity<TKey>> SessionEntityServiceProvider<TKey, TEntity> getEntityServiceProvider(EntityType<TKey, TEntity> entityType);
     <TKey, TEntity extends Entity<TKey>>EntitySet.Provider<TKey, TEntity> getEntitySetProvider(EntityType<TKey, TEntity> entityType);
     TransactionProvider getTransactionProvider();

@@ -8,7 +8,7 @@ import com.slimgears.slimorm.core.interfaces.entities.EntityType;
 import com.slimgears.slimorm.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimorm.core.interfaces.entities.FieldValueMap;
 import com.slimgears.slimorm.core.interfaces.fields.Fields;
-import com.slimgears.slimorm.core.interfaces.fields.NumberField;
+import com.slimgears.slimorm.core.interfaces.fields.NumericField;
 import com.slimgears.slimorm.core.interfaces.fields.StringField;
 import com.slimgears.slimorm.core.internal.AbstractEntityType;
 
@@ -18,8 +18,8 @@ import com.slimgears.slimorm.core.internal.AbstractEntityType;
  */
 public class RoleEntity extends AbstractRoleEntity implements Entity<Integer> {
     public static final EntityType<Integer, RoleEntity> EntityMetaType;
-    public static final NumberField<RoleEntity, Integer> RoleId = Fields.numberField(RoleEntity.class, "roleId", Integer.class);
-    public static final StringField<RoleEntity> RoleDescription = Fields.stringField(RoleEntity.class, "roleDescription");
+    public static final NumericField<RoleEntity, Integer> RoleId = Fields.numberField(RoleEntity.class, "roleId", Integer.class, false);
+    public static final StringField<RoleEntity> RoleDescription = Fields.stringField(RoleEntity.class, "roleDescription", true);
 
     static {
         EntityMetaType = new MetaType().addFields(RoleDescription).addRelatedEntities();
@@ -47,6 +47,11 @@ public class RoleEntity extends AbstractRoleEntity implements Entity<Integer> {
             map
                     .putValue(RoleId, entity.getRoleId())
                     .putValue(RoleDescription, entity.getRoleDescription());
+        }
+
+        @Override
+        public void setKey(RoleEntity entity, Integer key) {
+            entity.setRoleId(key);
         }
     }
 

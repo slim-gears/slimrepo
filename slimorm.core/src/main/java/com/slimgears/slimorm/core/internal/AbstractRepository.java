@@ -27,6 +27,7 @@ public abstract class AbstractRepository<TSession extends RepositorySession> imp
     public void update(UpdateAction<TSession> action) throws IOException {
         try (TSession session = open()) {
             action.execute(session);
+            session.saveChanges();
         }
     }
 

@@ -27,7 +27,7 @@ public class EntitySelectQuery<TKey, TEntity extends Entity<TKey>>
     }
 
     private PreparedQuery<CloseableIterator<TEntity>> preparedSelectQuery;
-    private PreparedQuery<Integer> preparedCountQuery;
+    private PreparedQuery<Long> preparedCountQuery;
 
     @Override
     protected Builder<TEntity> fork(SelectQueryParams<TKey, TEntity> queryParams, QueryProvider<TKey, TEntity> queryProvider) {
@@ -95,7 +95,7 @@ public class EntitySelectQuery<TKey, TEntity extends Entity<TKey>>
     }
 
     @Override
-    public int count() throws IOException {
+    public long count() throws IOException {
         return getPreparedCountQuery().execute();
     }
 
@@ -117,7 +117,7 @@ public class EntitySelectQuery<TKey, TEntity extends Entity<TKey>>
         return preparedSelectQuery = queryProvider.prepareSelect(queryParams);
     }
 
-    private PreparedQuery<Integer> getPreparedCountQuery() throws IOException {
+    private PreparedQuery<Long> getPreparedCountQuery() throws IOException {
         if (preparedCountQuery != null) return preparedCountQuery;
         return preparedCountQuery = queryProvider.prepareCount(queryParams);
     }
