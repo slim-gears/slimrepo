@@ -41,6 +41,12 @@ publishing {
     }
 }
 
+test {
+    afterTest { descriptor, result ->
+        println "TEST ${result.resultType} - ${descriptor.name}"
+    }
+}
+
 dependencies {
     compile 'com.squareup:javapoet:1.0.0'
     compile 'com.google.guava:guava:18.0'
