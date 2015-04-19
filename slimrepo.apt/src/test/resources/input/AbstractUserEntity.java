@@ -1,6 +1,6 @@
-import com.slimgears.slimorm.core.annotations.EntityTemplate;
+import com.slimgears.slimrepo.core.annotations.GenerateEntity;
 
-@EntityTemplate
+@GenerateEntity
 public class AbstractUserEntity {
     protected int userId;
     protected String userName;

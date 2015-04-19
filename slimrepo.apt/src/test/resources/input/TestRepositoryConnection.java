@@ -1,8 +1,9 @@
-import com.slimgears.slimorm.core.interfaces.entities.EntitySet;
-import com.slimgears.slimorm.core.annotations.RepositoryTemplate;
+import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
+import com.slimgears.slimrepo.core.interfaces.Repository;
+import com.slimgears.slimrepo.core.annotations.GenerateRepository;
 
-@RepositoryTemplate
-public interface TestRepositoryConnection extends com.slimgears.slimorm.core.interfaces.Repository.Connection {
+@GenerateRepository
+public interface TestRepository extends Repository {
     EntitySet<AbstractTestEntity> tests();
     EntitySet<AbstractUserEntity> users();
 }

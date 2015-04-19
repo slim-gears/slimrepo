@@ -8,9 +8,9 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/slimorm.android" />
-            <option value="$PROJECT_DIR$/slimorm.apt" />
-            <option value="$PROJECT_DIR$/slimorm.core" />
+            <option value="$PROJECT_DIR$/slimrepo.android" />
+            <option value="$PROJECT_DIR$/slimrepo.apt" />
+            <option value="$PROJECT_DIR$/slimrepo.core" />
           </set>
         </option>
       </GradleProjectSettings>

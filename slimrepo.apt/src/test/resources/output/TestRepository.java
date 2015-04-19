@@ -1,4 +1,4 @@
-import com.slimgears.slimorm.core.interfaces.Repository;
+import com.slimgears.slimrepo.core.interfaces.Repository;
 
 public interface TestRepository extends Repository<TestRepositoryConnection> {
 }
