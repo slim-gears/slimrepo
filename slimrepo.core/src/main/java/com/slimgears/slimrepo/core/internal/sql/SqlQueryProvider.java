@@ -61,6 +61,11 @@ public class SqlQueryProvider<TKey, TEntity extends Entity<TKey>> implements Que
                 }
             });
         }
+
+        @Override
+        public void remove() {
+            throw new RuntimeException("Remove is not supported");
+        }
     }
 
     public SqlQueryProvider(SqlSessionServiceProvider serviceProvider, EntityType<TKey, TEntity> entityType) {

@@ -2,6 +2,8 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal.query;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueMap;
@@ -11,6 +13,8 @@ import com.slimgears.slimrepo.core.internal.UpdateFieldInfo;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
+import static com.google.common.collect.Collections2.filter;
 
 /**
  * Created by Denis on 07-Apr-15
@@ -55,10 +59,10 @@ public class EntityUpdateQuery<TKey, TEntity extends Entity<TKey>>
 
     @Override
     public <T> Builder<TEntity> exclude(final Field<TEntity, T> field) {
-        queryParams.updates.removeIf(new java.util.function.Predicate<UpdateFieldInfo>() {
+        queryParams.updates = filter(queryParams.updates, new Predicate<UpdateFieldInfo>() {
             @Override
-            public boolean test(UpdateFieldInfo updateFieldInfo) {
-                return updateFieldInfo.field == field;
+            public boolean apply(UpdateFieldInfo input) {
+                return input.field != field;
             }
         });
         return this;

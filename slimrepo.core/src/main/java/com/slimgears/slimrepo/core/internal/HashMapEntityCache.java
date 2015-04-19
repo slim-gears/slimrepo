@@ -18,7 +18,7 @@ public class HashMapEntityCache<TKey, TEntity extends Entity<TKey>> implements E
 
     @Override
     public TEntity get(TKey id, Callable<TEntity> valueLoader) {
-        TEntity entity = entityCache.getOrDefault(id, null);
+        TEntity entity = entityCache.get(id);
         if (entity == null) {
             try {
                 TEntity tmpEntity = valueLoader.call();
@@ -33,7 +33,7 @@ public class HashMapEntityCache<TKey, TEntity extends Entity<TKey>> implements E
 
     @Override
     public TEntity getIfPresent(TKey id) {
-        return entityCache.getOrDefault(id, null);
+        return entityCache.get(id);
     }
 
     @Override

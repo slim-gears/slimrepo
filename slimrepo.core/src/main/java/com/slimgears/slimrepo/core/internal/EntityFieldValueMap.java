@@ -24,7 +24,7 @@ public class EntityFieldValueMap<TKey, TEntity extends Entity<TKey>> implements 
     @Override
     public <T> T getValue(Field<TEntity, T> field) {
         //noinspection unchecked
-        return (T)valueMap.getOrDefault(field.metaInfo().getName(), null);
+        return (T)valueMap.get(field.metaInfo().getName());
     }
 
     @Override

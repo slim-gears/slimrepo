@@ -147,7 +147,7 @@ public class SqlPredicateBuilder implements SqlStatementBuilder.PredicateBuilder
 
     protected String valueToString(PredicateType type, Object value) {
         if (value instanceof String) {
-            String argFormat = ARGUMENT_FORMATS.getOrDefault(type, null);
+            String argFormat = ARGUMENT_FORMATS.get(type);
             if (argFormat != null) value = String.format(argFormat, value);
         }
         return syntaxProvider.valueToString(value);
