@@ -50,7 +50,7 @@ test {
 dependencies {
     compile 'com.squareup:javapoet:1.0.0'
     compile 'com.google.guava:guava:18.0'
-    compile project(':slimorm.core')
+    compile project(':slimrepo.core')
 
     testCompile 'junit:junit:4.12'
     testCompile 'com.google.testing.compile:compile-testing:0.6'
