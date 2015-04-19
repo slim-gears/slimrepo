@@ -41,6 +41,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 import static com.slimgears.slimrepo.core.interfaces.conditions.Conditions.and;
 import static com.slimgears.slimrepo.core.interfaces.conditions.Conditions.or;
 import static org.mockito.Mockito.any;
@@ -72,8 +74,8 @@ public class PrototypeTest {
         public T answer(InvocationOnMock invocation) throws Throwable {
             SqlCommand command = (SqlCommand)invocation.getArguments()[0];
             String sql = command.getStatement();
-            String params = command.getParameters().getMap().toString();
-            String sqlWithParams = sql + "\n[Params: " + params + "]";
+            Object[] params = command.getParameters().getValues();
+            String sqlWithParams = sql + "\n{Params: [" + Joiner.on(", ").join(params) + "]}";
             sqlStatements.add(sqlWithParams);
             System.out.println(sqlWithParams);
             return answer;
@@ -206,6 +208,11 @@ public class PrototypeTest {
             @Override
             public T next() {
                 return iterator.next();
+            }
+
+            @Override
+            public void remove() {
+                throw new NotImplementedException();
             }
         };
     }
