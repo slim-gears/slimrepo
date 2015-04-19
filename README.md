@@ -73,10 +73,17 @@ In this case changes will be saved automatically:
 		EntitySet<UserEntity> users = repo.users();
 
 		// Possible syntax
-		users.addNew().setFirstName("John").setLastName("Doe").setLastVisitDate(Dates.now());
+		users.addNew()
+			.setFirstName("John")
+			.setLastName("Doe")
+			.setLastVisitDate(Dates.now());
 
 		// Alternative syntax
-		users.add(UserEntity.create().firstName("William").lastName("Shakespeare").lastVisitDate(Dates.now()).build());
+		users.add(UserEntity.create()
+			.firstName("William")
+			.lastName("Shakespeare")
+			.lastVisitDate(Dates.now())
+			.build());
 	});
 
 Query
@@ -105,8 +112,9 @@ Query
 	UserEntity[] repoService.query(repo -> {
 		return repo.users().query()
 			.where(Conditions
-				.and(UserEntity.FirstName.contains("a"),
-					 UserEntity.LastName.endsWith("e"))
+				.and(
+					UserEntity.FirstName.contains("a"),
+					UserEntity.LastName.endsWith("e"))
 				.or(UserEntity.LastVisitDate.greatThan(Dates.today()))
 			.prepare()
 			.toArray();
