@@ -212,7 +212,7 @@ public class PrototypeTest {
 
             @Override
             public void remove() {
-                throw new NotImplementedException();
+                throw new RuntimeException("Not implemented");
             }
         };
     }
