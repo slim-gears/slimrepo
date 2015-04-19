@@ -106,7 +106,7 @@ Query
 			.count();
 	}
 
-**Option 2** - using `RepositoryService.update()`: 
+**Option 2** - using `RepositoryService.query()`: 
  
 	UserEntity[] repoService.query(repo -> {
 		return repo.users().query()
@@ -123,7 +123,7 @@ Query
 				.and(
 					UserEntity.FirstName.contains("a"),
 					UserEntity.LastName.endsWith("e"))
-				.or(UserEntity.LastVisitDate.greatThan(Dates.today()))
+				.or(UserEntity.LastVisitDate.greaterThan(Dates.today()))
 			.prepare()
 			.toArray();
 	});
