@@ -21,6 +21,7 @@ The library inspired by [GreenDAO](http://greendao-orm.com/ "GreenDAO") and [Mic
 * **Modularity** - same Front-End (`Repository` and `Entities`), being able working transparently with different Back-Ends (underlying persistent storages - e.g. Sqlite, document db, remote RESTful service, etc.)
 * **Annotation processing based** - no reflection usage in run-time
 * **Intuitive syntax** - intuitive and highly readable syntax
+* **Bulk operations support** *Bulk update* and *bulk delete* are supported
 * **Light-weight**
 
 ---
