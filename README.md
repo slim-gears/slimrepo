@@ -12,7 +12,7 @@ The library was inspired by [GreenDAO](http://greendao-orm.com/ "GreenDAO") and 
 
 `Entity` - Data object, POJO 
  
-`Repository` - represents abstract working session, unit-of-work against ORM
+`Repository` - represents abstract working session, *unit-of-work* against ORM
 
 `RepositoryService` - factory, allowing to create `Repository` instances 
 
