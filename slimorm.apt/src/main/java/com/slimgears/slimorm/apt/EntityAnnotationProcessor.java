@@ -1,8 +1,8 @@
 package com.slimgears.slimorm.apt;// Copyright 2015 Denis Itskovich
 // Refer to LICENSE.txt for license details
 
-import com.slimgears.slimcode.processor.AnnotationProcessorBase;
-import com.slimgears.slimcode.processor.DataModelGenerator;
+import com.slimgears.slimorm.apt.base.AnnotationProcessorBase;
+import com.slimgears.slimorm.apt.base.DataModelGenerator;
 
 import java.io.IOException;
 

@@ -1,9 +1,8 @@
-package com.slimgears.slimcode.processor;// Copyright 2015 Denis Itskovich
+package com.slimgears.slimorm.apt.base;// Copyright 2015 Denis Itskovich
 // Refer to LICENSE.txt for license details
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 

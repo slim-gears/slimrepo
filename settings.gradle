@@ -1,1 +1,1 @@
-include ':slimcode', ':slimorm.core', ':slimorm.apt', ':slimorm.android'
+include ':slimorm.core', ':slimorm.apt', ':slimorm.android'

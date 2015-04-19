@@ -1,4 +1,4 @@
-package com.slimgears.slimcode.processor;// Copyright 2015 Denis Itskovich
+package com.slimgears.slimorm.apt.base;// Copyright 2015 Denis Itskovich
 // Refer to LICENSE.txt for license details
 
 import javax.lang.model.element.Element;
