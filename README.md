@@ -57,10 +57,17 @@ First, create `RepositoryService<UserRepository>` instance by instantiating gene
 		EntitySet<UserEntity> users = repo.users();
 
 		// Possible syntax
-		users.addNew().setFirstName("John").setLastName("Doe").setLastVisitDate(Dates.now());
+		users.addNew()
+			.setFirstName("John")
+			.setLastName("Doe")
+			.setLastVisitDate(Dates.now());
 
 		// Alternative syntax
-		users.add(UserEntity.create().firstName("William").lastName("Shakespeare").lastVisitDate(Dates.now()).build());
+		users.add(UserEntity.create()
+			.firstName("William")
+			.lastName("Shakespeare")
+			.lastVisitDate(Dates.now())
+			.build());
 
 		// Explicitly saving changes
 		repo.saveChanges();
