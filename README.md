@@ -108,70 +108,84 @@ Query
 
 **Option 1** - using `RepositoryService.open()`: 
 
-	try (UserRepository repo = repoService.open()) {
-		long count = repo.users().query()
-			.where(UserEntity.LastVisitDate.between(Dates.yesterday(), Dates.today())
-			.prepare()
-			.count();
-	}
+```java
+try (UserRepository repo = repoService.open()) {
+	long count = repo.users().query()
+		.where(UserEntity.LastVisitDate.between(Dates.yesterday(), Dates.today())
+		.prepare()
+		.count();
+}
+```
 
 **Option 2** - using `RepositoryService.query()`: 
- 
-	UserEntity[] repoService.query(repo -> {
-		return repo.users().query()
-			.where(UserEntity.UserFirstName.contains("a"))
-			.prepare()
-			.toArray();
-	});
+
+```java 
+UserEntity[] repoService.query(repo -> {
+	return repo.users().query()
+		.where(UserEntity.UserFirstName.contains("a"))
+		.prepare()
+		.toArray();
+});
+```
 
 **Using and / or condition compositions**
 
-	UserEntity[] repoService.query(repo -> {
-		return repo.users().query()
-			.where(Conditions
-				.and(
-					UserEntity.FirstName.contains("a"),
-					UserEntity.LastName.endsWith("e"))
-				.or(UserEntity.LastVisitDate.greaterThan(Dates.today()))
-			.prepare()
-			.toArray();
-	});
+```java
+UserEntity[] repoService.query(repo -> {
+	return repo.users().query()
+		.where(Conditions
+			.and(
+				UserEntity.FirstName.contains("a"),
+				UserEntity.LastName.endsWith("e"))
+			.or(UserEntity.LastVisitDate.greaterThan(Dates.today()))
+		.prepare()
+		.toArray();
+});
+```
 
 Update
 ---
 
 **Single entity update**: 
 
-	repoService.update(repo -> {
-		UserEntity user = repo.users().findById(2);
-		user.setLastName("Smith");
-	});
+```java
+repoService.update(repo -> {
+	UserEntity user = repo.users().findById(2);
+	user.setLastName("Smith");
+});
+```
 
 **Bulk update**: Updating all entities, matching `where` criteria:
- 
-	repoService.update(repo -> {
-		return repo.users().update()
-			.where(UserEntity.UserFirstName.contains("a"))
-			.set(UserEntity.LastVisitDate, Dates.now())
-			.prepare()
-			.execute();
-	});
+
+```java 
+repoService.update(repo -> {
+	return repo.users().update()
+		.where(UserEntity.UserFirstName.contains("a"))
+		.set(UserEntity.LastVisitDate, Dates.now())
+		.prepare()
+		.execute();
+});
+```
 
 Delete
 ---
 
 **Delete single entity directly**
 
-	repoService.update(repo -> {
-		UserEntity user = repo.users().findById(2);
-		repo.users().remove(user);
-	});
+```java
+repoService.update(repo -> {
+	UserEntity user = repo.users().findById(2);
+	repo.users().remove(user);
+});
+```
 
 **Bulk delete**: Deleting all entities, matching `where` criteria
 
-	repoService.update(repo -> {
-		return repo.users().delete()
-			.where(UserEntity.UserFirstName.contains("a"))
-			.prepare()
-			.execute();
-	});
+```java
+repoService.update(repo -> {
+	return repo.users().delete()
+		.where(UserEntity.UserFirstName.contains("a"))
+		.prepare()
+		.execute();
+});
+```
