@@ -5,13 +5,13 @@ package com.slimgears.slimrepo.apt.prototype;
 import com.slimgears.slimrepo.apt.prototype.generated.RoleEntity;
 import com.slimgears.slimrepo.apt.prototype.generated.UserEntity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
-import com.slimgears.slimrepo.core.interfaces.RepositorySession;
+import com.slimgears.slimrepo.core.interfaces.Repository;
 
 /**
  * Created by Denis on 05-Apr-15
  * <File Description>
  */
-public interface UserRepositorySession extends RepositorySession {
+public interface UserRepository extends Repository {
     EntitySet<Integer, UserEntity> users();
     EntitySet<Integer, RoleEntity> roles();
 }

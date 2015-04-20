@@ -2,7 +2,7 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal.interfaces;
 
-import com.slimgears.slimrepo.core.interfaces.RepositorySession;
+import com.slimgears.slimrepo.core.interfaces.Repository;
 
 import java.io.IOException;
 
@@ -12,9 +12,9 @@ import java.io.IOException;
  */
 public interface RepositorySessionNotifier {
     interface Listener {
-        void onSavingChanges(RepositorySession session) throws IOException;
-        void onDiscardingChanges(RepositorySession session);
-        void onClosing(RepositorySession session);
+        void onSavingChanges(Repository session) throws IOException;
+        void onDiscardingChanges(Repository session);
+        void onClosing(Repository session);
     }
 
     void addListener(Listener listener);

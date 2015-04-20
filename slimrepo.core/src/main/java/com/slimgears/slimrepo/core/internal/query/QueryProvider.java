@@ -2,7 +2,7 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal.query;
 
-import com.slimgears.slimrepo.core.interfaces.RepositorySession;
+import com.slimgears.slimrepo.core.interfaces.Repository;
 import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.internal.interfaces.CloseableIterator;
 import com.slimgears.slimrepo.core.internal.interfaces.EntityCache;
@@ -15,7 +15,7 @@ import java.util.Collection;
  */
 public interface QueryProvider<TKey, TEntity extends Entity<TKey>> {
     interface Factory {
-        <TKey, TEntity extends Entity<TKey>> QueryProvider<TKey, TEntity> createProvider(RepositorySession session, EntityCache<TKey, TEntity> entityCache);
+        <TKey, TEntity extends Entity<TKey>> QueryProvider<TKey, TEntity> createProvider(Repository session, EntityCache<TKey, TEntity> entityCache);
     }
 
     PreparedQuery<CloseableIterator<TEntity>> prepareSelect(SelectQueryParams<TKey, TEntity> query);

@@ -5,7 +5,7 @@ package com.slimgears.slimrepo.core.internal;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.slimgears.slimrepo.core.interfaces.RepositorySession;
+import com.slimgears.slimrepo.core.interfaces.Repository;
 import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
@@ -90,21 +90,21 @@ public abstract class AbstractSessionServiceProvider implements SessionServicePr
     }
 
     @Override
-    public void onSavingChanges(RepositorySession session) throws IOException {
+    public void onSavingChanges(Repository session) throws IOException {
         for (RepositorySessionNotifier.Listener listener : sessionListeners) {
             listener.onSavingChanges(session);
         }
     }
 
     @Override
-    public void onDiscardingChanges(RepositorySession session) {
+    public void onDiscardingChanges(Repository session) {
         for (RepositorySessionNotifier.Listener listener : sessionListeners) {
             listener.onDiscardingChanges(session);
         }
     }
 
     @Override
-    public void onClosing(RepositorySession session) {
+    public void onClosing(Repository session) {
         for (RepositorySessionNotifier.Listener listener : sessionListeners) {
             listener.onClosing(session);
         }

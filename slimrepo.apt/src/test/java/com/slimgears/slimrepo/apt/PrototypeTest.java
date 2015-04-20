@@ -5,11 +5,11 @@ package com.slimgears.slimrepo.apt;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import com.slimgears.slimrepo.apt.prototype.UserRepositorySession;
+import com.slimgears.slimrepo.apt.prototype.UserRepository;
 import com.slimgears.slimrepo.apt.prototype.generated.UserEntity;
+import com.slimgears.slimrepo.apt.prototype.generated.UserRepositoryServiceImpl;
 import com.slimgears.slimrepo.apt.prototype.generated.UserRepositoryImpl;
-import com.slimgears.slimrepo.apt.prototype.generated.UserRepositorySessionImpl;
-import com.slimgears.slimrepo.core.interfaces.Repository;
+import com.slimgears.slimrepo.core.interfaces.RepositoryService;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimrepo.core.internal.EntityFieldValueMap;
 import com.slimgears.slimrepo.core.internal.interfaces.CloseableIterator;
@@ -119,10 +119,10 @@ public class PrototypeTest {
 
     @Test
     public void queryCountWhereStringFieldContains() throws IOException {
-        testQuery(new Repository.QueryAction<UserRepositorySession, Long>() {
+        testQuery(new RepositoryService.QueryAction<UserRepository, Long>() {
             @Override
-            public Long execute(UserRepositorySession connection) throws IOException {
-                return connection.users().query()
+            public Long execute(UserRepository repository) throws IOException {
+                return repository.users().query()
                         .where(UserEntity.UserFirstName.contains("John"))
                         .skip(2)
                         .limit(10)
@@ -136,10 +136,10 @@ public class PrototypeTest {
 
     @Test
     public void queryWhereStringFieldContains() throws IOException {
-        testQuery(new Repository.QueryAction<UserRepositorySession, UserEntity[]>() {
+        testQuery(new RepositoryService.QueryAction<UserRepository, UserEntity[]>() {
             @Override
-            public UserEntity[] execute(UserRepositorySession connection) throws IOException {
-                return connection.users().query()
+            public UserEntity[] execute(UserRepository repository) throws IOException {
+                return repository.users().query()
                         .where(
                                 or(
                                         and(
@@ -162,14 +162,14 @@ public class PrototypeTest {
     @Test
     public void repositoryCreation() throws IOException {
         RepositoryCreator creator = ormServiceProviderMock
-                .createSessionServiceProvider(UserRepositorySessionImpl.Model.Instance)
+                .createSessionServiceProvider(UserRepositoryImpl.Model.Instance)
                 .getRepositoryCreator();
-        creator.createRepository(UserRepositorySessionImpl.Model.Instance);
+        creator.createRepository(UserRepositoryImpl.Model.Instance);
         assertSqlEquals("create-tables.sql");
     }
 
-    private <T> T testQuery(Repository.QueryAction<UserRepositorySession, T> queryAction) throws IOException {
-        Repository<UserRepositorySession> repo = new UserRepositoryImpl(ormServiceProviderMock);
+    private <T> T testQuery(RepositoryService.QueryAction<UserRepository, T> queryAction) throws IOException {
+        RepositoryService<UserRepository> repo = new UserRepositoryServiceImpl(ormServiceProviderMock);
         T result = repo.query(queryAction);
         Assert.assertNotNull(result);
         return result;

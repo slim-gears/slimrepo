@@ -4,11 +4,11 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.slimgears.slimrepo.android.core.SqliteOrmServiceProvider;
-import com.slimgears.slimrepo.android.prototype.UserRepositorySession;
+import com.slimgears.slimrepo.android.prototype.UserRepository;
 import com.slimgears.slimrepo.android.prototype.generated.RoleEntity;
 import com.slimgears.slimrepo.android.prototype.generated.UserEntity;
-import com.slimgears.slimrepo.android.prototype.generated.UserRepositoryImpl;
-import com.slimgears.slimrepo.core.interfaces.Repository;
+import com.slimgears.slimrepo.android.prototype.generated.UserRepositoryServiceImpl;
+import com.slimgears.slimrepo.core.interfaces.RepositoryService;
 import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
 import com.slimgears.slimrepo.core.interfaces.conditions.Conditions;
 import com.slimgears.slimrepo.core.internal.interfaces.OrmServiceProvider;
@@ -29,32 +29,32 @@ import java.util.Arrays;
  */
 @RunWith(RobolectricTestRunner.class)
 @Config(emulateSdk = 18, manifest=Config.NONE)
-public class RepositoryPrototypeTest  {
-    private Repository<UserRepositorySession> repository;
+public class RepositoryServicePrototypeTest {
+    private RepositoryService<UserRepository> repositoryService;
 
     @Before
     public void setup() {
         OrmServiceProvider orm = new SqliteOrmServiceProvider(RuntimeEnvironment.application);
-        repository = new UserRepositoryImpl(orm);
+        repositoryService = new UserRepositoryServiceImpl(orm);
     }
 
     @Test
     public void addEntitiesThenQuery() throws IOException {
-        repository.update(new Repository.UpdateAction<UserRepositorySession>() {
+        repositoryService.update(new RepositoryService.UpdateAction<UserRepository>() {
             @Override
-            public void execute(UserRepositorySession session) throws IOException {
-                UserEntity userJohnDoe = session.users().addNew()
+            public void execute(UserRepository repository) throws IOException {
+                UserEntity userJohnDoe = repository.users().addNew()
                         .setUserFirstName("John")
                         .setUserLastName("Doe");
-                UserEntity userJakeSmith = session.users().addNew()
+                UserEntity userJakeSmith = repository.users().addNew()
                         .setUserFirstName("Jake")
                         .setUserLastName("Smith");
-                RoleEntity roleUser = session.roles().addNew()
+                RoleEntity roleUser = repository.roles().addNew()
                         .setRoleDescription("User");
-                RoleEntity roleAdmin = session.roles().addNew()
+                RoleEntity roleAdmin = repository.roles().addNew()
                         .setRoleDescription("Administrator");
 
-                session.saveChanges();
+                repository.saveChanges();
 
                 Assert.assertEquals(1, userJohnDoe.getUserId());
                 Assert.assertEquals(2, userJakeSmith.getUserId());
@@ -64,17 +64,17 @@ public class RepositoryPrototypeTest  {
             }
         });
 
-        repository.query(new Repository.QueryAction<UserRepositorySession, Object>() {
+        repositoryService.query(new RepositoryService.QueryAction<UserRepository, Object>() {
             @Override
-            public Object execute(UserRepositorySession session) throws IOException {
-                UserEntity[] allUsers = session.users().query().prepare().toArray();
+            public Object execute(UserRepository repository) throws IOException {
+                UserEntity[] allUsers = repository.users().query().prepare().toArray();
 
                 Assert.assertNotNull(allUsers);
                 Assert.assertEquals(2, allUsers.length);
                 Assert.assertEquals("John", allUsers[0].getUserFirstName());
                 Assert.assertEquals("Smith", allUsers[1].getUserLastName());
 
-                RoleEntity[] allRoles = session.roles().query().prepare().toArray();
+                RoleEntity[] allRoles = repository.roles().query().prepare().toArray();
 
                 Assert.assertNotNull(allRoles);
                 Assert.assertEquals(2, allRoles.length);
@@ -114,28 +114,28 @@ public class RepositoryPrototypeTest  {
     }
 
     private void addUsers(final UserEntity... users) throws IOException {
-        repository.update(new Repository.UpdateAction<UserRepositorySession>() {
+        repositoryService.update(new RepositoryService.UpdateAction<UserRepository>() {
             @Override
-            public void execute(UserRepositorySession session) throws IOException {
-                session.users().add(Arrays.asList(users));
+            public void execute(UserRepository repository) throws IOException {
+                repository.users().add(Arrays.asList(users));
             }
         });
     }
 
     private void addRoles(final RoleEntity... roles) throws IOException {
-        repository.update(new Repository.UpdateAction<UserRepositorySession>() {
+        repositoryService.update(new RepositoryService.UpdateAction<UserRepository>() {
             @Override
-            public void execute(UserRepositorySession session) throws IOException {
-                session.roles().add(Arrays.asList(roles));
+            public void execute(UserRepository repository) throws IOException {
+                repository.roles().add(Arrays.asList(roles));
             }
         });
     }
 
     private long queryUsersCountWhere(final Condition<UserEntity> condition) throws IOException {
-        return repository.query(new Repository.QueryAction<UserRepositorySession, Long>() {
+        return repositoryService.query(new RepositoryService.QueryAction<UserRepository, Long>() {
             @Override
-            public Long execute(UserRepositorySession session) throws IOException {
-                return session.users()
+            public Long execute(UserRepository repository) throws IOException {
+                return repository.users()
                         .query()
                         .where(condition)
                         .prepare()
@@ -145,10 +145,10 @@ public class RepositoryPrototypeTest  {
     }
 
     private UserEntity[] queryUsersWhere(final Condition<UserEntity> condition) throws IOException {
-        return repository.query(new Repository.QueryAction<UserRepositorySession, UserEntity[]>() {
+        return repositoryService.query(new RepositoryService.QueryAction<UserRepository, UserEntity[]>() {
             @Override
-            public UserEntity[] execute(UserRepositorySession session) throws IOException {
-                return session.users()
+            public UserEntity[] execute(UserRepository repository) throws IOException {
+                return repository.users()
                         .query()
                         .where(condition)
                         .prepare()

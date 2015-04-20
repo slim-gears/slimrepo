@@ -9,7 +9,7 @@ import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.queries.Query;
-import com.slimgears.slimrepo.core.interfaces.RepositorySession;
+import com.slimgears.slimrepo.core.interfaces.Repository;
 import com.slimgears.slimrepo.core.interfaces.queries.UpdateQuery;
 import com.slimgears.slimrepo.core.internal.interfaces.EntityCache;
 import com.slimgears.slimrepo.core.internal.interfaces.EntityStateTracker;
@@ -107,7 +107,7 @@ public class DefaultEntitySet<TKey, TEntity extends Entity<TKey>> implements Ent
     }
 
     @Override
-    public void onSavingChanges(RepositorySession session) throws IOException {
+    public void onSavingChanges(Repository session) throws IOException {
         EntityStateTracker<TKey, TEntity> tracker = getStateTracker();
         insert(tracker.getAddedEntities());
         delete(tracker.getDeletedEntities());
@@ -116,7 +116,7 @@ public class DefaultEntitySet<TKey, TEntity extends Entity<TKey>> implements Ent
     }
 
     @Override
-    public void onDiscardingChanges(RepositorySession session) {
+    public void onDiscardingChanges(Repository session) {
         EntityStateTracker<TKey, TEntity> tracker = getStateTracker();
         EntityCache<TKey, TEntity> cache = getCache();
         for (TEntity entity : Iterables.concat(
@@ -129,7 +129,7 @@ public class DefaultEntitySet<TKey, TEntity extends Entity<TKey>> implements Ent
     }
 
     @Override
-    public void onClosing(RepositorySession session) {
+    public void onClosing(Repository session) {
     }
 
     private void insert(Collection<TEntity> entities) throws IOException {

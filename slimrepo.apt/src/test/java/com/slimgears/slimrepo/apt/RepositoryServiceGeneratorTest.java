@@ -20,7 +20,7 @@ import static com.google.testing.compile.JavaSourceSubjectFactory.javaSource;
  * <File Description>
  */
 @RunWith(JUnit4.class)
-public class RepositoryGeneratorTest {
+public class RepositoryServiceGeneratorTest {
     private void testAnnotationProcessing(AbstractProcessor processor, String inputResource, String expectedOutputResource) {
         JavaFileObject sourceFile = JavaFileObjects.forResource("input/" + inputResource);
         assert_()
