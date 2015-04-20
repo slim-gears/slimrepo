@@ -1,4 +1,5 @@
-# Slim Repo ![](https://travis-ci.org/slim-gears/slimrepo.svg)
+![](https://travis-ci.org/slim-gears/slimrepo.svg)
+# Slim Repo
 ### Light-weight modular ORM for Java and Android
 
 ##### The library is still under development. Stay tuned for updates.
