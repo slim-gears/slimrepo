@@ -23,6 +23,10 @@ import com.slimgears.slimrepo.core.internal.query.QueryProvider;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import static com.google.common.collect.Collections2.transform;
 
@@ -80,6 +84,26 @@ public class DefaultEntitySet<TKey, TEntity extends Entity<TKey>> implements Ent
     @Override
     public UpdateQuery.Builder<TEntity> updateQuery() {
         return new EntityUpdateQuery<>(entityType, getQueryProvider());
+    }
+
+    @Override
+    public TEntity[] toArray() throws IOException {
+        return query().prepare().toArray();
+    }
+
+    @Override
+    public List<TEntity> toList() throws IOException {
+        return query().prepare().toList();
+    }
+
+    @Override
+    public Map<TKey, TEntity> toMap() {
+        Map<TKey, TEntity> map = new HashMap<>();
+        for (Iterator<TEntity> it = query().prepare().iterator(); it.hasNext(); ) {
+            TEntity entity = it.next();
+            map.put(entity.getEntityId(), entity);
+        }
+        return map;
     }
 
     @Override

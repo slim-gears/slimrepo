@@ -11,6 +11,7 @@
             <option value="$PROJECT_DIR$/slimrepo.android" />
             <option value="$PROJECT_DIR$/slimrepo.apt" />
             <option value="$PROJECT_DIR$/slimrepo.core" />
+            <option value="$PROJECT_DIR$/slimrepo.example" />
           </set>
         </option>
       </GradleProjectSettings>

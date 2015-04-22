@@ -178,15 +178,19 @@ public class Fields {
         }
     }
 
-    public static <TEntity, T> NumericField<TEntity, T> numberField(Class<TEntity> entityClass, String name, Class<T> fieldType, boolean nullable) {
+    public static <TEntity, T> NumericField<TEntity, T> numberField(String name, Class<TEntity> entityClass, Class<T> fieldType, boolean nullable) {
         return new NumericFieldImplementation<>(entityClass, name, fieldType, nullable);
     }
 
-    public static <TEntity> StringField<TEntity> stringField(Class<TEntity> entityClass, String name, boolean nullable) {
+    public static <TEntity> StringField<TEntity> stringField(String name, Class<TEntity> entityClass, boolean nullable) {
         return new StringFieldImplementation<>(entityClass, name, nullable);
     }
 
-    public static <TEntity> NumericField<TEntity, Date> dateField(Class<TEntity> entityClass, String name, boolean nullable) {
-        return numberField(entityClass, name, Date.class, nullable);
+    public static <TEntity> NumericField<TEntity, Date> dateField(String name, Class<TEntity> entityClass, boolean nullable) {
+        return numberField(name, entityClass, Date.class, nullable);
+    }
+
+    public static <TEntity, T> BlobField<TEntity, T> blobField(String name, Class<TEntity> entityClass, Class<T> fieldType, boolean nullable) {
+        return new BlobFieldImplementation<>(entityClass, name, fieldType, nullable);
     }
 }

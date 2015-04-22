@@ -18,8 +18,8 @@ import com.slimgears.slimrepo.core.internal.AbstractEntityType;
  */
 public class RoleEntity extends AbstractRoleEntity implements Entity<Integer> {
     public static final EntityType<Integer, RoleEntity> EntityMetaType;
-    public static final NumericField<RoleEntity, Integer> RoleId = Fields.numberField(RoleEntity.class, "roleId", Integer.class, false);
-    public static final StringField<RoleEntity> RoleDescription = Fields.stringField(RoleEntity.class, "roleDescription", true);
+    public static final NumericField<RoleEntity, Integer> RoleId = Fields.numberField("roleId", RoleEntity.class, Integer.class, false);
+    public static final StringField<RoleEntity> RoleDescription = Fields.stringField("roleDescription", RoleEntity.class, true);
 
     static {
         EntityMetaType = new MetaType().addFields(RoleDescription).addRelatedEntities();

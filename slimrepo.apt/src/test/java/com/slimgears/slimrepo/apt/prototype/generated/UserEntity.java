@@ -46,9 +46,9 @@ public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
     }
 
     public static final EntityType<Integer, UserEntity> EntityMetaType;
-    public static final NumericField<UserEntity, Integer> UserId = Fields.numberField(UserEntity.class, "userId", Integer.class, false);
-    public static final StringField<UserEntity> UserFirstName = Fields.stringField(UserEntity.class, "userFirstName", true);
-    public static final StringField<UserEntity> UserLastName = Fields.stringField(UserEntity.class, "userLastName", true);
+    public static final NumericField<UserEntity, Integer> UserId = Fields.numberField("userId", UserEntity.class, Integer.class, false);
+    public static final StringField<UserEntity> UserFirstName = Fields.stringField("userFirstName", UserEntity.class, true);
+    public static final StringField<UserEntity> UserLastName = Fields.stringField("userLastName", UserEntity.class, true);
 
     static {
         EntityMetaType = new MetaType()

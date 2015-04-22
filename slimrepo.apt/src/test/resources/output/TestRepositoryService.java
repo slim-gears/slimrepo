@@ -1,12 +1,5 @@
 import com.slimgears.slimrepo.core.interfaces.RepositoryService;
 
-public interface TestRepositoryService extends RepositoryService<TestRepositoryConnection> {
-}
+public interface TestRepositoryService extends RepositoryService<TestRepository> {
 
-class SlimOrm_TestRepositoryService implements TestRepositoryService {
-
-}
-
-class SlimOrm_TestRepositoryConnection implements TestRepositoryConnection {
-    private final
 }

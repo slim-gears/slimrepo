@@ -3,7 +3,6 @@ package com.slimgears.slimrepo.apt;
 // Refer to LICENSE.txt for license details
 
 import com.slimgears.slimrepo.apt.base.AnnotationProcessorBase;
-import com.slimgears.slimrepo.apt.base.DataModelGenerator;
 
 import java.io.IOException;
 
@@ -16,12 +15,14 @@ import javax.lang.model.element.TypeElement;
  */
 @SupportedAnnotationTypes("com.slimgears.slimrepo.core.annotations.GenerateEntity")
 public class EntityAnnotationProcessor extends AnnotationProcessorBase {
+
     @Override
     protected boolean processType(TypeElement typeElement) throws IOException {
-        new DataModelGenerator()
+        new EntityGenerator(processingEnv)
                 .className(typeElement.getQualifiedName().toString().replace("Abstract", ""))
                 .superClass(typeElement)
-                .build(processingEnv.getFiler());
+                .build();
+
         return true;
     }
 }

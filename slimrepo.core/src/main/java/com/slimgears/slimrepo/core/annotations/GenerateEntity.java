@@ -12,6 +12,6 @@ import java.lang.annotation.Target;
  * <File Description>
  */
 @Target(ElementType.TYPE)
-@Retention(RetentionPolicy.CLASS)
+@Retention(RetentionPolicy.SOURCE)
 public @interface GenerateEntity {
 }

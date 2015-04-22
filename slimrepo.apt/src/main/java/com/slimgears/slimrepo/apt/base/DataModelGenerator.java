@@ -7,6 +7,7 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
@@ -19,9 +20,13 @@ public class DataModelGenerator extends ClassGenerator<DataModelGenerator> {
     private TypeSpec.Builder builderClassBuilder;
     private TypeName builderTypeName;
 
-    class Visitor extends ElementVisitorBase<Void, Void> {
-        private final TypeSpec.Builder modelBuilder;
-        private MethodSpec.Builder modelCtorBuilder;
+    public DataModelGenerator(ProcessingEnvironment processingEnvironment) {
+        super(processingEnvironment);
+    }
+
+    protected class Visitor extends ElementVisitorBase<Void, Void> {
+        protected final TypeSpec.Builder modelBuilder;
+        protected MethodSpec.Builder modelCtorBuilder;
 
         public Visitor(TypeSpec.Builder modelBuilder, MethodSpec.Builder modelCtorBuilder) {
             this.modelBuilder = modelBuilder;
@@ -82,24 +87,28 @@ public class DataModelGenerator extends ClassGenerator<DataModelGenerator> {
                 .constructorBuilder()
                 .addModifiers(Modifier.PUBLIC);
 
-        type.accept(new Visitor(builder, modelCtorBuilder), null);
+        type.accept(createVisitor(builder, modelCtorBuilder), null);
 
         builder.addType(builderClassBuilder.build());
         builder.addMethod(modelCtorBuilder.build());
     }
 
-    MethodSpec createModelGetter(String fieldName, TypeName fieldType) {
+    protected Visitor createVisitor(TypeSpec.Builder typeBuilder, MethodSpec.Builder ctorBuilder) {
+        return new Visitor(typeBuilder, ctorBuilder);
+    }
+
+    private MethodSpec createModelGetter(String fieldName, TypeName fieldType) {
         return MethodSpec
-                .methodBuilder(toCamelCase("get", fieldName))
+                .methodBuilder(getModelGetterName(fieldName))
                 .addModifiers(Modifier.PUBLIC)
                 .returns(fieldType)
                 .addCode("return this.$L;\n", fieldName)
                 .build();
     }
 
-    MethodSpec createModelSetter(String fieldName, TypeName fieldType, TypeName modelType) {
+    private MethodSpec createModelSetter(String fieldName, TypeName fieldType, TypeName modelType) {
         return MethodSpec
-                .methodBuilder(toCamelCase("set", fieldName))
+                .methodBuilder(getModelSetterName(fieldName))
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(fieldType, fieldName)
                 .returns(modelType)
@@ -114,16 +123,16 @@ public class DataModelGenerator extends ClassGenerator<DataModelGenerator> {
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(fieldType, fieldName)
                 .returns(builderType)
-                .addCode("model.$L($L);\n", toCamelCase("set", fieldName), fieldName)
+                .addCode("model.$L($L);\n", getModelSetterName(fieldName), fieldName)
                 .addCode("return this;\n")
                 .build();
     }
 
-    String toCamelCase(String begin, String... parts) {
-        String name = begin;
-        for (String part : parts) {
-            name += Character.toUpperCase(part.charAt(0)) + part.substring(1);
-        }
-        return name;
+    protected String getModelGetterName(String fieldName) {
+        return toCamelCase("get", fieldName);
+    }
+
+    protected String getModelSetterName(String fieldName) {
+        return toCamelCase("set", fieldName);
     }
 }

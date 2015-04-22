@@ -7,6 +7,7 @@ import com.slimgears.slimrepo.core.internal.interfaces.CloseableIterator;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Denis on 02-Apr-15
@@ -21,6 +22,7 @@ public interface Query<T> {
     T firstOrDefault() throws IOException;
     T singleOrDefault() throws IOException;
     List<T> toList() throws IOException;
+
     T[] toArray() throws IOException;
     long count() throws IOException;
     CloseableIterator<T> iterator();

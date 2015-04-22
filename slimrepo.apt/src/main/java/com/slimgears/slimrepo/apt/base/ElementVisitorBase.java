@@ -16,12 +16,15 @@ import javax.lang.model.element.VariableElement;
 public class ElementVisitorBase<R, P> implements ElementVisitor<R, P> {
     @Override
     public R visit(Element element, P p) {
-        if (element instanceof VariableElement) return visitVariable((VariableElement)element, p);
-        else if (element instanceof ExecutableElement) return visitExecutable((ExecutableElement)element, p);
-        else if (element instanceof TypeParameterElement) return visitTypeParameter((TypeParameterElement)element, p);
-        else if (element instanceof PackageElement) return visitPackage((PackageElement)element, p);
-        else if (element instanceof TypeElement) return visitType((TypeElement)element, p);
-        else return visitUnknown(element, p);
+        R result = seedResult();
+
+        if (element instanceof VariableElement) aggregateResult(result, visitVariable((VariableElement)element, p));
+        if (element instanceof ExecutableElement) aggregateResult(result, visitExecutable((ExecutableElement)element, p));
+        if (element instanceof TypeParameterElement) aggregateResult(result, visitTypeParameter((TypeParameterElement)element, p));
+        if (element instanceof PackageElement) aggregateResult(result, visitPackage((PackageElement)element, p));
+        if (element instanceof TypeElement) aggregateResult(result, visitType((TypeElement)element, p));
+
+        return result;
     }
 
     @Override

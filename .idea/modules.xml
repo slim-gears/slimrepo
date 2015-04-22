@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/slimrepo.android/slimrepo.android.iml" filepath="$PROJECT_DIR$/slimrepo.android/slimrepo.android.iml" />
       <module fileurl="file://$PROJECT_DIR$/slimrepo.apt/slimrepo.apt.iml" filepath="$PROJECT_DIR$/slimrepo.apt/slimrepo.apt.iml" />
       <module fileurl="file://$PROJECT_DIR$/slimrepo.core/slimrepo.core.iml" filepath="$PROJECT_DIR$/slimrepo.core/slimrepo.core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/slimrepo.example/slimrepo.example.iml" filepath="$PROJECT_DIR$/slimrepo.example/slimrepo.example.iml" />
     </modules>
   </component>
 </project>
