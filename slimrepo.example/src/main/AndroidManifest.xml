@@ -6,6 +6,15 @@
                  android:icon="@mipmap/ic_launcher"
                  android:theme="@style/AppTheme">
 
+        <activity android:name=".ui.MainActivity" android:label="@string/title_users">
+            <intent-filter>
+                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN"/>
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".ui.AddCountryActivity" android:label="@string/button_add_country"/>
+        <activity android:name=".ui.AddUserActivity" android:label="@string/button_add_user"/>
     </application>
 
 </manifest>

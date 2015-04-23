@@ -26,11 +26,12 @@ public abstract class AbstractEntityType<TKey, TEntity extends Entity<TKey>> imp
     protected AbstractEntityType(
             String name,
             Class<TEntity> entityClass,
-            ValueField<TEntity, TKey> keyField) {
+            ValueField<TEntity, TKey> keyField, Field<TEntity, ?>... otherFields) {
         this.name = name;
         this.entityClass = entityClass;
         this.keyField = keyField;
         addFields(keyField);
+        addFields(otherFields);
     }
 
     @Override

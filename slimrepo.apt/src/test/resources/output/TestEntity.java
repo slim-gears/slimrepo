@@ -11,11 +11,11 @@ import java.lang.Override;
 import java.lang.String;
 
 public class TestEntity extends AbstractTestEntity implements Entity<Integer> {
-    public static final EntityType<Integer, TestEntity> EntityMetaType = new MetaType();
-
     public static final NumericField<TestEntity, Integer> Id = Fields.numberField("id", TestEntity.class, Integer.class, false);
 
     public static final StringField<TestEntity> Name = Fields.stringField("name", TestEntity.class, true);
+
+    public static final EntityType<Integer, TestEntity> EntityMetaType = new MetaType();
 
     private TestEntity() {
     }
@@ -52,27 +52,9 @@ public class TestEntity extends AbstractTestEntity implements Entity<Integer> {
         return this.name;
     }
 
-    public static class Builder {
-        private TestEntity model = new TestEntity();
-
-        public TestEntity build() {
-            return model;
-        }
-
-        public Builder id(int id) {
-            model.setId(id);
-            return this;
-        }
-
-        public Builder name(String name) {
-            model.setName(name);
-            return this;
-        }
-    }
-
     private static class MetaType extends AbstractEntityType<Integer, TestEntity> {
         MetaType() {
-            super("TestEntity", TestEntity.class, Id);
+            super("TestEntity", TestEntity.class, Id, Name);
         }
 
         @Override
@@ -97,6 +79,24 @@ public class TestEntity extends AbstractTestEntity implements Entity<Integer> {
             map
                     .putValue(Id, entity.getId())
                     .putValue(Name, entity.getName());
+        }
+    }
+
+    public static class Builder {
+        private TestEntity model = new TestEntity();
+
+        public TestEntity build() {
+            return model;
+        }
+
+        public Builder id(int id) {
+            model.setId(id);
+            return this;
+        }
+
+        public Builder name(String name) {
+            model.setName(name);
+            return this;
         }
     }
 }

@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -28,7 +29,6 @@ import java.util.Map;
  * <File Description>
  */
 public class MainActivity extends Activity {
-    UserRepositoryService userRepositoryService;
 
     class UserListAdapter extends BaseAdapter {
         private final List<UserEntity> users;
@@ -59,7 +59,7 @@ public class MainActivity extends Activity {
             if (convertView == null) {
                 convertView = LayoutInflater
                         .from(MainActivity.this)
-                        .inflate(R.layout.user_list_item, parent, false);
+                        .inflate(R.layout.list_item_user, parent, false);
             }
 
             UserEntity user = users.get(position);
@@ -67,7 +67,7 @@ public class MainActivity extends Activity {
             setText(convertView, R.id.item_id, user.getId());
             setText(convertView, R.id.item_name, user.getFullName());
             setText(convertView, R.id.item_age, user.getAge());
-            setText(convertView, R.id.item_country, countries.get(user.getCountryId()));
+            setText(convertView, R.id.item_country, countries.get(user.getCountryId()).getName());
 
             return convertView;
         }
@@ -82,9 +82,23 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstance) {
         super.onCreate(savedInstance);
 
-        setContentView(R.layout.main);
+        setContentView(R.layout.activity_main);
 
-        userRepositoryService = new GeneratedUserRepositoryService(new SqliteOrmServiceProvider(this));
+        UserRepositoryService userRepositoryService = new GeneratedUserRepositoryService(new SqliteOrmServiceProvider(this));
+
+        setOnClickListener(R.id.button_add_user, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AddUserActivity.show(MainActivity.this);
+            }
+        });
+
+        setOnClickListener(R.id.button_add_country, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AddCountryActivity.show(MainActivity.this);
+            }
+        });
 
         try {
             UserRepository repo = userRepositoryService.open();
@@ -97,5 +111,9 @@ public class MainActivity extends Activity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void setOnClickListener(int viewId, View.OnClickListener listener) {
+        findViewById(viewId).setOnClickListener(listener);
     }
 }

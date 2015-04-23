@@ -7,6 +7,9 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
@@ -20,38 +23,23 @@ public class DataModelGenerator extends ClassGenerator<DataModelGenerator> {
     private TypeSpec.Builder builderClassBuilder;
     private TypeName builderTypeName;
 
+    protected class FieldInfo {
+        public final VariableElement element;
+        public final String name;
+        public final TypeName type;
+
+        FieldInfo(VariableElement element) {
+            this.element = element;
+            this.name = element.getSimpleName().toString();
+            this.type = TypeName.get(element.asType());
+        }
+    }
+
     public DataModelGenerator(ProcessingEnvironment processingEnvironment) {
         super(processingEnvironment);
     }
 
-    protected class Visitor extends ElementVisitorBase<Void, Void> {
-        protected final TypeSpec.Builder modelBuilder;
-        protected MethodSpec.Builder modelCtorBuilder;
-
-        public Visitor(TypeSpec.Builder modelBuilder, MethodSpec.Builder modelCtorBuilder) {
-            this.modelBuilder = modelBuilder;
-            this.modelCtorBuilder = modelCtorBuilder;
-        }
-
-        @Override
-        public Void visitVariable(VariableElement variableElement, Void arg) {
-            String name = variableElement.getSimpleName().toString();
-
-            TypeName type = TypeName.get(variableElement.asType());
-
-            modelBuilder.addMethod(createModelSetter(name, type, getTypeName()));
-            modelBuilder.addMethod(createModelGetter(name, type));
-            builderClassBuilder.addMethod(createBuilderSetter(name, type, builderTypeName));
-            modelCtorBuilder
-                    .addParameter(type, name)
-                    .addCode("this.$L = $L;\n", name, name);
-
-            return null;
-        }
-    }
-
-    @Override
-    protected void build(TypeSpec.Builder builder, TypeElement type, TypeElement... interfaces) {
+    protected void build(TypeSpec.Builder builder, TypeElement type, List<FieldInfo> fields) {
         builder.addModifiers(toModifiersArray(type.getModifiers()));
 
         builderClassBuilder = TypeSpec
@@ -87,14 +75,40 @@ public class DataModelGenerator extends ClassGenerator<DataModelGenerator> {
                 .constructorBuilder()
                 .addModifiers(Modifier.PUBLIC);
 
-        type.accept(createVisitor(builder, modelCtorBuilder), null);
+        processFields(builder, modelCtorBuilder, fields);
 
         builder.addType(builderClassBuilder.build());
         builder.addMethod(modelCtorBuilder.build());
     }
 
-    protected Visitor createVisitor(TypeSpec.Builder typeBuilder, MethodSpec.Builder ctorBuilder) {
-        return new Visitor(typeBuilder, ctorBuilder);
+    @Override
+    protected void build(TypeSpec.Builder builder, TypeElement type, TypeElement... interfaces) {
+        final List<FieldInfo> fields = new ArrayList<>();
+
+        type.accept(new ElementVisitorBase<Void, Void>(){
+            @Override
+            public Void visitVariable(VariableElement element, Void param) {
+                fields.add(new FieldInfo(element));
+                return null;
+            }
+        }, null);
+
+        build(builder, type, fields);
+    }
+
+    protected void processFields(TypeSpec.Builder modelBuilder, MethodSpec.Builder modelCtorBuilder, Iterable<FieldInfo> fields) {
+        for (FieldInfo field : fields) {
+            processField(modelBuilder, modelCtorBuilder, field);
+        }
+    }
+
+    protected void processField(TypeSpec.Builder modelBuilder, MethodSpec.Builder modelCtorBuilder, FieldInfo field) {
+        modelBuilder.addMethod(createModelSetter(field.name, field.type, getTypeName()));
+        modelBuilder.addMethod(createModelGetter(field.name, field.type));
+        builderClassBuilder.addMethod(createBuilderSetter(field.name, field.type, builderTypeName));
+        modelCtorBuilder
+                .addParameter(field.type, field.name)
+                .addCode("this.$L = $L;\n", field.name, field.name);
     }
 
     private MethodSpec createModelGetter(String fieldName, TypeName fieldType) {

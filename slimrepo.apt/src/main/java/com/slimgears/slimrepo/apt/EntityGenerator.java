@@ -2,8 +2,9 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.apt;
 
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
-import com.google.common.reflect.TypeToken;
 import com.slimgears.slimrepo.apt.base.DataModelGenerator;
 import com.slimgears.slimrepo.core.annotations.Key;
 import com.slimgears.slimrepo.core.interfaces.entities.Entity;
@@ -16,25 +17,23 @@ import com.slimgears.slimrepo.core.interfaces.fields.NumericField;
 import com.slimgears.slimrepo.core.interfaces.fields.StringField;
 import com.slimgears.slimrepo.core.internal.AbstractEntityType;
 import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 
 import static com.google.common.collect.Iterables.find;
+import static com.google.common.collect.Iterables.transform;
 
 /**
  * Created by Denis on 21-Apr-15
@@ -54,22 +53,21 @@ public class EntityGenerator extends DataModelGenerator {
         META_FIELD_BUILDER_MAP.put(TypeName.get(String.class), StringMetaFieldBuilder.INSTANCE);
     }
 
-    private static FieldSpec buildMetaField(ClassName entityType, String name, VariableElement field) {
-        AbstractMetaFieldBuilder builder = META_FIELD_BUILDER_MAP.get(TypeName.get(field.asType()));
+    private static FieldSpec buildMetaField(ClassName entityType, FieldInfo field) {
+        AbstractMetaFieldBuilder builder = META_FIELD_BUILDER_MAP.get(field.type);
         if (builder == null) builder = BlobMetaFieldBuilder.INSTANCE;
-        return builder.build(entityType, name, field);
+        return builder.build(entityType, field);
     }
 
     static abstract class AbstractMetaFieldBuilder {
-        public FieldSpec build(ClassName entityType, String name, VariableElement field) {
-            TypeName fieldType = TypeName.get(field.asType());
-            TypeName type = metaFieldType(entityType, fieldType);
-            FieldSpec.Builder builder = FieldSpec.builder(type, name, Modifier.STATIC, Modifier.PUBLIC, Modifier.FINAL);
-            return initialize(builder, entityType, fieldType, field.getSimpleName().toString(), !fieldType.isPrimitive()).build();
+        public FieldSpec build(ClassName entityType, FieldInfo field) {
+            TypeName type = metaFieldType(entityType, field.type);
+            FieldSpec.Builder builder = FieldSpec.builder(type, getMetaFieldName(field.name), Modifier.STATIC, Modifier.PUBLIC, Modifier.FINAL);
+            return initialize(builder, entityType, field, !field.type.isPrimitive()).build();
         }
 
         protected abstract TypeName metaFieldType(ClassName entityType, TypeName fieldType);
-        protected abstract FieldSpec.Builder initialize(FieldSpec.Builder builder, TypeName entityType, TypeName fieldType, String fieldName, boolean isNullable);
+        protected abstract FieldSpec.Builder initialize(FieldSpec.Builder builder, TypeName entityType, FieldInfo field, boolean isNullable);
     }
 
     static class NumericMetaFieldBuilder extends AbstractMetaFieldBuilder {
@@ -81,8 +79,8 @@ public class EntityGenerator extends DataModelGenerator {
         }
 
         @Override
-        protected FieldSpec.Builder initialize(FieldSpec.Builder builder, TypeName entityType, TypeName fieldType, String fieldName, boolean isNullable) {
-            return builder.initializer("$T.numberField($S, $T.class, $T.class, $L)", Fields.class, fieldName, entityType, box(fieldType), isNullable);
+        protected FieldSpec.Builder initialize(FieldSpec.Builder builder, TypeName entityType, FieldInfo field, boolean isNullable) {
+            return builder.initializer("$T.numberField($S, $T.class, $T.class, $L)", Fields.class, field.name, entityType, box(field.type), isNullable);
         }
     }
 
@@ -90,8 +88,8 @@ public class EntityGenerator extends DataModelGenerator {
         static final DateMetaFieldBuilder INSTANCE = new DateMetaFieldBuilder();
 
         @Override
-        protected FieldSpec.Builder initialize(FieldSpec.Builder builder, TypeName entityType, TypeName fieldType, String fieldName, boolean isNullable) {
-            return builder.initializer("$T.dateField($S, $T.class, $L)", Fields.class, fieldName, entityType, isNullable);
+        protected FieldSpec.Builder initialize(FieldSpec.Builder builder, TypeName entityType, FieldInfo field, boolean isNullable) {
+            return builder.initializer("$T.dateField($S, $T.class, $L)", Fields.class, field.name, entityType, isNullable);
         }
     }
 
@@ -104,8 +102,8 @@ public class EntityGenerator extends DataModelGenerator {
         }
 
         @Override
-        protected FieldSpec.Builder initialize(FieldSpec.Builder builder, TypeName entityType, TypeName fieldType, String fieldName, boolean isNullable) {
-            return builder.initializer("$T.stringField($S, $T.class, $L)", Fields.class, fieldName, entityType, isNullable);
+        protected FieldSpec.Builder initialize(FieldSpec.Builder builder, TypeName entityType, FieldInfo field, boolean isNullable) {
+            return builder.initializer("$T.stringField($S, $T.class, $L)", Fields.class, field.name, entityType, isNullable);
         }
     }
 
@@ -118,134 +116,120 @@ public class EntityGenerator extends DataModelGenerator {
         }
 
         @Override
-        protected FieldSpec.Builder initialize(FieldSpec.Builder builder, TypeName entityType, TypeName fieldType, String fieldName, boolean isNullable) {
-            return builder.initializer("$T.blobField($S, $T, $T, $L)", Fields.class, fieldName, entityType, fieldType, isNullable);
+        protected FieldSpec.Builder initialize(FieldSpec.Builder builder, TypeName entityType, FieldInfo field, boolean isNullable) {
+            return builder.initializer("$T.blobField($S, $T, $T, $L)", Fields.class, field.name, entityType, field.type, isNullable);
         }
     }
-
-    private MethodSpec.Builder metaNewInstanceMethodBuilder;
-    private MethodSpec.Builder metaEntityToMapMethodBuilder;
 
     public EntityGenerator(ProcessingEnvironment processingEnvironment) {
         super(processingEnvironment);
     }
 
-    class Visitor extends DataModelGenerator.Visitor {
-        public Visitor(TypeSpec.Builder modelBuilder, MethodSpec.Builder modelCtorBuilder) {
-            super(modelBuilder, modelCtorBuilder);
-        }
-
-        @Override
-        public Void visitVariable(VariableElement variableElement, Void arg) {
-            String fieldName = variableElement.getSimpleName().toString();
-            String metaFieldName = getFieldMetaName(fieldName);
-            ClassName entityType = getTypeName();
-            modelBuilder.addField(buildMetaField(entityType, metaFieldName, variableElement));
-
-            if (metaNewInstanceMethodBuilder == null) {
-                metaNewInstanceMethodBuilder = MethodSpec.methodBuilder("newInstance")
-                        .addAnnotation(Override.class)
-                        .addModifiers(Modifier.PUBLIC)
-                        .returns(entityType)
-                        .addParameter(ParameterizedTypeName.get(ClassName.get(FieldValueLookup.class), entityType), "lookup")
-                        .addCode("return new $T(\n", entityType)
-                        .addCode("    lookup.getValue($L)", metaFieldName);
-
-                metaEntityToMapMethodBuilder = MethodSpec.methodBuilder("entityToMap")
-                        .addAnnotation(Override.class)
-                        .addModifiers(Modifier.PUBLIC)
-                        .addParameter(entityType, "entity")
-                        .addParameter(ParameterizedTypeName.get(ClassName.get(FieldValueMap.class), entityType), "map")
-                        .addCode("map\n")
-                        .addCode("    .putValue($L, entity.$L())", metaFieldName, getModelGetterName(fieldName));
-            } else {
-                metaNewInstanceMethodBuilder.addCode(",\n    lookup.getValue($L)", metaFieldName);
-                metaEntityToMapMethodBuilder.addCode("\n    .putValue($L, entity.$L())", metaFieldName, getModelGetterName(fieldName));
-            }
-
-            return super.visitVariable(variableElement, arg);
-        }
-    }
-
     @Override
-    protected void build(TypeSpec.Builder builder, TypeElement type, TypeElement... interfaces) {
-        VariableElement keyField = getKeyField(type);
-        TypeName keyType = box(TypeName.get(keyField.asType()));
-        TypeName entityType = getTypeName();
+    protected void build(TypeSpec.Builder builder, TypeElement type, List<FieldInfo> fields) {
+        FieldInfo keyField = getKeyField(fields);
+        fields.remove(keyField);
+        fields.add(0, keyField);
 
-        TypeSpec.Builder metaTypeBuilder = createMetaTypeBuilder(keyField, keyType);
+        TypeName keyType = box(keyField.type);
+        ClassName entityType = getTypeName();
+        String keyFieldName = keyField.name;
 
-        builder.addSuperinterface(ParameterizedTypeName.get(ClassName.get(Entity.class), keyType));
-        builder.addMethod(MethodSpec.methodBuilder("getEntityId")
+        for (FieldInfo field : fields) {
+            builder.addField(buildMetaField(entityType, field));
+        }
+
+        builder
+            .addSuperinterface(ParameterizedTypeName.get(ClassName.get(Entity.class), keyType))
+            .addMethod(MethodSpec.methodBuilder("getEntityId")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(keyType)
-                .addCode("return this.$L;\n", keyField.getSimpleName().toString())
-                .build());
-
-        builder.addField(FieldSpec
+                .addCode("return this.$L;\n", keyFieldName)
+                .build())
+            .addField(FieldSpec
                 .builder(ParameterizedTypeName.get(ClassName.get(EntityType.class), keyType, entityType), "EntityMetaType", Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-                .initializer("new $T()", ClassName.get(getPackageName(), getClassName(), "MetaType"))
-                .build());
+                .initializer("new MetaType()")
+                .build())
+            .addType(createMetaType(keyField, keyType, fields));
 
-        super.build(builder, type, interfaces);
-
-        metaTypeBuilder.addMethod(metaNewInstanceMethodBuilder.addCode(");\n").build());
-        metaTypeBuilder.addMethod(metaEntityToMapMethodBuilder.addCode(";\n").build());
-
-        builder.addType(metaTypeBuilder.build());
+        super.build(builder, type, fields);
     }
 
-    private TypeSpec.Builder createMetaTypeBuilder(VariableElement keyField, TypeName keyType) {
+    private TypeSpec createMetaType(FieldInfo keyField, TypeName keyType, Iterable<FieldInfo> fields) {
         ClassName entityType = getTypeName();
-        String keyFieldName = keyField.getSimpleName().toString();
 
-        TypeSpec.Builder metaTypeBuilder = TypeSpec.classBuilder("MetaType")
-                .superclass(ParameterizedTypeName.get(ClassName.get(AbstractEntityType.class), keyType, getTypeName()))
-                .addModifiers(Modifier.PRIVATE, Modifier.STATIC);
-
-        metaTypeBuilder.addMethod(MethodSpec.constructorBuilder()
-                .addCode("super($S, $T.class, $L);\n", getClassName(), getTypeName(), getFieldMetaName(keyFieldName))
-                .build());
-
-        metaTypeBuilder.addMethod(MethodSpec.methodBuilder("newInstance")
+        return TypeSpec.classBuilder("MetaType")
+            .superclass(ParameterizedTypeName.get(ClassName.get(AbstractEntityType.class), keyType, getTypeName()))
+            .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
+            .addMethod(MethodSpec.constructorBuilder()
+                .addCode("super($S, $T.class, ", getClassName(), getTypeName())
+                .addCode(Joiner
+                        .on(", ")
+                        .join(transform(fields, new Function<FieldInfo, String>() {
+                            @Override
+                            public String apply(FieldInfo field) {
+                                return getMetaFieldName(field.name);
+                            }
+                        })))
+                .addCode(");\n")
+                .build())
+            .addMethod(MethodSpec.methodBuilder("newInstance")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(entityType)
                 .addCode("return new $T();\n", entityType)
-                .build());
-
-        metaTypeBuilder.addMethod(MethodSpec.methodBuilder("setKey")
+                .build())
+            .addMethod(MethodSpec.methodBuilder("setKey")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(void.class)
                 .addParameter(entityType, "entity")
                 .addParameter(keyType, "key")
-                .addCode("entity.$L(key);\n", getModelSetterName(keyFieldName))
-                .build());
-
-        return metaTypeBuilder;
+                .addCode("entity.$L(key);\n", getModelSetterName(keyField.name))
+                .build())
+            .addMethod(MethodSpec.methodBuilder("newInstance")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .returns(entityType)
+                .addParameter(ParameterizedTypeName.get(ClassName.get(FieldValueLookup.class), entityType), "lookup")
+                .addCode("return new $T(\n", entityType)
+                .addCode(Joiner.on(",\n").join(transform(fields, new Function<FieldInfo, String>() {
+                    @Override
+                    public String apply(FieldInfo field) {
+                        return "    lookup.getValue(" + getMetaFieldName(field.name) + ")";
+                    }
+                })))
+                .addCode(");\n")
+                .build())
+            .addMethod(MethodSpec.methodBuilder("entityToMap")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .addParameter(entityType, "entity")
+                .addParameter(ParameterizedTypeName.get(ClassName.get(FieldValueMap.class), entityType), "map")
+                .addCode("map\n")
+                .addCode(Joiner.on("\n").join(transform(fields, new Function<FieldInfo, String>() {
+                    @Override
+                    public String apply(FieldInfo field) {
+                        return "    .putValue(" + getMetaFieldName(field.name) + ", entity." + getModelGetterName(field.name) + "())";
+                    }
+                })))
+                .addCode(";\n")
+                .build())
+            .build();
     }
 
-    @Override
-    protected Visitor createVisitor(TypeSpec.Builder typeBuilder, MethodSpec.Builder ctorBuilder) {
-        return new Visitor(typeBuilder, ctorBuilder);
-    }
-
-    private String getFieldMetaName(String fieldName) {
+    private static String getMetaFieldName(String fieldName) {
         return toCamelCase("", fieldName);
     }
 
-    private VariableElement getKeyField(TypeElement entityBaseType) {
-        VariableElement keyField = (VariableElement)find(entityBaseType.getEnclosedElements(), new Predicate<Element>() {
+    private FieldInfo getKeyField(Iterable<FieldInfo> fields) {
+        return find(fields, new Predicate<FieldInfo>() {
             @Override
-            public boolean apply(Element input) {
-                return (input instanceof VariableElement) && input.getAnnotation(Key.class) != null;
+            public boolean apply(FieldInfo input) {
+                return input.element.getAnnotation(Key.class) != null;
             }
         });
-
-        if (keyField == null) throw new RuntimeException("Key field not found in class '" + entityBaseType.getQualifiedName() + "'");
-        return keyField;
     }
 
     private static TypeName box(TypeName type) {
