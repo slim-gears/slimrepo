@@ -1,8 +1,8 @@
 // Copyright 2015 Denis Itskovich
 // Refer to LICENSE.txt for license details
-package com.slimgears.slimrepo.apt.prototype.generated;
+package com.slimgears.slimrepo.core.prototype.generated;
 
-import com.slimgears.slimrepo.apt.prototype.AbstractRoleEntity;
+import com.slimgears.slimrepo.core.prototype.AbstractRoleEntity;
 import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueMap;
@@ -17,17 +17,13 @@ import com.slimgears.slimrepo.core.internal.AbstractEntityType;
  * <File Description>
  */
 public class RoleEntity extends AbstractRoleEntity implements Entity<Integer> {
-    public static final EntityType<Integer, RoleEntity> EntityMetaType;
     public static final NumericField<RoleEntity, Integer> RoleId = Fields.numberField("roleId", RoleEntity.class, Integer.class, false);
     public static final StringField<RoleEntity> RoleDescription = Fields.stringField("roleDescription", RoleEntity.class, true);
-
-    static {
-        EntityMetaType = new MetaType().addFields(RoleDescription).addRelatedEntities();
-    }
+    public static final EntityType<Integer, RoleEntity> EntityMetaType = new MetaType();
 
     static class MetaType extends AbstractEntityType<Integer, RoleEntity> {
         protected MetaType() {
-            super("RoleEntity", RoleEntity.class, RoleId);
+            super("RoleEntity", RoleEntity.class, RoleId, RoleDescription);
         }
 
         @Override
@@ -37,9 +33,9 @@ public class RoleEntity extends AbstractRoleEntity implements Entity<Integer> {
 
         @Override
         public RoleEntity newInstance(FieldValueLookup<RoleEntity> lookup) {
-            return newInstance()
-                    .setRoleId(lookup.getValue(RoleId))
-                    .setRoleDescription(lookup.getValue(RoleDescription));
+            return new RoleEntity(
+                    lookup.getValue(RoleId),
+                    lookup.getValue(RoleDescription));
         }
 
         @Override
@@ -58,6 +54,15 @@ public class RoleEntity extends AbstractRoleEntity implements Entity<Integer> {
     @Override
     public Integer getEntityId() {
         return getRoleId();
+    }
+
+    private RoleEntity() {
+
+    }
+
+    public RoleEntity(int roleId, String roleDescription) {
+        this.roleId = roleId;
+        this.roleDescription = roleDescription;
     }
 
     public static class Builder {

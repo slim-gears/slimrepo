@@ -2,11 +2,13 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal.sql;
 
+import com.slimgears.slimrepo.core.internal.AbstractOrmServiceProvider;
+
 /**
  * Created by Denis on 15-Apr-15
  * <File Description>
  */
-public abstract class AbstractSqlOrmServiceProvider implements SqlOrmServiceProvider {
+public abstract class AbstractSqlOrmServiceProvider extends AbstractOrmServiceProvider implements SqlOrmServiceProvider {
     private SqlStatementBuilder sqlBuilder;
     private SqlStatementBuilder.SyntaxProvider syntaxProvider;
 

@@ -1,6 +1,6 @@
 // Copyright 2015 Denis Itskovich
 // Refer to LICENSE.txt for license details
-package com.slimgears.slimrepo.apt.prototype;
+package com.slimgears.slimrepo.core.prototype;
 
 /**
  * Created by Denis on 07-Apr-15

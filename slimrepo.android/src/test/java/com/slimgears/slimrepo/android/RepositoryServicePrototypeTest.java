@@ -4,10 +4,10 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.slimgears.slimrepo.android.core.SqliteOrmServiceProvider;
-import com.slimgears.slimrepo.android.prototype.UserRepository;
-import com.slimgears.slimrepo.android.prototype.generated.RoleEntity;
-import com.slimgears.slimrepo.android.prototype.generated.UserEntity;
-import com.slimgears.slimrepo.android.prototype.generated.UserRepositoryServiceImpl;
+import com.slimgears.slimrepo.core.prototype.UserRepository;
+import com.slimgears.slimrepo.core.prototype.generated.RoleEntity;
+import com.slimgears.slimrepo.core.prototype.generated.UserEntity;
+import com.slimgears.slimrepo.core.prototype.generated.GeneratedUserRepositoryService;
 import com.slimgears.slimrepo.core.interfaces.RepositoryService;
 import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
 import com.slimgears.slimrepo.core.interfaces.conditions.Conditions;
@@ -23,6 +23,10 @@ import org.robolectric.annotation.Config;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
+
+import static com.slimgears.slimrepo.core.utilities.Dates.addDays;
+import static com.slimgears.slimrepo.core.utilities.Dates.fromDate;
 
 /**
  * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
@@ -35,7 +39,7 @@ public class RepositoryServicePrototypeTest {
     @Before
     public void setup() {
         OrmServiceProvider orm = new SqliteOrmServiceProvider(RuntimeEnvironment.application);
-        repositoryService = new UserRepositoryServiceImpl(orm);
+        repositoryService = new GeneratedUserRepositoryService(orm);
     }
 
     @Test
@@ -111,6 +115,27 @@ public class RepositoryServicePrototypeTest {
                         UserEntity.UserLastName.contains("t")));
 
         Assert.assertEquals(1, count);
+    }
+
+    @Test
+    public void queryByDate() throws IOException {
+        Date date = fromDate(1999, 12, 31);
+        addUsers(
+                UserEntity.create().lastVisitDate(addDays(date, -1)).userFirstName("John").userLastName("Doe").build(),
+                UserEntity.create().lastVisitDate(addDays(date, -2)).userFirstName("Jake").userLastName("Smith").build(),
+                UserEntity.create().lastVisitDate(addDays(date, -3)).userFirstName("Bill").userLastName("Doors").build(),
+                UserEntity.create().lastVisitDate(addDays(date, -4)).userFirstName("Bred").userLastName("Beat").build());
+
+        UserRepository repo = repositoryService.open();
+        try {
+            long count = repo.users().query()
+                    .where(UserEntity.LastVisitDate.greaterOrEqual(addDays(date, -2)))
+                    .prepare()
+                    .count();
+            Assert.assertEquals(2, count);
+        } finally {
+            repo.close();
+        }
     }
 
     private void addUsers(final UserEntity... users) throws IOException {

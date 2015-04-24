@@ -64,13 +64,8 @@ public abstract class AbstractEntityType<TKey, TEntity extends Entity<TKey>> imp
         return entity.getEntityId();
     }
 
-    public AbstractEntityType<TKey, TEntity> addFields(Field<TEntity, ?>... fields) {
+    private AbstractEntityType<TKey, TEntity> addFields(Field<TEntity, ?>... fields) {
         this.fields.addAll(Arrays.asList(fields));
-        return this;
-    }
-
-    public AbstractEntityType<TKey, TEntity> addRelatedEntities(EntityType... relatedEntities) {
-        this.relatedEntities.addAll(Arrays.asList(relatedEntities));
         return this;
     }
 }

@@ -5,6 +5,7 @@ package com.slimgears.slimrepo.core.internal.sql;
 import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.internal.AbstractSessionServiceProvider;
+import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMapper;
 import com.slimgears.slimrepo.core.internal.interfaces.RepositoryCreator;
 import com.slimgears.slimrepo.core.internal.interfaces.SessionEntityServiceProvider;
 import com.slimgears.slimrepo.core.internal.interfaces.TransactionProvider;
@@ -16,13 +17,11 @@ import java.io.IOException;
  * <File Description>
  */
 public abstract class AbstractSqlSessionServiceProvider extends AbstractSessionServiceProvider implements SqlSessionServiceProvider {
-    private final SqlStatementBuilder sqlBuilder;
     private SqlCommandExecutor sqlExecutor;
     private TransactionProvider transactionProvider;
     private SqlOrmServiceProvider ormServiceProvider;
 
     public AbstractSqlSessionServiceProvider(SqlOrmServiceProvider serviceProvider) {
-        this.sqlBuilder = serviceProvider.getStatementBuilder();
         this.ormServiceProvider = serviceProvider;
     }
 
@@ -48,11 +47,6 @@ public abstract class AbstractSqlSessionServiceProvider extends AbstractSessionS
     }
 
     @Override
-    public SqlStatementBuilder getStatementBuilder() {
-        return sqlBuilder;
-    }
-
-    @Override
     public TransactionProvider getTransactionProvider() {
         return transactionProvider != null
                 ? transactionProvider
@@ -65,7 +59,7 @@ public abstract class AbstractSqlSessionServiceProvider extends AbstractSessionS
     }
 
     @Override
-    public SqlStatementBuilder.SyntaxProvider getSyntaxProvider() {
-        return ormServiceProvider.getSyntaxProvider();
+    public SqlOrmServiceProvider getOrmServiceProvider() {
+        return ormServiceProvider;
     }
 }

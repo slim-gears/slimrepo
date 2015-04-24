@@ -10,6 +10,7 @@ import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueMap;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.internal.interfaces.EntityCache;
+import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMapper;
 import com.slimgears.slimrepo.core.internal.query.PreparedQuery;
 import com.slimgears.slimrepo.core.internal.sql.SqlQueryProvider;
 import com.slimgears.slimrepo.core.internal.sql.SqlSessionEntityServiceProvider;
@@ -25,6 +26,7 @@ import java.util.Collection;
 public class SqliteQueryProvider<TKey, TEntity extends Entity<TKey>> extends SqlQueryProvider<TKey, TEntity> {
     private final SQLiteDatabase database;
     private final Class keyType;
+    private final FieldTypeMapper fieldTypeMapper;
     private final SqlSessionEntityServiceProvider<TKey, TEntity> entityServiceProvider;
 
     class ContentValuesAdapter implements FieldValueMap<TEntity> {
@@ -37,17 +39,21 @@ public class SqliteQueryProvider<TKey, TEntity extends Entity<TKey>> extends Sql
         @Override
         public <T> FieldValueMap<TEntity> putValue(Field<TEntity, T> field, T value) {
             if (field == entityType.getKeyField()) return this;
+
+            Object dbValue = fieldTypeMapper.fromFieldType(field.metaInfo().getType(), value);
             String fieldName = field.metaInfo().getName();
-            if (value == null) values.putNull(fieldName);
-            else if (value instanceof Integer) values.put(fieldName, (Integer)value);
-            else if (value instanceof Long) values.put(fieldName, (Long)value);
-            else if (value instanceof Short) values.put(fieldName, (Short)value);
-            else if (value instanceof String) values.put(fieldName, (String)value);
-            else if (value instanceof Double) values.put(fieldName, (Double)value);
-            else if (value instanceof Float) values.put(fieldName, (Float)value);
-            else if (value instanceof Boolean) values.put(fieldName, (Boolean)value);
-            else if (value instanceof byte[]) values.put(fieldName, (byte[])value);
+
+            if (dbValue == null) values.putNull(fieldName);
+            else if (dbValue instanceof Integer) values.put(fieldName, (Integer)dbValue);
+            else if (dbValue instanceof Long) values.put(fieldName, (Long)dbValue);
+            else if (dbValue instanceof Short) values.put(fieldName, (Short)dbValue);
+            else if (dbValue instanceof String) values.put(fieldName, (String)dbValue);
+            else if (dbValue instanceof Double) values.put(fieldName, (Double)dbValue);
+            else if (dbValue instanceof Float) values.put(fieldName, (Float)dbValue);
+            else if (dbValue instanceof Boolean) values.put(fieldName, (Boolean)dbValue);
+            else if (dbValue instanceof byte[]) values.put(fieldName, (byte[])dbValue);
             else throw new RuntimeException("Not supported value type: " + value.getClass().getSimpleName());
+
             return this;
         }
 
@@ -62,6 +68,7 @@ public class SqliteQueryProvider<TKey, TEntity extends Entity<TKey>> extends Sql
         this.database = database;
         this.keyType = entityType.getKeyField().metaInfo().getType();
         this.entityServiceProvider = entityServiceProvider;
+        this.fieldTypeMapper = serviceProvider.getOrmServiceProvider().getFieldTypeMapper();
     }
 
     @Override
@@ -70,7 +77,7 @@ public class SqliteQueryProvider<TKey, TEntity extends Entity<TKey>> extends Sql
             @SuppressWarnings("unchecked")
             @Override
             public Void execute() throws IOException {
-                String tableName = serviceProvider.getSyntaxProvider().tableName(entityType);
+                String tableName = serviceProvider.getOrmServiceProvider().getSyntaxProvider().tableName(entityType);
                 EntityCache<TKey, TEntity> cache = entityServiceProvider.getEntityCache();
                 for (TEntity entity : entitites) {
                     long id = insertEntity(tableName, entity);

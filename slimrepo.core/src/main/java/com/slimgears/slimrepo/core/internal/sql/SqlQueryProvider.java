@@ -164,6 +164,6 @@ public class SqlQueryProvider<TKey, TEntity extends Entity<TKey>> implements Que
 
     private SqlStatementBuilder getBuilder() {
         if (sqlBuilder != null) return sqlBuilder;
-        return sqlBuilder = serviceProvider.getStatementBuilder();
+        return sqlBuilder = serviceProvider.getOrmServiceProvider().getStatementBuilder();
     }
 }

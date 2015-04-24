@@ -150,7 +150,7 @@ public class SqlPredicateBuilder implements SqlStatementBuilder.PredicateBuilder
             String argFormat = ARGUMENT_FORMATS.get(type);
             if (argFormat != null) value = String.format(argFormat, value);
         }
-        return syntaxProvider.valueToString(value);
+        return syntaxProvider.valueToString(null, value);
     }
 
     protected String joinValues(PredicateType type, Object... values) {

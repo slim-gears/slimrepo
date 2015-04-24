@@ -110,7 +110,7 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
                                             @Override
                                             public String apply(Field field) {
                                                 //noinspection unchecked
-                                                return syntaxProvider.substituteParameter(parameters, row.getValue(field));
+                                                return syntaxProvider.substituteParameter(parameters, field.metaInfo().getType(), row.getValue(field));
                                             }
                         })) + ")";
                     }
@@ -169,7 +169,7 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
                         new Function<UpdateFieldInfo, String>() {
                             @Override
                             public String apply(UpdateFieldInfo updateField) {
-                                return fieldName(updateField.field) + " = " + syntaxProvider.substituteParameter(parameters, updateField.value);
+                                return fieldName(updateField.field) + " = " + syntaxProvider.substituteParameter(parameters, updateField.field.metaInfo().getType(), updateField.value);
                             }
                         })) + "\n";
     }
@@ -180,10 +180,6 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
 
     private String fromClause(EntityType entityType) {
         return "FROM " + tableName(entityType) + "\n";
-    }
-
-    private String valueToString(Object value) {
-        return syntaxProvider.valueToString(value);
     }
 
     private String tableName(EntityType entityType) {

@@ -13,9 +13,9 @@ public interface SqlCommand {
     Parameters getParameters();
 
     interface Parameters {
-        String add(Object parameter);
+        String add(String parameter);
         int getCount();
-        Map<String, Object> getMap();
-        Object[] getValues();
+        Map<String, String> getMap();
+        String[] getValues();
     }
 }

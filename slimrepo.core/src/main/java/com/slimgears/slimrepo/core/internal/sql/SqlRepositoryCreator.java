@@ -3,6 +3,7 @@
 package com.slimgears.slimrepo.core.internal.sql;
 
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
+import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMapper;
 import com.slimgears.slimrepo.core.internal.interfaces.RepositoryCreator;
 import com.slimgears.slimrepo.core.internal.interfaces.RepositoryModel;
 import com.slimgears.slimrepo.core.internal.interfaces.TransactionProvider;
@@ -20,7 +21,7 @@ public class SqlRepositoryCreator implements RepositoryCreator {
 
     public SqlRepositoryCreator(SqlSessionServiceProvider sessionServiceProvider) {
         this.transactionProvider = sessionServiceProvider.getTransactionProvider();
-        this.sqlBuilder = sessionServiceProvider.getStatementBuilder();
+        this.sqlBuilder = sessionServiceProvider.getOrmServiceProvider().getStatementBuilder();
         this.sqlExecutor = sessionServiceProvider.getExecutor();
     }
 

@@ -12,12 +12,13 @@ import android.os.Build;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimrepo.core.internal.interfaces.CloseableIterator;
+import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMapper;
 import com.slimgears.slimrepo.core.internal.sql.SqlCommand;
 import com.slimgears.slimrepo.core.internal.sql.SqlCommandExecutor;
 import com.slimgears.slimrepo.core.internal.sql.SqlSessionServiceProvider;
+import com.slimgears.slimrepo.core.internal.sql.SqlStatementBuilder;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,11 +28,11 @@ import java.util.Map;
  */
 public class SqliteCommandExecutor implements SqlCommandExecutor {
     private final SQLiteDatabase database;
+    private final FieldTypeMapper fieldTypeMapper;
 
     class CursorIteratorAdapter<T> implements CloseableIterator<FieldValueLookup<T>> {
         private final Cursor cursor;
         private Map<Field, Integer> fieldToIndexMap = new HashMap<>();
-        private Map<Field, Class> fieldToTypeMap = new HashMap<>();
         private final Lookup lookup = new Lookup();
         private boolean needsMove;
 
@@ -41,39 +42,25 @@ public class SqliteCommandExecutor implements SqlCommandExecutor {
         }
 
         class Lookup implements FieldValueLookup<T> {
-            @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-            @SuppressWarnings("unchecked")
             @Override
             public <T1> T1 getValue(Field<T, T1> field) {
                 int columnIndex = getColumnIndex(field);
-                Class fieldType = getFieldType(field);
-
-                if (fieldType == Integer.class) return (T1)(Integer)cursor.getInt(columnIndex);
-                if (fieldType == String.class) return (T1) cursor.getString(columnIndex);
-                if (fieldType == Boolean.class) return (T1)(Boolean)(cursor.getShort(columnIndex) != 0);
-                if (fieldType == Float.class) return (T1)(Float) cursor.getFloat(columnIndex);
-                if (fieldType == Byte.class) return (T1)(Byte)(byte) cursor.getShort(columnIndex);
-                if (fieldType == Date.class) return (T1)new Date(cursor.getLong(columnIndex));
-                if (fieldType == Short.class) return (T1)(Short) cursor.getShort(columnIndex);
-                if (fieldType == Long.class) return (T1)(Long) cursor.getLong(columnIndex);
-                if (fieldType == Double.class) return (T1)(Double) cursor.getDouble(columnIndex);
-
-                return null;
-            }
-        }
-
-        private Class getFieldType(Field field) {
-            Class type;
-            if (fieldToTypeMap != null) {
-                type = fieldToTypeMap.get(field);
-                if (type != null) return type;
-            } else {
-                fieldToTypeMap = new HashMap<>();
+                Class dbType = fieldTypeMapper.getMappedType(field.metaInfo().getType());
+                Object value = getValue(dbType, cursor, columnIndex);
+                return fieldTypeMapper.toFieldType(field.metaInfo().getType(), value);
             }
 
-            type = field.metaInfo().getType();
-            fieldToTypeMap.put(field, type);
-            return type;
+            private Object getValue(Class type, Cursor cursor, int columnIndex) {
+                if (type == Integer.class) return cursor.getInt(columnIndex);
+                if (type == String.class) return cursor.getString(columnIndex);
+                if (type == Boolean.class) return cursor.getShort(columnIndex) != 0;
+                if (type == Float.class) return cursor.getFloat(columnIndex);
+                if (type == Byte.class) return cursor.getShort(columnIndex);
+                if (type == Short.class) return cursor.getShort(columnIndex);
+                if (type == Long.class) return cursor.getLong(columnIndex);
+                if (type == Double.class) return cursor.getDouble(columnIndex);
+                throw new RuntimeException("Unsupported value type: " + type.getSimpleName());
+            }
         }
 
         private int getColumnIndex(Field field) {
@@ -116,17 +103,18 @@ public class SqliteCommandExecutor implements SqlCommandExecutor {
 
     public SqliteCommandExecutor(SQLiteDatabase sqliteDatabase, SqlSessionServiceProvider sessionServiceProvider) {
         database = sqliteDatabase;
+        fieldTypeMapper = sessionServiceProvider.getOrmServiceProvider().getFieldTypeMapper();
     }
 
     @Override
     public long count(SqlCommand command) throws IOException {
-        return DatabaseUtils.longForQuery(database, command.getStatement(), toStringArguments(command.getParameters()));
+        return DatabaseUtils.longForQuery(database, command.getStatement(), command.getParameters().getValues());
     }
 
     @Override
     public <T> CloseableIterator<FieldValueLookup<T>> select(final SqlCommand command) throws IOException {
         String sql = command.getStatement();
-        String[] params = toStringArguments(command.getParameters());
+        String[] params = command.getParameters().getValues();
         @SuppressLint("Recycle") Cursor cursor = database.rawQuery(sql, params);
         return new CursorIteratorAdapter<>(cursor);
     }
@@ -135,16 +123,7 @@ public class SqliteCommandExecutor implements SqlCommandExecutor {
     @Override
     public void execute(SqlCommand command) throws IOException {
         String sql = command.getStatement();
-        String[] params = toStringArguments(command.getParameters());
+        String[] params = command.getParameters().getValues();
         database.execSQL(sql, params);
-    }
-
-    private String[] toStringArguments(SqlCommand.Parameters params) {
-        Object[] values = params.getValues();
-        String[] strValues = new String[values.length];
-        for (int i = 0; i < values.length; ++i) {
-            strValues[i] = String.valueOf(values[i]);
-        }
-        return strValues;
     }
 }

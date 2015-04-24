@@ -12,11 +12,11 @@ import java.util.Map;
 * <File Description>
 */
 class SqlCommandParameters implements SqlCommand.Parameters {
-    private final List<Object> parameters = new ArrayList<>();
-    private final Map<String, Object> parameterMap = new HashMap<>();
+    private final List<String> parameters = new ArrayList<>();
+    private final Map<String, String> parameterMap = new HashMap<>();
 
     @Override
-    public String add(Object value) {
+    public String add(String value) {
         parameters.add(value);
         String paramName = "@p" + parameters.size();
         parameterMap.put(paramName, value);
@@ -29,12 +29,12 @@ class SqlCommandParameters implements SqlCommand.Parameters {
     }
 
     @Override
-    public Map<String, Object> getMap() {
+    public Map<String, String> getMap() {
         return parameterMap;
     }
 
     @Override
-    public Object[] getValues() {
-        return parameters.toArray();
+    public String[] getValues() {
+        return parameters.toArray(new String[parameters.size()]);
     }
 }

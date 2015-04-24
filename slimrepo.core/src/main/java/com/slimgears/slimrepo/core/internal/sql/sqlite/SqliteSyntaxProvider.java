@@ -4,6 +4,7 @@ package com.slimgears.slimrepo.core.internal.sql.sqlite;
 
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
+import com.slimgears.slimrepo.core.internal.interfaces.OrmServiceProvider;
 import com.slimgears.slimrepo.core.internal.interfaces.RepositoryModel;
 import com.slimgears.slimrepo.core.internal.sql.AbstractSqlSyntaxProvider;
 
@@ -24,6 +25,10 @@ public class SqliteSyntaxProvider extends AbstractSqlSyntaxProvider {
         registerType("TEXT", String.class);
     }
 
+    public SqliteSyntaxProvider(OrmServiceProvider ormServiceProvider) {
+        super(ormServiceProvider);
+    }
+
     private static void registerType(String typeName, Class... classes) {
         for (Class c : classes) {
             CLASS_TO_TYPE_NAME_MAP.put(c, typeName);
@@ -42,8 +47,11 @@ public class SqliteSyntaxProvider extends AbstractSqlSyntaxProvider {
 
     @Override
     public <TEntity, T> String typeName(Field<TEntity, T> field) {
-        String name = CLASS_TO_TYPE_NAME_MAP.get(field.metaInfo().getType());
-        return name != null ? name : "";
+        Class fieldType = field.metaInfo().getType();
+        Class mappedType = fieldTypeMapper.getMappedType(fieldType);
+        String name = CLASS_TO_TYPE_NAME_MAP.get(mappedType);
+        if (name == null) throw new RuntimeException("Field type " + fieldType.getSimpleName() + " is not supported");
+        return name;
     }
 
     @Override
@@ -57,8 +65,9 @@ public class SqliteSyntaxProvider extends AbstractSqlSyntaxProvider {
     }
 
     @Override
-    public String valueToString(Object value) {
+    public String valueToString(Class valueType, Object value) {
         if (value == null) return "NULL";
-        return value.toString();
+        if (valueType == null) valueType = value.getClass();
+        return fieldTypeMapper.fromFieldType(valueType, value).toString();
     }
 }

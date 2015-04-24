@@ -1,8 +1,8 @@
 // Copyright 2015 Denis Itskovich
 // Refer to LICENSE.txt for license details
-package com.slimgears.slimrepo.apt.prototype.generated;
+package com.slimgears.slimrepo.core.prototype.generated;
 
-import com.slimgears.slimrepo.apt.prototype.AbstractUserEntity;
+import com.slimgears.slimrepo.core.prototype.AbstractUserEntity;
 import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
@@ -12,10 +12,12 @@ import com.slimgears.slimrepo.core.interfaces.fields.NumericField;
 import com.slimgears.slimrepo.core.interfaces.fields.StringField;
 import com.slimgears.slimrepo.core.internal.AbstractEntityType;
 
+import java.util.Date;
+
 public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
     static class MetaType extends AbstractEntityType<Integer, UserEntity> {
         public MetaType() {
-            super("UserEntity", UserEntity.class, UserId);
+            super("UserEntity", UserEntity.class, UserId, UserFirstName, UserLastName, LastVisitDate);
         }
 
         @Override
@@ -25,10 +27,11 @@ public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
 
         @Override
         public UserEntity newInstance(FieldValueLookup<UserEntity> lookup) {
-            return newInstance()
-                    .setUserId(lookup.getValue(UserId))
-                    .setUserFirstName(lookup.getValue(UserFirstName))
-                    .setUserLastName(lookup.getValue(UserLastName));
+            return new UserEntity(
+                    lookup.getValue(UserId),
+                    lookup.getValue(UserFirstName),
+                    lookup.getValue(UserLastName),
+                    lookup.getValue(LastVisitDate));
         }
 
         @Override
@@ -36,7 +39,8 @@ public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
             map
                     .putValue(UserId, entity.getUserId())
                     .putValue(UserFirstName, entity.getUserFirstName())
-                    .putValue(UserLastName, entity.getUserLastName());
+                    .putValue(UserLastName, entity.getUserLastName())
+                    .putValue(LastVisitDate, entity.getLastVisitDate());
         }
 
         @Override
@@ -45,15 +49,21 @@ public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
         }
     }
 
-    public static final EntityType<Integer, UserEntity> EntityMetaType;
     public static final NumericField<UserEntity, Integer> UserId = Fields.numberField("userId", UserEntity.class, Integer.class, false);
     public static final StringField<UserEntity> UserFirstName = Fields.stringField("userFirstName", UserEntity.class, true);
     public static final StringField<UserEntity> UserLastName = Fields.stringField("userLastName", UserEntity.class, true);
+    public static final NumericField<UserEntity, Date> LastVisitDate = Fields.dateField("lastVisitDate", UserEntity.class, true);
+    public static final EntityType<Integer, UserEntity> EntityMetaType = new MetaType();
 
-    static {
-        EntityMetaType = new MetaType()
-                .addFields(UserFirstName, UserLastName)
-                .addRelatedEntities();
+    private UserEntity() {
+
+    }
+
+    public UserEntity(int userId, String userFirstName, String userLastName, Date lastVisitDate) {
+        this.userId = userId;
+        this.userFirstName = userFirstName;
+        this.userLastName = userLastName;
+        this.lastVisitDate = lastVisitDate;
     }
 
     @Override
@@ -76,6 +86,11 @@ public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
 
         public Builder userLastName(String lastName) {
             model.setUserLastName(lastName);
+            return this;
+        }
+
+        public Builder lastVisitDate(Date lastVisitDate) {
+            model.setLastVisitDate(lastVisitDate);
             return this;
         }
 
@@ -112,6 +127,15 @@ public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
 
     public UserEntity setUserLastName(String lastName) {
         this.userLastName = lastName;
+        return this;
+    }
+
+    public Date getLastVisitDate() {
+        return lastVisitDate;
+    }
+
+    public UserEntity setLastVisitDate(Date lastVisitDate) {
+        this.lastVisitDate = lastVisitDate;
         return this;
     }
 }

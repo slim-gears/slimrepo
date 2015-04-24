@@ -17,4 +17,5 @@ public interface SessionServiceProvider extends RepositorySessionNotifier, Repos
     <TKey, TEntity extends Entity<TKey>>EntitySet.Provider<TKey, TEntity> getEntitySetProvider(EntityType<TKey, TEntity> entityType);
     TransactionProvider getTransactionProvider();
     RepositoryCreator getRepositoryCreator();
+    OrmServiceProvider getOrmServiceProvider();
 }

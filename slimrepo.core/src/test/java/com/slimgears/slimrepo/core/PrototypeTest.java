@@ -1,14 +1,14 @@
 // Copyright 2015 Denis Itskovich
 // Refer to LICENSE.txt for license details
-package com.slimgears.slimrepo.apt;
+package com.slimgears.slimrepo.core;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import com.slimgears.slimrepo.apt.prototype.UserRepository;
-import com.slimgears.slimrepo.apt.prototype.generated.UserEntity;
-import com.slimgears.slimrepo.apt.prototype.generated.UserRepositoryServiceImpl;
-import com.slimgears.slimrepo.apt.prototype.generated.UserRepositoryImpl;
+import com.slimgears.slimrepo.core.prototype.UserRepository;
+import com.slimgears.slimrepo.core.prototype.generated.UserEntity;
+import com.slimgears.slimrepo.core.prototype.generated.GeneratedUserRepositoryService;
+import com.slimgears.slimrepo.core.prototype.generated.GeneratedUserRepository;
 import com.slimgears.slimrepo.core.interfaces.RepositoryService;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimrepo.core.internal.EntityFieldValueMap;
@@ -29,7 +29,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.mockito.Matchers;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -110,11 +112,11 @@ public class PrototypeTest {
             }
         };
 
-        when(executorMock.select(any(SqlCommand.class)))
+        Mockito.when(executorMock.select(Matchers.any(SqlCommand.class)))
                 .thenAnswer(answer(rowsMock(10)));
-        when(executorMock.count(any(SqlCommand.class)))
+        Mockito.when(executorMock.count(Matchers.any(SqlCommand.class)))
                 .thenAnswer(answer(0));
-        doAnswer(answer(null)).when(executorMock).execute(any(SqlCommand.class));
+        Mockito.doAnswer(answer(null)).when(executorMock).execute(Matchers.any(SqlCommand.class));
     }
 
     @Test
@@ -130,7 +132,7 @@ public class PrototypeTest {
                         .count();
             }
         });
-        verify(executorMock).count(any(SqlCommand.class));
+        Mockito.verify(executorMock).count(Matchers.any(SqlCommand.class));
         assertSqlEquals("query-count-users.sql");
     }
 
@@ -155,21 +157,21 @@ public class PrototypeTest {
                         .toArray();
             }
         });
-        verify(executorMock).select(any(SqlCommand.class));
+        Mockito.verify(executorMock).select(Matchers.any(SqlCommand.class));
         assertSqlEquals("query-users.sql");
     }
 
     @Test
     public void repositoryCreation() throws IOException {
         RepositoryCreator creator = ormServiceProviderMock
-                .createSessionServiceProvider(UserRepositoryImpl.Model.Instance)
+                .createSessionServiceProvider(GeneratedUserRepository.Model.Instance)
                 .getRepositoryCreator();
-        creator.createRepository(UserRepositoryImpl.Model.Instance);
+        creator.createRepository(GeneratedUserRepository.Model.Instance);
         assertSqlEquals("create-tables.sql");
     }
 
     private <T> T testQuery(RepositoryService.QueryAction<UserRepository, T> queryAction) throws IOException {
-        RepositoryService<UserRepository> repo = new UserRepositoryServiceImpl(ormServiceProviderMock);
+        RepositoryService<UserRepository> repo = new GeneratedUserRepositoryService(ormServiceProviderMock);
         T result = repo.query(queryAction);
         Assert.assertNotNull(result);
         return result;
