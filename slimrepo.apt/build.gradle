@@ -3,7 +3,7 @@ import org.gradle.internal.jvm.Jvm
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 
-group = 'com.slimgears.slimorm'
+group = 'com.slimgears.slimrepo'
 version = '0.2'
 
 sourceCompatibility = JavaVersion.VERSION_1_7
@@ -25,7 +25,7 @@ processResources.dependsOn copyResources
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifactId 'slimorm-apt'
+            artifactId 'slimrepo-apt'
             from components.java
         }
     }
