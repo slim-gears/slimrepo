@@ -12,6 +12,7 @@ buildscript {
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
 apply plugin: 'org.robolectric'
+apply plugin: 'maven-publish'
 
 android {
     compileSdkVersion 22
@@ -30,7 +31,20 @@ android {
         }
     }
 }
-    
+
+publishing {
+    repositories {
+        mavenLocal()
+    }
+
+    publications {
+        maven(MavenPublication) {
+            artifact "${project.buildDir}/outputs/aar/${project.name}-release.aar"
+            artifactId 'slimrepo-android'
+        }
+    }
+}
+
 robolectric {
     afterTest { descriptor, result ->
         println "TEST ${result.resultType} - ${descriptor.name}"
@@ -38,7 +52,6 @@ robolectric {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':slimrepo.core')
 
     testCompile project(path: ':slimrepo.core', configuration: 'testOutput')

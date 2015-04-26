@@ -1,4 +1,5 @@
 apply plugin: 'java'
+apply plugin: 'maven-publish'
 
 configurations {
     testOutput.extendsFrom (testCompile)
@@ -27,6 +28,19 @@ task testJar(type: Jar, dependsOn: testClasses) {
     classifier = 'tests'
     from sourceSets.test.output
 }
+
+publishing {
+    repositories {
+        mavenLocal()
+    }
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId 'slimrepo-core'
+            from components.java
+        }
+    }
+}
+
 
 artifacts {
     testOutput testJar
