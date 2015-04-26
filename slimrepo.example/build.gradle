@@ -15,6 +15,7 @@ apply plugin: 'org.robolectric'
 
 configurations {
     apt
+    phony
 }
 
 android {
@@ -47,10 +48,9 @@ dependencies {
     compile 'com.slimgears.slimrepo:slimrepo-android:0.3-SNAPSHOT'
     apt 'com.slimgears.slimrepo:slimrepo-apt:0.3-SNAPSHOT'
 
-//    compile project(':slimrepo.core')
-//    compile project(':slimrepo.android')
-
-//    apt project(':slimrepo.apt')
+    phony project(':slimrepo.core')
+    phony project(':slimrepo.android')
+    phony project(':slimrepo.apt')
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.0.5-beta'
