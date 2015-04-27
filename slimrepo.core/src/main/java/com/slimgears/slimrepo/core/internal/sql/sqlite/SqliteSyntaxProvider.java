@@ -47,10 +47,9 @@ public class SqliteSyntaxProvider extends AbstractSqlSyntaxProvider {
 
     @Override
     public <TEntity, T> String typeName(Field<TEntity, T> field) {
-        Class fieldType = field.metaInfo().getType();
-        Class mappedType = fieldTypeMapper.getMappedType(fieldType);
+        Class mappedType = fieldTypeMapper.getMappedType(field);
         String name = CLASS_TO_TYPE_NAME_MAP.get(mappedType);
-        if (name == null) throw new RuntimeException("Field type " + fieldType.getSimpleName() + " is not supported");
+        if (name == null) throw new RuntimeException("Field type " + field.metaInfo().getType().getSimpleName() + " is not supported");
         return name;
     }
 
@@ -65,9 +64,8 @@ public class SqliteSyntaxProvider extends AbstractSqlSyntaxProvider {
     }
 
     @Override
-    public String valueToString(Class valueType, Object value) {
+    public <TEntity, T> String valueToString(Field<TEntity, T> field, T value) {
         if (value == null) return "NULL";
-        if (valueType == null) valueType = value.getClass();
-        return fieldTypeMapper.fromFieldType(valueType, value).toString();
+        return fieldTypeMapper.fromFieldType(field, value).toString();
     }
 }

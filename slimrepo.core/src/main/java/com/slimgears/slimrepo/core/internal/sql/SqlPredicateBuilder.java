@@ -63,7 +63,7 @@ public class SqlPredicateBuilder implements SqlStatementBuilder.PredicateBuilder
         this.syntaxProvider = syntaxProvider;
     }
 
-    private String operator(PredicateType predicateType, Object... args) {
+    private String operator(PredicateType predicateType, String... args) {
         String format = OPERATOR_FORMATS.get(predicateType);
         if (format == null) throw new RuntimeException("Not support predicate type: " + predicateType);
         return String.format(format, args);
@@ -76,40 +76,41 @@ public class SqlPredicateBuilder implements SqlStatementBuilder.PredicateBuilder
             this.parameters = parameters;
         }
 
-        private String substituteArg(PredicateType type, Object value) {
-            return SqlPredicateBuilder.this.substituteArg(parameters, type, value);
+        private <V> String substituteArg(FieldCondition<T, V> condition, V value) {
+            return SqlPredicateBuilder.this.substituteArg(parameters, condition, value);
         }
 
-        private Object[] substituteArgs(PredicateType type, Object... args) {
-            Object[] substitutedArgs = new String[args.length];
+        @SafeVarargs
+        private final <V> String[] substituteArgs(FieldCondition<T, V> type, V... args) {
+            String[] substitutedArgs = new String[args.length];
             for (int i = 0; i < args.length; ++i) {
                 substitutedArgs[i] = substituteArg(type, args[i]);
             }
             return substitutedArgs;
         }
 
-        private String fieldOperator(FieldCondition<T, ?> predicate, Object... args) {
+        private <V> String fieldOperator(FieldCondition<T, V> predicate, String... args) {
             PredicateType type = predicate.getType();
-            return fieldName(predicate.getField()) + " " + operator(type, substituteArgs(type, args));
+            return fieldName(predicate.getField()) + " " + operator(type, args);
         }
 
         @Override
-        protected String visitBinary(BinaryCondition<T, ?> predicate) {
-            return fieldOperator(predicate, predicate.getValue());
+        protected <V> String visitBinary(BinaryCondition<T, V> predicate) {
+            return fieldOperator(predicate, substituteArg(predicate, predicate.getValue()));
         }
 
         @Override
-        protected String visitTernary(TernaryCondition<T, ?> predicate) {
-            return fieldOperator(predicate, predicate.getFirst(), predicate.getSecond());
+        protected <V> String visitTernary(TernaryCondition<T, V> predicate) {
+            return fieldOperator(predicate, substituteArgs(predicate, predicate.getFirst(), predicate.getSecond()));
         }
 
         @Override
-        protected String visitCollection(CollectionCondition<T, ?> predicate) {
-            return fieldOperator(predicate, joinValues(predicate.getType(), predicate.getValues()));
+        protected <V> String visitCollection(CollectionCondition<T, V> predicate) {
+            return fieldOperator(predicate, joinValues(predicate, predicate.getValues()));
         }
 
         @Override
-        protected String visitUnary(UnaryCondition<T, ?> predicate) {
+        protected <V> String visitUnary(UnaryCondition<T, V> predicate) {
             return fieldOperator(predicate);
         }
 
@@ -137,26 +138,27 @@ public class SqlPredicateBuilder implements SqlStatementBuilder.PredicateBuilder
         return visitor.visit(condition);
     }
 
-    protected String substituteArg(SqlCommand.Parameters params, PredicateType type, Object value) {
-        return syntaxProvider.parameterReference(params.getCount(), params.add(valueToString(type, value)));
+    protected <T, V> String substituteArg(SqlCommand.Parameters params, FieldCondition<T, V> condition, V value) {
+        return syntaxProvider.parameterReference(params.getCount(), params.add(valueToString(condition, value)));
     }
 
     protected String fieldName(Field field) {
         return syntaxProvider.fieldName(field);
     }
 
-    protected String valueToString(PredicateType type, Object value) {
+    protected <T, V> String valueToString(FieldCondition<T, V> condition, V value) {
         if (value instanceof String) {
-            String argFormat = ARGUMENT_FORMATS.get(type);
-            if (argFormat != null) value = String.format(argFormat, value);
+            String argFormat = ARGUMENT_FORMATS.get(condition.getType());
+            if (argFormat != null) //noinspection unchecked
+                value = (V)String.format(argFormat, value);
         }
-        return syntaxProvider.valueToString(null, value);
+        return syntaxProvider.valueToString(condition.getField(), value);
     }
 
-    protected String joinValues(PredicateType type, Object... values) {
+    protected <T, V> String joinValues(FieldCondition<T, V> condition, V[] values) {
         String[] strValues = new String[values.length];
         for (int i = 0; i < values.length; ++i) {
-            strValues[i] = valueToString(type, values[i]);
+            strValues[i] = valueToString(condition, values[i]);
         }
         return Joiner
                 .on(", ")

@@ -45,9 +45,9 @@ public class SqliteCommandExecutor implements SqlCommandExecutor {
             @Override
             public <T1> T1 getValue(Field<T, T1> field) {
                 int columnIndex = getColumnIndex(field);
-                Class dbType = fieldTypeMapper.getMappedType(field.metaInfo().getType());
+                Class dbType = fieldTypeMapper.getMappedType(field);
                 Object value = getValue(dbType, cursor, columnIndex);
-                return fieldTypeMapper.toFieldType(field.metaInfo().getType(), value);
+                return fieldTypeMapper.toFieldType(field, value);
             }
 
             private Object getValue(Class type, Cursor cursor, int columnIndex) {
@@ -119,7 +119,6 @@ public class SqliteCommandExecutor implements SqlCommandExecutor {
         return new CursorIteratorAdapter<>(cursor);
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     public void execute(SqlCommand command) throws IOException {
         String sql = command.getStatement();

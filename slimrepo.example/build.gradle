@@ -42,14 +42,20 @@ robolectric {
     }
 }
 
-dependencies {
-//    compile 'com.slimgears.slimrepo:slimrepo-core:0.3-SNAPSHOT'
-//    compile 'com.slimgears.slimrepo:slimrepo-android:0.3-SNAPSHOT'
-//    apt 'com.slimgears.slimrepo:slimrepo-apt:0.3-SNAPSHOT'
+repositories {
+	maven {
+		url 'http://jitpack.io'
+	}
+}
 
-    compile project(':slimrepo.core')
-    compile project(':slimrepo.android')
-    apt project(':slimrepo.apt')
+dependencies {
+    compile 'com.github.slim-gears.slimrepo:slimrepo-core:0.3-SNAPSHOT'
+    compile 'com.github.slim-gears.slimrepo:slimrepo-android:0.3-SNAPSHOT'
+    apt 'com.github.slim-gears.slimrepo:slimrepo-apt:0.3-SNAPSHOT'
+
+    // compile project(':slimrepo.core')
+    // compile project(':slimrepo.android')
+    // apt project(':slimrepo.apt')
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.0.5-beta'

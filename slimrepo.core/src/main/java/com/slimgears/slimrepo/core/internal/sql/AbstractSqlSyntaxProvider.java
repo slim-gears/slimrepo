@@ -2,6 +2,7 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal.sql;
 
+import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMapper;
 import com.slimgears.slimrepo.core.internal.interfaces.OrmServiceProvider;
 
@@ -17,9 +18,8 @@ public abstract class AbstractSqlSyntaxProvider implements SqlStatementBuilder.S
     }
 
     @Override
-    public String substituteParameter(SqlCommand.Parameters params, Class valueType, Object value) {
+    public <TEntity, T> String substituteParameter(SqlCommand.Parameters params, Field<TEntity, T> field, T value) {
         int index = params.getCount();
-        Object mappedValue = fieldTypeMapper.fromFieldType(valueType, value);
-        return parameterReference(index, params.add(valueToString(valueType, mappedValue)));
+        return parameterReference(index, params.add(valueToString(field, value)));
     }
 }

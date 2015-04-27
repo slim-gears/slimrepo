@@ -23,10 +23,10 @@ public abstract class PredicateVisitor<TEntity, T> {
         return visitUnknown(condition);
     }
 
-    protected abstract T visitBinary(BinaryCondition<TEntity, ?> predicate);
-    protected abstract T visitTernary(TernaryCondition<TEntity, ?> predicate);
-    protected abstract T visitCollection(CollectionCondition<TEntity, ?> predicate);
-    protected abstract T visitUnary(UnaryCondition<TEntity, ?> predicate);
+    protected abstract <V> T visitBinary(BinaryCondition<TEntity, V> predicate);
+    protected abstract <V> T visitTernary(TernaryCondition<TEntity, V> predicate);
+    protected abstract <V> T visitCollection(CollectionCondition<TEntity, V> predicate);
+    protected abstract <V> T visitUnary(UnaryCondition<TEntity, V> predicate);
     protected abstract T visitComposite(CompositeCondition<TEntity> predicate);
     protected abstract T visitUnknown(Condition<TEntity> condition);
 }

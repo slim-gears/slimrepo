@@ -7,6 +7,8 @@ import com.slimgears.slimrepo.core.interfaces.conditions.CollectionCondition;
 import com.slimgears.slimrepo.core.interfaces.conditions.Conditions;
 import com.slimgears.slimrepo.core.interfaces.conditions.TernaryCondition;
 import com.slimgears.slimrepo.core.interfaces.conditions.UnaryCondition;
+import com.slimgears.slimrepo.core.interfaces.entities.Entity;
+import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 
 import java.util.Collection;
 import java.util.Date;
@@ -16,6 +18,7 @@ import java.util.Date;
  * <File Description>
  */
 public class Fields {
+
     static class AbstractField<TEntity, T> implements Field<TEntity, T>, Field.MetaInfo<TEntity, T> {
         private final Class<TEntity> entityClass;
         private final String name;
@@ -178,6 +181,27 @@ public class Fields {
         }
     }
 
+    static class RelatedFieldImplementation<TEntity, TRelatedEntity extends Entity<?>>
+            extends AbstractField<TEntity, TRelatedEntity>
+            implements RelationalField<TEntity, TRelatedEntity>, RelationalField.MetaInfo<TEntity, TRelatedEntity> {
+        private final EntityType<?, TRelatedEntity> relatedEntityType;
+
+        RelatedFieldImplementation(Class<TEntity> entityClass, String name, EntityType<?, TRelatedEntity> relatedEntityType, boolean nullable) {
+            super(entityClass, name, relatedEntityType.getEntityClass(), nullable);
+            this.relatedEntityType = relatedEntityType;
+        }
+
+        @Override
+        public RelationalField.MetaInfo<TEntity, TRelatedEntity> metaInfo() {
+            return this;
+        }
+
+        @Override
+        public EntityType<?, TRelatedEntity> relatedEntityType() {
+            return relatedEntityType;
+        }
+    }
+
     public static <TEntity, T> NumericField<TEntity, T> numberField(String name, Class<TEntity> entityClass, Class<T> fieldType, boolean nullable) {
         return new NumericFieldImplementation<>(entityClass, name, fieldType, nullable);
     }
@@ -192,5 +216,9 @@ public class Fields {
 
     public static <TEntity, T> BlobField<TEntity, T> blobField(String name, Class<TEntity> entityClass, Class<T> fieldType, boolean nullable) {
         return new BlobFieldImplementation<>(entityClass, name, fieldType, nullable);
+    }
+
+    public static <TEntity, TRelatedEntity extends Entity<?>> RelationalField<TEntity, TRelatedEntity> relationalField(String name, Class<TEntity> entityClass, EntityType<?, TRelatedEntity> relatedEntityType, boolean nullable) {
+        return new RelatedFieldImplementation<>(entityClass, name, relatedEntityType, nullable);
     }
 }

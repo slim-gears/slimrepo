@@ -110,7 +110,7 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
                                             @Override
                                             public String apply(Field field) {
                                                 //noinspection unchecked
-                                                return syntaxProvider.substituteParameter(parameters, field.metaInfo().getType(), row.getValue(field));
+                                                return substituteParameter(parameters, field, row.getValue(field));
                                             }
                         })) + ")";
                     }
@@ -169,7 +169,7 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
                         new Function<UpdateFieldInfo, String>() {
                             @Override
                             public String apply(UpdateFieldInfo updateField) {
-                                return fieldName(updateField.field) + " = " + syntaxProvider.substituteParameter(parameters, updateField.field.metaInfo().getType(), updateField.value);
+                                return fieldName(updateField.field) + " = " + substituteParameter(parameters, updateField.field, updateField.value);
                             }
                         })) + "\n";
     }
@@ -249,5 +249,9 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
 
     private String columnType(Field field) {
         return syntaxProvider.typeName(field);
+    }
+
+    private <T> String substituteParameter(SqlCommand.Parameters parameters, Field<?, T> field, T value) {
+        return syntaxProvider.substituteParameter(parameters, field, value);
     }
 }

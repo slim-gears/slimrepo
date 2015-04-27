@@ -21,7 +21,6 @@ public abstract class AbstractEntityType<TKey, TEntity extends Entity<TKey>> imp
     private final Class<TEntity> entityClass;
     private final ValueField<TEntity, TKey> keyField;
     private final List<Field<TEntity, ?>> fields = new ArrayList<>();
-    private final List<EntityType> relatedEntities = new ArrayList<>();
 
     protected AbstractEntityType(
             String name,
@@ -52,11 +51,6 @@ public abstract class AbstractEntityType<TKey, TEntity extends Entity<TKey>> imp
     @Override
     public ValueField<TEntity, TKey> getKeyField() {
         return keyField;
-    }
-
-    @Override
-    public Collection<EntityType> getRelatedEntities() {
-        return relatedEntities;
     }
 
     @Override

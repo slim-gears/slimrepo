@@ -13,4 +13,5 @@ public class AbstractUserEntity {
     protected String userFirstName;
     protected String userLastName;
     protected Date lastVisitDate;
+    protected AbstractRoleEntity role;
 }

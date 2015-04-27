@@ -16,7 +16,6 @@ public interface EntityType<TKey, TEntity extends Entity<TKey>> {
     String getName();
     ValueField<TEntity, TKey> getKeyField();
     Collection<Field<TEntity, ?>> getFields();
-    Collection<EntityType> getRelatedEntities();
     TEntity newInstance();
     TEntity newInstance(FieldValueLookup<TEntity> lookup);
     void entityToMap(TEntity entity, FieldValueMap<TEntity> map);

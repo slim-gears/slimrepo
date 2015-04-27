@@ -40,7 +40,7 @@ public class SqliteQueryProvider<TKey, TEntity extends Entity<TKey>> extends Sql
         public <T> FieldValueMap<TEntity> putValue(Field<TEntity, T> field, T value) {
             if (field == entityType.getKeyField()) return this;
 
-            Object dbValue = fieldTypeMapper.fromFieldType(field.metaInfo().getType(), value);
+            Object dbValue = fieldTypeMapper.fromFieldType(field, value);
             String fieldName = field.metaInfo().getName();
 
             if (dbValue == null) values.putNull(fieldName);

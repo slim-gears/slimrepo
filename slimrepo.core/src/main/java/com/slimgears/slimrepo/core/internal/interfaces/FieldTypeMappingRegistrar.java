@@ -2,16 +2,23 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal.interfaces;
 
+import com.slimgears.slimrepo.core.interfaces.fields.Field;
+
 /**
  * Created by Denis on 24-Apr-15
  * <File Description>
  */
 public interface FieldTypeMappingRegistrar extends FieldTypeMapper {
     interface TypeConverter<T> {
-        T toEntityType(Object value);
-        Object fromEntityType(T value);
+        T toEntityType(Field<?, T> field, Object value);
+        Object fromEntityType(Field<?, T> field, T value);
         Class getMappedType(Class fieldType);
     }
 
-    <T> void registerConverter(Class<? extends T> fieldType, TypeConverter<T> converter);
+    interface Matcher {
+        boolean match(Field field);
+    }
+
+    <T> void registerConverter(Class<? extends T> valueType, TypeConverter<T> converter);
+    void registerConverter(Matcher matcher, TypeConverter converter);
 }

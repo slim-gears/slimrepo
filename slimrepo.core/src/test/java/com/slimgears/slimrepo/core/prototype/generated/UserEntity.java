@@ -2,6 +2,7 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.prototype.generated;
 
+import com.slimgears.slimrepo.core.interfaces.fields.RelationalField;
 import com.slimgears.slimrepo.core.prototype.AbstractUserEntity;
 import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
@@ -53,6 +54,7 @@ public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
     public static final StringField<UserEntity> UserFirstName = Fields.stringField("userFirstName", UserEntity.class, true);
     public static final StringField<UserEntity> UserLastName = Fields.stringField("userLastName", UserEntity.class, true);
     public static final NumericField<UserEntity, Date> LastVisitDate = Fields.dateField("lastVisitDate", UserEntity.class, true);
+    public static final RelationalField<UserEntity, RoleEntity> Role = Fields.relationalField("role", UserEntity.class, RoleEntity.EntityMetaType, true);
     public static final EntityType<Integer, UserEntity> EntityMetaType = new MetaType();
 
     private UserEntity() {
@@ -91,6 +93,11 @@ public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
 
         public Builder lastVisitDate(Date lastVisitDate) {
             model.setLastVisitDate(lastVisitDate);
+            return this;
+        }
+
+        public Builder role(RoleEntity role) {
+            model.setRole(role);
             return this;
         }
 
@@ -136,6 +143,15 @@ public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
 
     public UserEntity setLastVisitDate(Date lastVisitDate) {
         this.lastVisitDate = lastVisitDate;
+        return this;
+    }
+
+    public RoleEntity getRole() {
+        return (RoleEntity)role;
+    }
+
+    public UserEntity setRole(RoleEntity role) {
+        this.role = role;
         return this;
     }
 }

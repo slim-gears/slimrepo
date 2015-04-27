@@ -23,8 +23,8 @@ public interface SqlStatementBuilder {
         <TKey, TEntity extends Entity<TKey>> String tableName(EntityType<TKey, TEntity> entityType);
         String databaseName(RepositoryModel repositoryModel);
         String parameterReference(int index, String name);
-        String valueToString(Class valueType, Object value);
-        String substituteParameter(SqlCommand.Parameters params, Class valueType, Object value);
+        <TEntity, T> String valueToString(Field<TEntity, T> field, T value);
+        <TEntity, T> String substituteParameter(SqlCommand.Parameters params, Field<TEntity, T> field, T value);
     }
 
     interface PredicateBuilder {

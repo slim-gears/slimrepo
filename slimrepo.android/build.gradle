@@ -13,6 +13,7 @@ apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
 apply plugin: 'org.robolectric'
 apply plugin: 'maven-publish'
+apply plugin: 'idea'
 
 android {
     compileSdkVersion 22
