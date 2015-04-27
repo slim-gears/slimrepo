@@ -4,6 +4,7 @@ package com.slimgears.slimrepo.core.interfaces.fields;
 
 import com.slimgears.slimrepo.core.interfaces.conditions.BinaryCondition;
 import com.slimgears.slimrepo.core.interfaces.conditions.CollectionCondition;
+import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
 import com.slimgears.slimrepo.core.interfaces.conditions.Conditions;
 import com.slimgears.slimrepo.core.interfaces.conditions.TernaryCondition;
 import com.slimgears.slimrepo.core.interfaces.conditions.UnaryCondition;
@@ -194,6 +195,11 @@ public class Fields {
         @Override
         public RelationalField.MetaInfo<TEntity, TRelatedEntity> metaInfo() {
             return this;
+        }
+
+        @Override
+        public Condition<TEntity> is(Condition<TRelatedEntity> condition) {
+            return null;
         }
 
         @Override

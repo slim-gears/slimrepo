@@ -11,5 +11,5 @@ import com.slimgears.slimrepo.core.interfaces.fields.Field;
 public interface FieldTypeMapper {
     <T> T toFieldType(Field<?, T> field, Object value);
     <T> Object fromFieldType(Field<?, T> field, T value);
-    Class getMappedType(Field<?, ?> field);
+    <T> Class getMappedType(Field<?, T> field);
 }

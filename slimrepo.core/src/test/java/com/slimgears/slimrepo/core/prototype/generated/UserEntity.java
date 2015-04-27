@@ -18,7 +18,7 @@ import java.util.Date;
 public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
     static class MetaType extends AbstractEntityType<Integer, UserEntity> {
         public MetaType() {
-            super("UserEntity", UserEntity.class, UserId, UserFirstName, UserLastName, LastVisitDate);
+            super("UserEntity", UserEntity.class, UserId, UserFirstName, UserLastName, LastVisitDate, Role);
         }
 
         @Override
@@ -32,7 +32,8 @@ public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
                     lookup.getValue(UserId),
                     lookup.getValue(UserFirstName),
                     lookup.getValue(UserLastName),
-                    lookup.getValue(LastVisitDate));
+                    lookup.getValue(LastVisitDate),
+                    lookup.getValue(Role));
         }
 
         @Override
@@ -41,7 +42,8 @@ public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
                     .putValue(UserId, entity.getUserId())
                     .putValue(UserFirstName, entity.getUserFirstName())
                     .putValue(UserLastName, entity.getUserLastName())
-                    .putValue(LastVisitDate, entity.getLastVisitDate());
+                    .putValue(LastVisitDate, entity.getLastVisitDate())
+                    .putValue(Role, entity.getRole());
         }
 
         @Override
@@ -61,11 +63,12 @@ public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
 
     }
 
-    public UserEntity(int userId, String userFirstName, String userLastName, Date lastVisitDate) {
+    public UserEntity(int userId, String userFirstName, String userLastName, Date lastVisitDate, RoleEntity role) {
         this.userId = userId;
         this.userFirstName = userFirstName;
         this.userLastName = userLastName;
         this.lastVisitDate = lastVisitDate;
+        this.role = role;
     }
 
     @Override

@@ -6,6 +6,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.slimgears.slimrepo.core.prototype.UserRepository;
+import com.slimgears.slimrepo.core.prototype.generated.RoleEntity;
 import com.slimgears.slimrepo.core.prototype.generated.UserEntity;
 import com.slimgears.slimrepo.core.prototype.generated.GeneratedUserRepositoryService;
 import com.slimgears.slimrepo.core.prototype.generated.GeneratedUserRepository;
@@ -168,6 +169,21 @@ public class PrototypeTest {
                 .getRepositoryCreator();
         creator.createRepository(GeneratedUserRepository.Model.Instance);
         assertSqlEquals("create-tables.sql");
+    }
+
+    @Test
+    public void queryForRelatedField() throws IOException {
+        testQuery(new RepositoryService.QueryAction<UserRepository, Object>() {
+            @Override
+            public Object execute(UserRepository repository) throws IOException {
+                return repository.users().query()
+                        .where(UserEntity.Role.is(RoleEntity.RoleDescription.contains("ad")))
+                        .prepare()
+                        .toArray();
+            }
+        });
+        Mockito.verify(executorMock).select(Matchers.any(SqlCommand.class));
+        assertSqlEquals("query-related-field.sql");
     }
 
     private <T> T testQuery(RepositoryService.QueryAction<UserRepository, T> queryAction) throws IOException {

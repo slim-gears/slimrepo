@@ -12,7 +12,7 @@ public interface FieldTypeMappingRegistrar extends FieldTypeMapper {
     interface TypeConverter<T> {
         T toEntityType(Field<?, T> field, Object value);
         Object fromEntityType(Field<?, T> field, T value);
-        Class getMappedType(Class fieldType);
+        Class getMappedType(Field<?, T> field);
     }
 
     interface Matcher {

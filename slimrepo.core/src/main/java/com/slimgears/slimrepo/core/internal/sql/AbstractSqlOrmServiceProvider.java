@@ -3,6 +3,7 @@
 package com.slimgears.slimrepo.core.internal.sql;
 
 import com.slimgears.slimrepo.core.internal.AbstractOrmServiceProvider;
+import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMappingRegistrar;
 
 /**
  * Created by Denis on 15-Apr-15
@@ -38,6 +39,14 @@ public abstract class AbstractSqlOrmServiceProvider extends AbstractOrmServicePr
 
     protected SqlStatementBuilder.PredicateBuilder createPredicateBuilder(SqlStatementBuilder.SyntaxProvider syntaxProvider) {
         return new SqlPredicateBuilder(syntaxProvider);
+    }
+
+    @Override
+    protected FieldTypeMappingRegistrar createTypeMappingRegistrar() {
+        FieldTypeMappingRegistrar registrar = super.createTypeMappingRegistrar();
+        SqlRelationalTypeMapper typeMapper = new SqlRelationalTypeMapper();
+        registrar.registerConverter(typeMapper, typeMapper);
+        return registrar;
     }
 
     protected abstract SqlStatementBuilder.SyntaxProvider createSyntaxProvider();

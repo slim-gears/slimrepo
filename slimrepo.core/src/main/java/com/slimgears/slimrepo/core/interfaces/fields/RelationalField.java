@@ -1,5 +1,6 @@
 package com.slimgears.slimrepo.core.interfaces.fields;
 
+import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
 import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 
@@ -12,4 +13,6 @@ public interface RelationalField<TEntity, TRelatedEntity extends Entity<?>> exte
     }
 
     MetaInfo<TEntity, TRelatedEntity> metaInfo();
+
+    Condition<TEntity> is(Condition<TRelatedEntity> condition);
 }

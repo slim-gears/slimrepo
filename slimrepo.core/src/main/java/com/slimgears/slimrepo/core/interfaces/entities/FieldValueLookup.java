@@ -9,5 +9,9 @@ import com.slimgears.slimrepo.core.interfaces.fields.Field;
  * <File Description>
  */
 public interface FieldValueLookup<TEntity> {
+    interface Provider<TEntity> {
+        FieldValueLookup<TEntity> get();
+    }
+
     <T> T getValue(Field<TEntity, T> field);
 }
