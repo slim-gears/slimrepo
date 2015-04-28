@@ -18,7 +18,7 @@ public abstract class AbstractSqlSyntaxProvider implements SqlStatementBuilder.S
     }
 
     @Override
-    public <TEntity, T> String substituteParameter(SqlCommand.Parameters params, Field<TEntity, T> field, T value) {
+    public <T> String substituteParameter(SqlCommand.Parameters params, Field<?, T> field, T value) {
         int index = params.getCount();
         return parameterReference(index, params.add(valueToString(field, value)));
     }

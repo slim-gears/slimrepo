@@ -2,6 +2,7 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.interfaces.conditions;
 
+import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.interfaces.fields.NumericField;
 import com.slimgears.slimrepo.core.interfaces.fields.StringField;
@@ -35,7 +36,7 @@ public class Conditions {
         }
     }
 
-    static abstract class AbstractFieldCondition<TEntity, T> extends AbstractCondition<TEntity> implements FieldCondition<TEntity, T> {
+    static abstract class AbstractFieldCondition<TEntity extends Entity<?>, T> extends AbstractCondition<TEntity> implements FieldCondition<TEntity, T> {
         private final Field<TEntity, T> field;
 
         AbstractFieldCondition(PredicateType type, Field<TEntity, T> field) {
@@ -49,7 +50,7 @@ public class Conditions {
         }
     }
 
-    static class BinaryConditionImplementation<TEntity, T> extends AbstractFieldCondition<TEntity, T> implements BinaryCondition<TEntity, T> {
+    static class BinaryConditionImplementation<TEntity extends Entity<?>, T> extends AbstractFieldCondition<TEntity, T> implements BinaryCondition<TEntity, T> {
         private final T value;
 
         BinaryConditionImplementation(PredicateType type, Field<TEntity, T> field, T value) {
@@ -63,7 +64,7 @@ public class Conditions {
         }
     }
 
-    static class CollectionConditionImplementation<TEntity, T> extends AbstractFieldCondition<TEntity, T> implements CollectionCondition<TEntity, T> {
+    static class CollectionConditionImplementation<TEntity extends Entity<?>, T> extends AbstractFieldCondition<TEntity, T> implements CollectionCondition<TEntity, T> {
         private final T[] values;
 
         CollectionConditionImplementation(PredicateType type, Field<TEntity, T> field, T[] values) {
@@ -77,7 +78,7 @@ public class Conditions {
         }
     }
 
-    static class TernaryConditionImplementation<TEntity, T> extends AbstractFieldCondition<TEntity, T> implements TernaryCondition<TEntity, T> {
+    static class TernaryConditionImplementation<TEntity extends Entity<?>, T> extends AbstractFieldCondition<TEntity, T> implements TernaryCondition<TEntity, T> {
         private final T first;
         private final T second;
 
@@ -98,7 +99,7 @@ public class Conditions {
         }
     }
 
-    static class UnaryConditionImplementation<TEntity, T> extends AbstractFieldCondition<TEntity, T> implements UnaryCondition<TEntity, T> {
+    static class UnaryConditionImplementation<TEntity extends Entity<?>, T> extends AbstractFieldCondition<TEntity, T> implements UnaryCondition<TEntity, T> {
         UnaryConditionImplementation(PredicateType type, Field<TEntity, T> field) {
             super(type, field);
         }

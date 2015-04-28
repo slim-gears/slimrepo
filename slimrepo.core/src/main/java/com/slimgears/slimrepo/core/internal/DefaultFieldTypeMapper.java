@@ -26,22 +26,22 @@ public class DefaultFieldTypeMapper implements FieldTypeMapper, FieldTypeMapping
 
         @Override
         public boolean match(Field field) {
-            return converterMap.containsKey(field.metaInfo().getType());
+            return converterMap.containsKey(field.metaInfo().getValueType());
         }
 
         @Override
         public Object toEntityType(Field field, Object value) {
-            return getConverter(field.metaInfo().getType()).toEntityType(field, value);
+            return getConverter(field.metaInfo().getValueType()).toEntityType(field, value);
         }
 
         @Override
         public Object fromEntityType(Field field, Object value) {
-            return getConverter(field.metaInfo().getType()).fromEntityType(field, value);
+            return getConverter(field.metaInfo().getValueType()).fromEntityType(field, value);
         }
 
         @Override
         public Class getMappedType(Field field) {
-            return getConverter(field.metaInfo().getType()).getMappedType(field);
+            return getConverter(field.metaInfo().getValueType()).getMappedType(field);
         }
 
         private TypeConverter getConverter(Class valueType) {
@@ -62,7 +62,7 @@ public class DefaultFieldTypeMapper implements FieldTypeMapper, FieldTypeMapping
 
         @Override
         public Class getMappedType(Field field) {
-            return field.metaInfo().getType();
+            return field.metaInfo().getValueType();
         }
     };
 

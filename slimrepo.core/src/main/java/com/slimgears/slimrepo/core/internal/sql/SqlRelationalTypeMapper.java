@@ -36,6 +36,6 @@ public class SqlRelationalTypeMapper implements FieldTypeMappingRegistrar.Matche
     @Override
     public Class getMappedType(Field field) {
         RelationalField relationalField = (RelationalField)field;
-        return relationalField.metaInfo().relatedEntityType().getKeyField().metaInfo().getType();
+        return relationalField.metaInfo().relatedEntityType().getKeyField().metaInfo().getValueType();
     }
 }

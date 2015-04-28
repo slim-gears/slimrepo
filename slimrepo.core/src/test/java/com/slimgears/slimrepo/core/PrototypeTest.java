@@ -200,8 +200,8 @@ public class PrototypeTest {
                     UserEntity.EntityMetaType,
                     UserEntity.create()
                             .userId(i)
-                            .userFirstName("Denis")
-                            .userLastName("Itsko")
+                            .userFirstName("John")
+                            .userLastName("Doe")
                             .build());
         }
         return iteratorMock(rows);

@@ -12,6 +12,7 @@ import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimrepo.core.interfaces.fields.NumericField;
 import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
+import com.slimgears.slimrepo.core.interfaces.fields.RelationalField;
 import com.slimgears.slimrepo.core.internal.EntityFieldValueMap;
 import com.slimgears.slimrepo.core.internal.OrderFieldInfo;
 import com.slimgears.slimrepo.core.internal.UpdateFieldInfo;
@@ -231,8 +232,18 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
     private String columnConstraints(EntityType entityType, Field field) {
         if (isAutoIncremented(entityType, field)) return "PRIMARY KEY ASC";
         if (isPrimaryKey(entityType, field)) return "PRIMARY KEY";
+        if (isForeignKey(field)) return foreignKeyConstraint((RelationalField)field);
         if (!field.metaInfo().isNullable()) return "NOT NULL";
         return "";
+    }
+
+    private String foreignKeyConstraint(RelationalField field) {
+        EntityType relatedEntityType = field.metaInfo().relatedEntityType();
+        return "REFERENCES " + syntaxProvider.tableName(relatedEntityType) + " (" + syntaxProvider.fieldName(relatedEntityType.getKeyField()) + ")";
+    }
+
+    private boolean isForeignKey(Field field) {
+        return field instanceof RelationalField;
     }
 
     private boolean isPrimaryKey(EntityType entityType, Field field) {

@@ -49,7 +49,7 @@ public class SqliteSyntaxProvider extends AbstractSqlSyntaxProvider {
     public <TEntity, T> String typeName(Field<TEntity, T> field) {
         Class mappedType = fieldTypeMapper.getMappedType(field);
         String name = CLASS_TO_TYPE_NAME_MAP.get(mappedType);
-        if (name == null) throw new RuntimeException("Field type " + field.metaInfo().getType().getSimpleName() + " is not supported");
+        if (name == null) throw new RuntimeException("Field type " + field.metaInfo().getValueType().getSimpleName() + " is not supported");
         return name;
     }
 

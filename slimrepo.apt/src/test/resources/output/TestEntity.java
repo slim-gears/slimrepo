@@ -2,7 +2,7 @@ import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueMap;
-import com.slimgears.slimrepo.core.interfaces.fields.Fields;
+import com.slimgears.slimrepo.core.internal.Fields;
 import com.slimgears.slimrepo.core.interfaces.fields.NumericField;
 import com.slimgears.slimrepo.core.interfaces.fields.StringField;
 import com.slimgears.slimrepo.core.internal.AbstractEntityType;
@@ -11,9 +11,9 @@ import java.lang.Override;
 import java.lang.String;
 
 public class TestEntity extends AbstractTestEntity implements Entity<Integer> {
-    public static final NumericField<TestEntity, Integer> Id = Fields.numberField("id", TestEntity.class, Integer.class, false);
+    public static final NumericField<TestEntity, Integer> Id = Fields.numberField("id", Integer.class, false);
 
-    public static final StringField<TestEntity> Name = Fields.stringField("name", TestEntity.class, true);
+    public static final StringField<TestEntity> Name = Fields.stringField("name", true);
 
     public static final EntityType<Integer, TestEntity> EntityMetaType = new MetaType();
 

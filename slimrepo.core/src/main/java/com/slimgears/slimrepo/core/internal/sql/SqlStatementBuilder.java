@@ -18,13 +18,13 @@ import com.slimgears.slimrepo.core.internal.query.UpdateQueryParams;
  */
 public interface SqlStatementBuilder {
     interface SyntaxProvider {
-        <TEntity, T> String fieldName(Field<TEntity, T> field);
-        <TEntity, T> String typeName(Field<TEntity, T> field);
-        <TKey, TEntity extends Entity<TKey>> String tableName(EntityType<TKey, TEntity> entityType);
+        String fieldName(Field<?, ?> field);
+        String typeName(Field<?, ?> field);
+        String tableName(EntityType<?, ?> entityType);
         String databaseName(RepositoryModel repositoryModel);
         String parameterReference(int index, String name);
-        <TEntity, T> String valueToString(Field<TEntity, T> field, T value);
-        <TEntity, T> String substituteParameter(SqlCommand.Parameters params, Field<TEntity, T> field, T value);
+        <T> String valueToString(Field<?, T> field, T value);
+        <T> String substituteParameter(SqlCommand.Parameters params, Field<?, T> field, T value);
     }
 
     interface PredicateBuilder {

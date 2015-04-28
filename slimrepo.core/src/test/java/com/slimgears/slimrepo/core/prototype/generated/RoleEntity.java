@@ -6,7 +6,7 @@ import com.slimgears.slimrepo.core.prototype.AbstractRoleEntity;
 import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueMap;
-import com.slimgears.slimrepo.core.interfaces.fields.Fields;
+import com.slimgears.slimrepo.core.internal.Fields;
 import com.slimgears.slimrepo.core.interfaces.fields.NumericField;
 import com.slimgears.slimrepo.core.interfaces.fields.StringField;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
@@ -17,8 +17,8 @@ import com.slimgears.slimrepo.core.internal.AbstractEntityType;
  * <File Description>
  */
 public class RoleEntity extends AbstractRoleEntity implements Entity<Integer> {
-    public static final NumericField<RoleEntity, Integer> RoleId = Fields.numberField("roleId", RoleEntity.class, Integer.class, false);
-    public static final StringField<RoleEntity> RoleDescription = Fields.stringField("roleDescription", RoleEntity.class, true);
+    public static final NumericField<RoleEntity, Integer> RoleId = Fields.numberField("roleId", Integer.class, false);
+    public static final StringField<RoleEntity> RoleDescription = Fields.stringField("roleDescription", true);
     public static final EntityType<Integer, RoleEntity> EntityMetaType = new MetaType();
 
     static class MetaType extends AbstractEntityType<Integer, RoleEntity> {

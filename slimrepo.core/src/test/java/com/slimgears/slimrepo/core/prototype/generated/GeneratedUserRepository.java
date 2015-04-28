@@ -14,13 +14,13 @@ import com.slimgears.slimrepo.core.internal.interfaces.SessionServiceProvider;
  * <File Description>
  */
 public class GeneratedUserRepository extends AbstractRepository implements UserRepository {
-    private final EntitySet.Provider<Integer, UserEntity> usersEntitySet;
     private final EntitySet.Provider<Integer, RoleEntity> rolesEntitySet;
+    private final EntitySet.Provider<Integer, UserEntity> usersEntitySet;
 
     public GeneratedUserRepository(SessionServiceProvider sessionServiceProvider) {
         super(sessionServiceProvider);
-        usersEntitySet = sessionServiceProvider.getEntitySetProvider(UserEntity.EntityMetaType);
         rolesEntitySet = sessionServiceProvider.getEntitySetProvider(RoleEntity.EntityMetaType);
+        usersEntitySet = sessionServiceProvider.getEntitySetProvider(UserEntity.EntityMetaType);
     }
 
     public static class Model extends DefaultRepositoryModel {
@@ -28,17 +28,17 @@ public class GeneratedUserRepository extends AbstractRepository implements UserR
         private final static int Version = 10;
         private final static String Name = "UserRepository";
         public Model() {
-            super(Name, Version, UserEntity.EntityMetaType, RoleEntity.EntityMetaType);
+            super(Name, Version, RoleEntity.EntityMetaType, UserEntity.EntityMetaType);
         }
-    }
-
-    @Override
-    public EntitySet<Integer, UserEntity> users() {
-        return usersEntitySet.get();
     }
 
     @Override
     public EntitySet<Integer, RoleEntity> roles() {
         return rolesEntitySet.get();
+    }
+
+    @Override
+    public EntitySet<Integer, UserEntity> users() {
+        return usersEntitySet.get();
     }
 }

@@ -8,7 +8,6 @@ import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.interfaces.fields.ValueField;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -59,7 +58,13 @@ public abstract class AbstractEntityType<TKey, TEntity extends Entity<TKey>> imp
     }
 
     private AbstractEntityType<TKey, TEntity> addFields(Field<TEntity, ?>... fields) {
-        this.fields.addAll(Arrays.asList(fields));
+        for (Field<TEntity, ?> field : fields) {
+            if (field instanceof Bindable) {
+                //noinspection unchecked
+                ((Bindable<TEntity>)field).bind(this);
+            }
+            this.fields.add(field);
+        }
         return this;
     }
 }

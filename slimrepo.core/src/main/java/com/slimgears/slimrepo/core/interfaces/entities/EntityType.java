@@ -21,4 +21,8 @@ public interface EntityType<TKey, TEntity extends Entity<TKey>> {
     void entityToMap(TEntity entity, FieldValueMap<TEntity> map);
     TKey getKey(TEntity entity);
     void setKey(TEntity entity, TKey key);
+
+    interface Bindable<TEntity extends Entity<?>> {
+        void bind(EntityType<?, TEntity> entityType);
+    }
 }

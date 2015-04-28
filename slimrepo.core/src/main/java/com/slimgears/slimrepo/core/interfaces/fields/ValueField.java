@@ -3,6 +3,7 @@
 package com.slimgears.slimrepo.core.interfaces.fields;
 
 import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
+import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 
 import java.util.Collection;
 
@@ -10,7 +11,7 @@ import java.util.Collection;
  * Created by Denis on 11-Apr-15
  * <File Description>
  */
-public interface ValueField<TEntity, T> extends Field<TEntity, T> {
+public interface ValueField<TEntity extends Entity<?>, T> extends Field<TEntity, T> {
     Condition<TEntity> equal(T value);
     Condition<TEntity> notEqual(T value);
     Condition<TEntity> in(T... values);

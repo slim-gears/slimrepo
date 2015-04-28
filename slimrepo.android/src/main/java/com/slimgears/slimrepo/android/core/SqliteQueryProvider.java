@@ -66,7 +66,7 @@ public class SqliteQueryProvider<TKey, TEntity extends Entity<TKey>> extends Sql
     public SqliteQueryProvider(SQLiteDatabase database, SqlSessionServiceProvider serviceProvider, SqliteSessionEntityServiceProvider<TKey, TEntity> entityServiceProvider, EntityType<TKey, TEntity> entityType) {
         super(serviceProvider, entityType);
         this.database = database;
-        this.keyType = entityType.getKeyField().metaInfo().getType();
+        this.keyType = entityType.getKeyField().metaInfo().getValueType();
         this.entityServiceProvider = entityServiceProvider;
         this.fieldTypeMapper = serviceProvider.getOrmServiceProvider().getFieldTypeMapper();
     }
