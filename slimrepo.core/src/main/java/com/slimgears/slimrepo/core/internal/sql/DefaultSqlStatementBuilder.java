@@ -23,6 +23,8 @@ import com.slimgears.slimrepo.core.internal.query.InsertQueryParams;
 import com.slimgears.slimrepo.core.internal.query.QueryPagination;
 import com.slimgears.slimrepo.core.internal.query.SelectQueryParams;
 import com.slimgears.slimrepo.core.internal.query.UpdateQueryParams;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommand;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlStatementBuilder;
 
 import java.util.Collection;
 import java.util.HashSet;

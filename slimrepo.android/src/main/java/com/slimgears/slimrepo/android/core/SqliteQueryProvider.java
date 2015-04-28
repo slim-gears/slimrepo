@@ -14,7 +14,7 @@ import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMapper;
 import com.slimgears.slimrepo.core.internal.query.PreparedQuery;
 import com.slimgears.slimrepo.core.internal.sql.SqlQueryProvider;
 import com.slimgears.slimrepo.core.internal.sql.SqlSessionEntityServiceProvider;
-import com.slimgears.slimrepo.core.internal.sql.SqlSessionServiceProvider;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlSessionServiceProvider;
 
 import java.io.IOException;
 import java.util.Collection;

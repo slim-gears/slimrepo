@@ -9,8 +9,8 @@ import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.internal.interfaces.SessionEntityServiceProvider;
 import com.slimgears.slimrepo.core.internal.interfaces.TransactionProvider;
 import com.slimgears.slimrepo.core.internal.sql.AbstractSqlSessionServiceProvider;
-import com.slimgears.slimrepo.core.internal.sql.SqlCommandExecutor;
-import com.slimgears.slimrepo.core.internal.sql.SqlOrmServiceProvider;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommandExecutor;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlOrmServiceProvider;
 
 import java.io.Closeable;
 import java.io.IOException;

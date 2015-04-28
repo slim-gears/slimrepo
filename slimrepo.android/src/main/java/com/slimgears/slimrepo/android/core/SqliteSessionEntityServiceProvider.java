@@ -8,7 +8,7 @@ import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.internal.query.QueryProvider;
 import com.slimgears.slimrepo.core.internal.sql.SqlSessionEntityServiceProvider;
-import com.slimgears.slimrepo.core.internal.sql.SqlSessionServiceProvider;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlSessionServiceProvider;
 
 /**
  * Created by Denis on 18-Apr-15

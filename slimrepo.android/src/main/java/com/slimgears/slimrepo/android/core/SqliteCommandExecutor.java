@@ -11,11 +11,11 @@ import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimrepo.core.internal.interfaces.CloseableIterator;
 import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMapper;
-import com.slimgears.slimrepo.core.internal.sql.SqlCommand;
-import com.slimgears.slimrepo.core.internal.sql.SqlCommandExecutor;
-import com.slimgears.slimrepo.core.internal.sql.SqlOrmServiceProvider;
-import com.slimgears.slimrepo.core.internal.sql.SqlSessionServiceProvider;
-import com.slimgears.slimrepo.core.internal.sql.SqlStatementBuilder;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommand;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommandExecutor;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlOrmServiceProvider;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlSessionServiceProvider;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlStatementBuilder;
 
 import java.io.IOException;
 import java.util.HashMap;

@@ -15,6 +15,8 @@ import com.slimgears.slimrepo.core.interfaces.conditions.PredicateType;
 import com.slimgears.slimrepo.core.interfaces.conditions.TernaryCondition;
 import com.slimgears.slimrepo.core.interfaces.conditions.UnaryCondition;
 import com.slimgears.slimrepo.core.internal.PredicateVisitor;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommand;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlStatementBuilder;
 
 import java.util.HashMap;
 import java.util.Iterator;

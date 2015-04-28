@@ -2,12 +2,9 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal.sql.sqlite;
 
-import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMappingRegistrar;
 import com.slimgears.slimrepo.core.internal.sql.AbstractSqlOrmServiceProvider;
-import com.slimgears.slimrepo.core.internal.sql.SqlStatementBuilder;
-
-import java.util.Date;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlStatementBuilder;
 
 /**
  * Created by Denis on 15-Apr-15

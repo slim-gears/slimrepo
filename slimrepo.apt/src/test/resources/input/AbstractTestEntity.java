@@ -1,5 +1,6 @@
 import com.slimgears.slimrepo.core.annotations.GenerateEntity;
 import com.slimgears.slimrepo.core.annotations.Key;
+import com.slimgears.slimrepo.core.annotations.Relation;
 import com.slimgears.slimrepo.core.prototype.generated.UserEntity;
 
 @GenerateEntity

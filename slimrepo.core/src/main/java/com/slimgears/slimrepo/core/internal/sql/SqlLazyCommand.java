@@ -2,6 +2,9 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal.sql;
 
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommand;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlStatementBuilder;
+
 /**
  * Created by Denis on 08-Apr-15
  * <File Description>

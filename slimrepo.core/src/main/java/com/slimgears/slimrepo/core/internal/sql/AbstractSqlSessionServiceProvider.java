@@ -5,10 +5,12 @@ package com.slimgears.slimrepo.core.internal.sql;
 import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.internal.AbstractSessionServiceProvider;
-import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMapper;
 import com.slimgears.slimrepo.core.internal.interfaces.RepositoryCreator;
 import com.slimgears.slimrepo.core.internal.interfaces.SessionEntityServiceProvider;
 import com.slimgears.slimrepo.core.internal.interfaces.TransactionProvider;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommandExecutor;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlOrmServiceProvider;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlSessionServiceProvider;
 
 import java.io.IOException;
 

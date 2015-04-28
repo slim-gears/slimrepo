@@ -4,6 +4,8 @@ package com.slimgears.slimrepo.core.internal.sql;
 
 import com.slimgears.slimrepo.core.internal.AbstractOrmServiceProvider;
 import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMappingRegistrar;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlOrmServiceProvider;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlStatementBuilder;
 
 /**
  * Created by Denis on 15-Apr-15

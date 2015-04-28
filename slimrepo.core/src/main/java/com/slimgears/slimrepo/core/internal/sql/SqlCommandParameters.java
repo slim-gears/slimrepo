@@ -2,6 +2,8 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal.sql;
 
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommand;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

@@ -19,9 +19,9 @@ import com.slimgears.slimrepo.core.internal.interfaces.RepositoryModel;
 import com.slimgears.slimrepo.core.internal.interfaces.SessionServiceProvider;
 import com.slimgears.slimrepo.core.internal.interfaces.TransactionProvider;
 import com.slimgears.slimrepo.core.internal.sql.AbstractSqlSessionServiceProvider;
-import com.slimgears.slimrepo.core.internal.sql.SqlCommand;
-import com.slimgears.slimrepo.core.internal.sql.SqlCommandExecutor;
-import com.slimgears.slimrepo.core.internal.sql.SqlOrmServiceProvider;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommand;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommandExecutor;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlOrmServiceProvider;
 import com.slimgears.slimrepo.core.internal.sql.sqlite.AbstractSqliteOrmServiceProvider;
 
 import org.apache.commons.io.IOUtils;
@@ -47,9 +47,7 @@ import java.util.List;
 import static com.slimgears.slimrepo.core.interfaces.conditions.Conditions.and;
 import static com.slimgears.slimrepo.core.interfaces.conditions.Conditions.or;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Created by Denis on 07-Apr-15

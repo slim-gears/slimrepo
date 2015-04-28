@@ -14,6 +14,10 @@ import com.slimgears.slimrepo.core.internal.query.PreparedQuery;
 import com.slimgears.slimrepo.core.internal.query.QueryProvider;
 import com.slimgears.slimrepo.core.internal.query.SelectQueryParams;
 import com.slimgears.slimrepo.core.internal.query.UpdateQueryParams;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommand;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommandExecutor;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlSessionServiceProvider;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlStatementBuilder;
 
 import java.io.IOException;
 import java.util.Collection;
