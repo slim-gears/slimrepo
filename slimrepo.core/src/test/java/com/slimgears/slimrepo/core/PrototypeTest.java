@@ -163,6 +163,21 @@ public class PrototypeTest {
     }
 
     @Test
+    public void queryCountWithRelationalCondition() throws IOException {
+        testQuery(new RepositoryService.QueryAction<UserRepository, Object>() {
+            @Override
+            public Object execute(UserRepository repository) throws IOException {
+                return repository.users().query()
+                        .where(UserEntity.Role.is(RoleEntity.RoleDescription.in("Admin")))
+                        .prepare()
+                        .count();
+            }
+        });
+        Mockito.verify(executorMock).count(Matchers.any(SqlCommand.class));
+        assertSqlEquals("query-count-related-field.sql");
+    }
+
+    @Test
     public void repositoryCreation() throws IOException {
         RepositoryCreator creator = ormServiceProviderMock
                 .createSessionServiceProvider(GeneratedUserRepository.Model.Instance)
@@ -172,12 +187,12 @@ public class PrototypeTest {
     }
 
     @Test
-    public void queryForRelatedField() throws IOException {
+    public void queryWithRelationalCondition() throws IOException {
         testQuery(new RepositoryService.QueryAction<UserRepository, Object>() {
             @Override
             public Object execute(UserRepository repository) throws IOException {
                 return repository.users().query()
-                        .where(UserEntity.Role.is(RoleEntity.RoleDescription.contains("ad")))
+                        .where(UserEntity.Role.is(RoleEntity.RoleDescription.in("Admin")))
                         .prepare()
                         .toArray();
             }

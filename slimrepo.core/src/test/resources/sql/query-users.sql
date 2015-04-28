@@ -1,7 +1,8 @@
-SELECT `userId`, `userFirstName`, `userLastName`, `lastVisitDate`, `role`
+SELECT `UserEntity`.`userId`, `UserEntity`.`userFirstName`, `UserEntity`.`userLastName`, `UserEntity`.`lastVisitDate`, `UserEntity`.`role`, `RoleEntity`.`roleId`, `RoleEntity`.`roleDescription`
 FROM `UserEntity`
-WHERE ((`userFirstName` LIKE ?) AND (`userId` > ?)) OR (`userLastName` LIKE ?)
-ORDER BY `userLastName` ASC, `userFirstName` ASC, `userId` ASC
+JOIN `RoleEntity` ON `UserEntity`.`role` = `RoleEntity`.`roleId`
+WHERE ((`UserEntity`.`userFirstName` LIKE ?) AND (`UserEntity`.`userId` > ?)) OR (`UserEntity`.`userLastName` LIKE ?)
+ORDER BY `UserEntity`.`userLastName` ASC, `UserEntity`.`userFirstName` ASC, `UserEntity`.`userId` ASC
 LIMIT 10 OFFSET 3
 
 {Params: [%John%, 20, Smi%]}

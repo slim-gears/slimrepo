@@ -6,6 +6,7 @@ import com.slimgears.slimrepo.core.interfaces.conditions.BinaryCondition;
 import com.slimgears.slimrepo.core.interfaces.conditions.CollectionCondition;
 import com.slimgears.slimrepo.core.interfaces.conditions.CompositeCondition;
 import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
+import com.slimgears.slimrepo.core.interfaces.conditions.RelationalCondition;
 import com.slimgears.slimrepo.core.interfaces.conditions.TernaryCondition;
 import com.slimgears.slimrepo.core.interfaces.conditions.UnaryCondition;
 
@@ -20,13 +21,39 @@ public abstract class PredicateVisitor<TEntity, T> {
         if (condition instanceof TernaryCondition) return visitTernary((TernaryCondition<TEntity, ?>) condition);
         if (condition instanceof CollectionCondition) return visitCollection((CollectionCondition<TEntity, ?>) condition);
         if (condition instanceof CompositeCondition) return visitComposite((CompositeCondition<TEntity>) condition);
+        if (condition instanceof RelationalCondition) return visitRelational((RelationalCondition<TEntity, ?>) condition);
         return visitUnknown(condition);
     }
 
-    protected abstract <V> T visitBinary(BinaryCondition<TEntity, V> predicate);
-    protected abstract <V> T visitTernary(TernaryCondition<TEntity, V> predicate);
-    protected abstract <V> T visitCollection(CollectionCondition<TEntity, V> predicate);
-    protected abstract <V> T visitUnary(UnaryCondition<TEntity, V> predicate);
-    protected abstract T visitComposite(CompositeCondition<TEntity> predicate);
-    protected abstract T visitUnknown(Condition<TEntity> condition);
+    protected <V> T visitBinary(BinaryCondition<TEntity, V> predicate) {
+        return defaultValue();
+    }
+
+    protected <V> T visitTernary(TernaryCondition<TEntity, V> predicate) {
+        return defaultValue();
+    }
+
+    protected <V> T visitCollection(CollectionCondition<TEntity, V> predicate) {
+        return defaultValue();
+    }
+
+    protected <V> T visitUnary(UnaryCondition<TEntity, V> predicate) {
+        return defaultValue();
+    }
+
+    protected T visitComposite(CompositeCondition<TEntity> predicate) {
+        return defaultValue();
+    }
+
+    protected T visitUnknown(Condition<TEntity> condition) {
+        return defaultValue();
+    }
+
+    protected <V> T visitRelational(RelationalCondition<TEntity, V> condition) {
+        return defaultValue();
+    }
+
+    protected T defaultValue() {
+        return null;
+    }
 }

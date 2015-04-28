@@ -21,7 +21,7 @@ public class SqlRelationalTypeMapper implements FieldTypeMappingRegistrar.Matche
     public Object toEntityType(Field field, Object value) {
         if (value == null) return null;
         RelationalField relationalField = (RelationalField)field;
-        EntityType relatedEntityType = relationalField.metaInfo().relatedEntityType();
+        EntityType relatedEntityType = relationalField.metaInfo().getRelatedEntityType();
         Entity entity = relatedEntityType.newInstance();
         //noinspection unchecked
         relatedEntityType.setKey(entity, value);
@@ -36,6 +36,6 @@ public class SqlRelationalTypeMapper implements FieldTypeMappingRegistrar.Matche
     @Override
     public Class getMappedType(Field field) {
         RelationalField relationalField = (RelationalField)field;
-        return relationalField.metaInfo().relatedEntityType().getKeyField().metaInfo().getValueType();
+        return relationalField.metaInfo().getRelatedEntityType().getKeyField().metaInfo().getValueType();
     }
 }

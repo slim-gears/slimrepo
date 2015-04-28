@@ -6,15 +6,17 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
+import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
+import com.slimgears.slimrepo.core.interfaces.conditions.RelationalCondition;
 import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
-import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
+import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.interfaces.fields.NumericField;
-import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
 import com.slimgears.slimrepo.core.interfaces.fields.RelationalField;
 import com.slimgears.slimrepo.core.internal.EntityFieldValueMap;
 import com.slimgears.slimrepo.core.internal.OrderFieldInfo;
+import com.slimgears.slimrepo.core.internal.PredicateVisitor;
 import com.slimgears.slimrepo.core.internal.UpdateFieldInfo;
 import com.slimgears.slimrepo.core.internal.query.DeleteQueryParams;
 import com.slimgears.slimrepo.core.internal.query.InsertQueryParams;
@@ -23,6 +25,9 @@ import com.slimgears.slimrepo.core.internal.query.SelectQueryParams;
 import com.slimgears.slimrepo.core.internal.query.UpdateQueryParams;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import static com.google.common.collect.Iterables.transform;
 
@@ -41,9 +46,11 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
 
     @Override
     public <TKey, TEntity extends Entity<TKey>> String countStatement(SelectQueryParams<TKey, TEntity> params, SqlCommand.Parameters sqlParams) {
+        Iterable<RelationalField> relationalFields = findRelationalFieldsInCondition(params.condition);
         return
                 selectCountClause() +
                 fromClause(params.entityType) +
+                joinClauses(relationalFields) +
                 whereClause(params.condition, sqlParams) +
                 limitClause(params.pagination);
     }
@@ -53,6 +60,7 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
         return
                 selectClause(params.entityType) +
                 fromClause(params.entityType) +
+                joinClauses(params.entityType) +
                 whereClause(params.condition, sqlParams) +
                 orderByClause(params.order) +
                 limitClause(params.pagination);
@@ -142,12 +150,47 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
         return "WHERE " + strPredicate + "\n";
     }
 
+    private String joinClauses(Iterable<RelationalField> relationalFields) {
+        StringBuilder builder = new StringBuilder();
+        addJoinClauses(builder, new HashSet<EntityType>(), relationalFields);
+        return builder.toString();
+    }
+
+    private String joinClauses(EntityType entityType) {
+        StringBuilder builder = new StringBuilder();
+        addJoinClauses(builder, new HashSet<EntityType>(), entityType);
+        return builder.toString();
+    }
+
+    private void addJoinClauses(StringBuilder builder, Set<EntityType> processedTypes, EntityType entityType) {
+        if (processedTypes.add(entityType)) {
+            //noinspection unchecked
+            addJoinClauses(builder, processedTypes, entityType.getRelationalFields());
+        }
+    }
+
+    private void addJoinClauses(StringBuilder builder, Set<EntityType> processedTypes, Iterable<RelationalField> relationalFields) {
+        for (RelationalField<?, ?> relationalField : relationalFields) {
+            builder.append(joinClause(relationalField));
+            builder.append('\n');
+
+            addJoinClauses(builder, processedTypes, relationalField.metaInfo().getRelatedEntityType());
+        }
+    }
+
+    private String joinClause(RelationalField<?, ?> relationalField) {
+        RelationalField.MetaInfo<?> relationalFieldMeta = relationalField.metaInfo();
+        return "JOIN " +
+                tableName(relationalFieldMeta.getRelatedEntityType()) +
+                " ON " +  qualifiedFieldName(relationalField) + " = " + qualifiedFieldName(relationalFieldMeta.getRelatedEntityType().getKeyField());
+    }
+
     private String selectCountClause() {
         return "SELECT COUNT(*)\n";
     }
 
     private String selectClause(EntityType entityType) {
-        return "SELECT " + Joiner.on(", ").join(fieldNames(entityType)) + "\n";
+        return "SELECT " + Joiner.on(", ").join(allRelatedFieldNames(entityType)) + "\n";
     }
 
     private String orderByClause(Collection<OrderFieldInfo> orderFields) {
@@ -157,7 +200,7 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
                         new Function<OrderFieldInfo, String>() {
                             @Override
                             public String apply(OrderFieldInfo orderField) {
-                                return fieldName(orderField.field) + " " + (orderField.ascending ? "ASC" : "DESC");
+                                return qualifiedFieldName(orderField.field) + " " + (orderField.ascending ? "ASC" : "DESC");
                             }
                         })) + "\n";
     }
@@ -192,6 +235,19 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
         return fieldNames(entityType.getFields());
     }
 
+    private Iterable<String> allRelatedFieldNames(EntityType<?, ?> entityType) {
+        return qualifiedFieldNames(allRelatedFields(entityType));
+    }
+
+    private Iterable<String> qualifiedFieldNames(Iterable<Field> fields) {
+        return transform(fields, new Function<Field, String>() {
+            @Override
+            public String apply(Field field) {
+                return syntaxProvider.qualifiedFieldName(field);
+            }
+        });
+    }
+
     private Iterable<String> fieldNames(Iterable<Field> fields) {
         return transform(fields, new Function<Field, String>() {
             @Override
@@ -206,7 +262,7 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
     }
 
     private String fieldName(Field field) {
-        return syntaxProvider.fieldName(field);
+        return syntaxProvider.simpleFieldName(field);
     }
 
     private <TKey, TEntity extends Entity<TKey>> Collection<FieldValueLookup> entitiesToRows(final EntityType<TKey, TEntity> entityType, Collection<TEntity> entities) {
@@ -238,8 +294,8 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
     }
 
     private String foreignKeyConstraint(RelationalField field) {
-        EntityType relatedEntityType = field.metaInfo().relatedEntityType();
-        return "REFERENCES " + syntaxProvider.tableName(relatedEntityType) + " (" + syntaxProvider.fieldName(relatedEntityType.getKeyField()) + ")";
+        EntityType relatedEntityType = field.metaInfo().getRelatedEntityType();
+        return "REFERENCES " + syntaxProvider.tableName(relatedEntityType) + " (" + syntaxProvider.simpleFieldName(relatedEntityType.getKeyField()) + ")";
     }
 
     private boolean isForeignKey(Field field) {
@@ -264,5 +320,45 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
 
     private <T> String substituteParameter(SqlCommand.Parameters parameters, Field<?, T> field, T value) {
         return syntaxProvider.substituteParameter(parameters, field, value);
+    }
+
+    private String qualifiedFieldName(Field<?, ?> field) {
+        return syntaxProvider.qualifiedFieldName(field);
+    }
+
+    private Iterable<Field> allRelatedFields(EntityType<?, ?> entityType) {
+        Set<Field> fields = new LinkedHashSet<>();
+        addAllRelatedFields(fields, new HashSet<EntityType>(), entityType);
+        return fields;
+    }
+
+    private void addAllRelatedFields(Set<Field> fields, Set<EntityType> processedEntityTypes, EntityType<?, ?> entityType) {
+        if (!processedEntityTypes.add(entityType)) return;
+
+        for (Field<?, ?> field : entityType.getFields()) {
+            if (fields.add(field)) {
+                if (field instanceof RelationalField) {
+                    RelationalField<?, ?> relationalField = (RelationalField<?, ?>)field;
+                    addAllRelatedFields(fields, processedEntityTypes, relationalField.metaInfo().getRelatedEntityType());
+                }
+            }
+        }
+    }
+
+    private Iterable<RelationalField> findRelationalFieldsInCondition(Condition<?> condition) {
+        final Set<RelationalField> relationalFields = new LinkedHashSet<>();
+        PredicateVisitor visitor = new PredicateVisitor() {
+            @Override
+            public Object visitRelational(RelationalCondition relationalCondition) {
+                if (relationalFields.add(relationalCondition.getField())) {
+                    //noinspection unchecked
+                    visit(relationalCondition.getCondition());
+                }
+                return null;
+            }
+        };
+        //noinspection unchecked
+        visitor.visit(condition);
+        return relationalFields;
     }
 }

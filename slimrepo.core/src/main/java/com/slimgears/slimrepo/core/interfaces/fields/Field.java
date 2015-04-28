@@ -10,17 +10,16 @@ import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
  * Created by Denis on 06-Apr-15
  * <File Description>
  */
-public interface Field<TEntity extends Entity<?>, T> {
+public interface Field<TEntity, T> {
 
-    interface MetaInfo<TEntity extends Entity<?>, T> {
-        EntityType<?, TEntity> getEntityType();
+    interface MetaInfo<T> {
+        EntityType<?, ?> getEntityType();
         String getName();
         Class<T> getValueType();
         boolean isNullable();
     }
 
-    MetaInfo<TEntity, T> metaInfo();
+    MetaInfo<T> metaInfo();
     Condition<TEntity> isNull();
     Condition<TEntity> isNotNull();
 }
-

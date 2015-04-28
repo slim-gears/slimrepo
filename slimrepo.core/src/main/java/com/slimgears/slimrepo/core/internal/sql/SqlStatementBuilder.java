@@ -18,7 +18,8 @@ import com.slimgears.slimrepo.core.internal.query.UpdateQueryParams;
  */
 public interface SqlStatementBuilder {
     interface SyntaxProvider {
-        String fieldName(Field<?, ?> field);
+        String qualifiedFieldName(Field<?, ?> field);
+        String simpleFieldName(Field<?, ?> field);
         String typeName(Field<?, ?> field);
         String tableName(EntityType<?, ?> entityType);
         String databaseName(RepositoryModel repositoryModel);

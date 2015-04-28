@@ -26,12 +26,12 @@ import java.util.Date;
  */
 public class Fields {
 
-    static class AbstractField<TEntity extends Entity<?>, T>
+    static class AbstractField<TEntity, T>
             implements
                 Field<TEntity, T>,
-                Field.MetaInfo<TEntity, T>,
-            EntityType.Bindable<TEntity> {
-        private EntityType<?, TEntity> entityType;
+                Field.MetaInfo<T>,
+            EntityType.Bindable {
+        private EntityType<?, ?> entityType;
         private final String name;
         private final Class<T> type;
         private final boolean nullable;
@@ -43,7 +43,7 @@ public class Fields {
         }
 
         @Override
-        public EntityType<?, TEntity> getEntityType() {
+        public EntityType<?, ?> getEntityType() {
             return this.entityType;
         }
 
@@ -63,7 +63,7 @@ public class Fields {
         }
 
         @Override
-        public MetaInfo<TEntity, T> metaInfo() {
+        public MetaInfo<T> metaInfo() {
             return this;
         }
 
@@ -78,12 +78,12 @@ public class Fields {
         }
 
         @Override
-        public void bind(EntityType<?, TEntity> entityType) {
+        public void bind(EntityType<?, ?> entityType) {
             this.entityType = entityType;
         }
     }
 
-    static class AbstractValueField<TEntity extends Entity<?>, T> extends AbstractField<TEntity, T> implements ValueField<TEntity, T> {
+    static class AbstractValueField<TEntity, T> extends AbstractField<TEntity, T> implements ValueField<TEntity, T> {
         AbstractValueField(String name, Class<T> type, boolean nullable) {
             super(name, type, nullable);
         }
@@ -123,7 +123,7 @@ public class Fields {
         }
     }
 
-    static class NumericFieldImplementation<TEntity extends Entity<?>, T> extends AbstractValueField<TEntity, T> implements NumericField<TEntity, T> {
+    static class NumericFieldImplementation<TEntity, T> extends AbstractValueField<TEntity, T> implements NumericField<TEntity, T> {
         NumericFieldImplementation(String name, Class<T> type, boolean nullable) {
             super(name, type, nullable);
         }
@@ -154,7 +154,7 @@ public class Fields {
         }
     }
 
-    static class StringFieldImplementation<TEntity extends Entity<?>> extends AbstractValueField<TEntity, String> implements StringField<TEntity> {
+    static class StringFieldImplementation<TEntity> extends AbstractValueField<TEntity, String> implements StringField<TEntity> {
         StringFieldImplementation(String name, boolean nullable) {
             super(name, String.class, nullable);
         }
@@ -190,15 +190,15 @@ public class Fields {
         }
     }
 
-    static class BlobFieldImplementation<TEntity extends Entity<?>, T> extends AbstractField<TEntity, T> implements BlobField<TEntity, T> {
+    static class BlobFieldImplementation<TEntity, T> extends AbstractField<TEntity, T> implements BlobField<TEntity, T> {
         BlobFieldImplementation(String name, Class<T> type, boolean nullable) {
             super(name, type, nullable);
         }
     }
 
-    static class RelatedFieldImplementation<TEntity extends Entity<?>, TRelatedEntity extends Entity<?>>
+    static class RelatedFieldImplementation<TEntity, TRelatedEntity extends Entity<?>>
             extends AbstractField<TEntity, TRelatedEntity>
-            implements RelationalField<TEntity, TRelatedEntity>, RelationalField.MetaInfo<TEntity, TRelatedEntity> {
+            implements RelationalField<TEntity, TRelatedEntity>, RelationalField.MetaInfo<TRelatedEntity> {
         private final EntityType<?, TRelatedEntity> relatedEntityType;
 
         RelatedFieldImplementation(String name, EntityType<?, TRelatedEntity> relatedEntityType, boolean nullable) {
@@ -207,38 +207,38 @@ public class Fields {
         }
 
         @Override
-        public RelationalField.MetaInfo<TEntity, TRelatedEntity> metaInfo() {
+        public RelationalField.MetaInfo<TRelatedEntity> metaInfo() {
             return this;
         }
 
         @Override
         public Condition<TEntity> is(Condition<TRelatedEntity> condition) {
-            return null;
+            return Conditions.is(this, condition);
         }
 
         @Override
-        public EntityType<?, TRelatedEntity> relatedEntityType() {
+        public EntityType<?, TRelatedEntity> getRelatedEntityType() {
             return relatedEntityType;
         }
     }
 
-    public static <TEntity extends Entity<?>, T> NumericField<TEntity, T> numberField(String name, Class<T> fieldType, boolean nullable) {
+    public static <TEntity, T> NumericField<TEntity, T> numberField(String name, Class<T> fieldType, boolean nullable) {
         return new NumericFieldImplementation<>(name, fieldType, nullable);
     }
 
-    public static <TEntity extends Entity<?>> StringField<TEntity> stringField(String name, boolean nullable) {
+    public static <TEntity> StringField<TEntity> stringField(String name, boolean nullable) {
         return new StringFieldImplementation<>(name, nullable);
     }
 
-    public static <TEntity extends Entity<?>> NumericField<TEntity, Date> dateField(String name, boolean nullable) {
+    public static <TEntity> NumericField<TEntity, Date> dateField(String name, boolean nullable) {
         return numberField(name, Date.class, nullable);
     }
 
-    public static <TEntity extends Entity<?>, T> BlobField<TEntity, T> blobField(String name, Class<T> fieldType, boolean nullable) {
+    public static <TEntity, T> BlobField<TEntity, T> blobField(String name, Class<T> fieldType, boolean nullable) {
         return new BlobFieldImplementation<>(name, fieldType, nullable);
     }
 
-    public static <TEntity extends Entity<?>, TRelatedEntity extends Entity<?>> RelationalField<TEntity, TRelatedEntity> relationalField(String name, EntityType<?, TRelatedEntity> relatedEntityType, boolean nullable) {
+    public static <TEntity, TRelatedEntity extends Entity<?>> RelationalField<TEntity, TRelatedEntity> relationalField(String name, EntityType<?, TRelatedEntity> relatedEntityType, boolean nullable) {
         return new RelatedFieldImplementation<>(name, relatedEntityType, nullable);
     }
 }

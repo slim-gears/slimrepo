@@ -22,4 +22,9 @@ public abstract class AbstractSqlSyntaxProvider implements SqlStatementBuilder.S
         int index = params.getCount();
         return parameterReference(index, params.add(valueToString(field, value)));
     }
+
+    @Override
+    public String qualifiedFieldName(Field<?, ?> field) {
+        return tableName(field.metaInfo().getEntityType()) + '.' + simpleFieldName(field);
+    }
 }

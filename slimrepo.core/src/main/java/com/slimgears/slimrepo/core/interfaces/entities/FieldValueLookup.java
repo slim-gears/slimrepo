@@ -8,8 +8,8 @@ import com.slimgears.slimrepo.core.interfaces.fields.Field;
  * Created by Denis on 09-Apr-15
  * <File Description>
  */
-public interface FieldValueLookup<TEntity extends Entity<?>> {
-    interface Provider<TEntity extends Entity<?>> {
+public interface FieldValueLookup<TEntity> {
+    interface Provider<TEntity> {
         FieldValueLookup<TEntity> get();
     }
 

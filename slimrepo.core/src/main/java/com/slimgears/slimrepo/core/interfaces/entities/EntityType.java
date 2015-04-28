@@ -3,6 +3,7 @@
 package com.slimgears.slimrepo.core.interfaces.entities;
 
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
+import com.slimgears.slimrepo.core.interfaces.fields.RelationalField;
 import com.slimgears.slimrepo.core.interfaces.fields.ValueField;
 
 import java.util.Collection;
@@ -16,13 +17,14 @@ public interface EntityType<TKey, TEntity extends Entity<TKey>> {
     String getName();
     ValueField<TEntity, TKey> getKeyField();
     Collection<Field<TEntity, ?>> getFields();
+    Collection<RelationalField<TEntity, ?>> getRelationalFields();
     TEntity newInstance();
     TEntity newInstance(FieldValueLookup<TEntity> lookup);
     void entityToMap(TEntity entity, FieldValueMap<TEntity> map);
     TKey getKey(TEntity entity);
     void setKey(TEntity entity, TKey key);
 
-    interface Bindable<TEntity extends Entity<?>> {
-        void bind(EntityType<?, TEntity> entityType);
+    interface Bindable {
+        void bind(EntityType<?, ?> entityType);
     }
 }

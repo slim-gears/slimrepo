@@ -26,5 +26,6 @@ public enum PredicateType {
     STRING_FIELD_NOT_ENDS_WITH,
     COMPOSITE_AND,
     COMPOSITE_OR,
-    COMPOSITE_NOT
+    COMPOSITE_NOT,
+    RELATIONAL_IS,
 }

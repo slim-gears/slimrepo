@@ -5,6 +5,7 @@ package com.slimgears.slimrepo.core.internal;
 import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
+import com.slimgears.slimrepo.core.interfaces.fields.RelationalField;
 import com.slimgears.slimrepo.core.interfaces.fields.ValueField;
 
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ public abstract class AbstractEntityType<TKey, TEntity extends Entity<TKey>> imp
     private final Class<TEntity> entityClass;
     private final ValueField<TEntity, TKey> keyField;
     private final List<Field<TEntity, ?>> fields = new ArrayList<>();
+    private final List<RelationalField<TEntity, ?>> relationalFields = new ArrayList<>();
 
     protected AbstractEntityType(
             String name,
@@ -48,6 +50,11 @@ public abstract class AbstractEntityType<TKey, TEntity extends Entity<TKey>> imp
     }
 
     @Override
+    public Collection<RelationalField<TEntity, ?>> getRelationalFields() {
+        return relationalFields;
+    }
+
+    @Override
     public ValueField<TEntity, TKey> getKeyField() {
         return keyField;
     }
@@ -60,10 +67,13 @@ public abstract class AbstractEntityType<TKey, TEntity extends Entity<TKey>> imp
     private AbstractEntityType<TKey, TEntity> addFields(Field<TEntity, ?>... fields) {
         for (Field<TEntity, ?> field : fields) {
             if (field instanceof Bindable) {
-                //noinspection unchecked
-                ((Bindable<TEntity>)field).bind(this);
+                ((Bindable)field).bind(this);
             }
             this.fields.add(field);
+            if (field instanceof RelationalField) {
+                //noinspection unchecked
+                relationalFields.add((RelationalField<TEntity, ?>)field);
+            }
         }
         return this;
     }

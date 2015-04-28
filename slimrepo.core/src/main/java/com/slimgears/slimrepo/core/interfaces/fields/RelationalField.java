@@ -7,12 +7,12 @@ import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 /**
  * Created by ditskovi on 4/27/2015.
  */
-public interface RelationalField<TEntity extends Entity<?>, TRelatedEntity extends Entity<?>> extends Field<TEntity, TRelatedEntity> {
-    interface MetaInfo<TEntity extends Entity<?>, TRelatedEntity extends Entity<?>> extends Field.MetaInfo<TEntity, TRelatedEntity> {
-        EntityType<?, TRelatedEntity> relatedEntityType();
+public interface RelationalField<TEntity, TRelatedEntity> extends Field<TEntity, TRelatedEntity> {
+    interface MetaInfo<TRelatedEntity> extends Field.MetaInfo<TRelatedEntity> {
+        EntityType<?, ?> getRelatedEntityType();
     }
 
-    MetaInfo<TEntity, TRelatedEntity> metaInfo();
+    MetaInfo<TRelatedEntity> metaInfo();
 
     Condition<TEntity> is(Condition<TRelatedEntity> condition);
 }
