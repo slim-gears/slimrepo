@@ -40,8 +40,13 @@ public class DefaultFieldTypeMapper implements FieldTypeMapper, FieldTypeMapping
         }
 
         @Override
-        public Class getMappedType(Field field) {
-            return getConverter(field.metaInfo().getValueType()).getMappedType(field);
+        public Class getOutboundType(Field field) {
+            return getConverter(field.metaInfo().getValueType()).getOutboundType(field);
+        }
+
+        @Override
+        public Class getInboundType(Field field) {
+            return getConverter(field.metaInfo().getValueType()).getInboundType(field);
         }
 
         private TypeConverter getConverter(Class valueType) {
@@ -61,8 +66,13 @@ public class DefaultFieldTypeMapper implements FieldTypeMapper, FieldTypeMapping
         }
 
         @Override
-        public Class getMappedType(Field field) {
+        public Class getOutboundType(Field field) {
             return field.metaInfo().getValueType();
+        }
+
+        @Override
+        public Class getInboundType(Field field) {
+            return getOutboundType(field);
         }
     };
 
@@ -94,8 +104,13 @@ public class DefaultFieldTypeMapper implements FieldTypeMapper, FieldTypeMapping
     }
 
     @Override
-    public <T> Class getMappedType(Field<?, T> field) {
-        return getConverter(field).getMappedType(field);
+    public <T> Class getOutboundType(Field<?, T> field) {
+        return getConverter(field).getOutboundType(field);
+    }
+
+    @Override
+    public <T> Class getInboundType(Field<?, T> field) {
+        return getConverter(field).getInboundType(field);
     }
 
     @Override

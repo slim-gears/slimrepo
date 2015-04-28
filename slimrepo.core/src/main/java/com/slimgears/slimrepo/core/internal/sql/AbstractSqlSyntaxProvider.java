@@ -27,4 +27,9 @@ public abstract class AbstractSqlSyntaxProvider implements SqlStatementBuilder.S
     public String qualifiedFieldName(Field<?, ?> field) {
         return tableName(field.metaInfo().getEntityType()) + '.' + simpleFieldName(field);
     }
+
+    @Override
+    public String fieldAlias(Field<?, ?> field) {
+        return '`' + rawFieldAlias(field) + '`';
+    }
 }

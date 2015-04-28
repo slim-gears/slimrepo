@@ -1,17 +1,14 @@
 package com.slimgears.slimrepo.android;
 
-import android.database.DatabaseUtils;
-import android.database.sqlite.SQLiteDatabase;
-
 import com.slimgears.slimrepo.android.core.SqliteOrmServiceProvider;
-import com.slimgears.slimrepo.core.prototype.UserRepository;
-import com.slimgears.slimrepo.core.prototype.generated.RoleEntity;
-import com.slimgears.slimrepo.core.prototype.generated.UserEntity;
-import com.slimgears.slimrepo.core.prototype.generated.GeneratedUserRepositoryService;
 import com.slimgears.slimrepo.core.interfaces.RepositoryService;
 import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
 import com.slimgears.slimrepo.core.interfaces.conditions.Conditions;
 import com.slimgears.slimrepo.core.internal.interfaces.OrmServiceProvider;
+import com.slimgears.slimrepo.core.prototype.UserRepository;
+import com.slimgears.slimrepo.core.prototype.generated.GeneratedUserRepositoryService;
+import com.slimgears.slimrepo.core.prototype.generated.RoleEntity;
+import com.slimgears.slimrepo.core.prototype.generated.UserEntity;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -28,9 +25,6 @@ import java.util.Date;
 import static com.slimgears.slimrepo.core.utilities.Dates.addDays;
 import static com.slimgears.slimrepo.core.utilities.Dates.fromDate;
 
-/**
- * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
- */
 @RunWith(RobolectricTestRunner.class)
 @Config(emulateSdk = 18, manifest=Config.NONE)
 public class RepositoryServicePrototypeTest {
@@ -138,22 +132,43 @@ public class RepositoryServicePrototypeTest {
         }
     }
 
-    private void addUsers(final UserEntity... users) throws IOException {
+    @Test
+    public void queryReturnsRelatedEntities() throws IOException {
+        RoleEntity[] roles = addRoles(
+                RoleEntity.create().roleDescription("Admin").build(),
+                RoleEntity.create().roleDescription("User").build());
+
+        addUsers(
+                UserEntity.create().userFirstName("John").userLastName("Doe").role(roles[0]).build(),
+                UserEntity.create().userFirstName("Bob").userLastName("Smith").role(roles[1]).build(),
+                UserEntity.create().userFirstName("Ben").userLastName("Stone").role(roles[1]).build());
+
+        UserEntity[] allUsers = queryUsersWhere(UserEntity.Role.is(RoleEntity.RoleDescription.in("User")));
+        Assert.assertNotNull(allUsers);
+        Assert.assertEquals(2, allUsers.length);
+        Assert.assertNotNull(allUsers[0].getRole());
+        Assert.assertEquals(2, allUsers[0].getRole().getRoleId());
+        Assert.assertEquals("User", allUsers[1].getRole().getRoleDescription());
+    }
+
+    private UserEntity[] addUsers(final UserEntity... users) throws IOException {
         repositoryService.update(new RepositoryService.UpdateAction<UserRepository>() {
             @Override
             public void execute(UserRepository repository) throws IOException {
                 repository.users().add(Arrays.asList(users));
             }
         });
+        return users;
     }
 
-    private void addRoles(final RoleEntity... roles) throws IOException {
+    private RoleEntity[] addRoles(final RoleEntity... roles) throws IOException {
         repositoryService.update(new RepositoryService.UpdateAction<UserRepository>() {
             @Override
             public void execute(UserRepository repository) throws IOException {
                 repository.roles().add(Arrays.asList(roles));
             }
         });
+        return roles;
     }
 
     private long queryUsersCountWhere(final Condition<UserEntity> condition) throws IOException {
@@ -180,10 +195,5 @@ public class RepositoryServicePrototypeTest {
                         .toArray();
             }
         });
-    }
-
-    private void assertTableExists(SQLiteDatabase db, String tableName) {
-        long tables = DatabaseUtils.longForQuery(db, "SELECT count(*) FROM sqlite_master WHERE type='table' AND name=?", new String[]{tableName});
-        Assert.assertEquals(1, tables);
     }
 }

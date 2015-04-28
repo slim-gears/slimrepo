@@ -180,7 +180,7 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
 
     private String joinClause(RelationalField<?, ?> relationalField) {
         RelationalField.MetaInfo<?> relationalFieldMeta = relationalField.metaInfo();
-        return "JOIN " +
+        return "LEFT JOIN " +
                 tableName(relationalFieldMeta.getRelatedEntityType()) +
                 " ON " +  qualifiedFieldName(relationalField) + " = " + qualifiedFieldName(relationalFieldMeta.getRelatedEntityType().getKeyField());
     }
@@ -190,7 +190,20 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
     }
 
     private String selectClause(EntityType entityType) {
-        return "SELECT " + Joiner.on(", ").join(allRelatedFieldNames(entityType)) + "\n";
+        return "SELECT\n    " + Joiner.on(",\n    ").join(fieldsAsAliases(allRelatedFields(entityType))) + "\n";
+    }
+
+    private Iterable<String> fieldsAsAliases(Iterable<Field> fields) {
+        return transform(fields, new Function<Field, String>() {
+            @Override
+            public String apply(Field field) {
+                return fieldAsAlias(field);
+            }
+        });
+    }
+
+    private String fieldAsAlias(Field field) {
+        return syntaxProvider.qualifiedFieldName(field) + " AS " + syntaxProvider.fieldAlias(field);
     }
 
     private String orderByClause(Collection<OrderFieldInfo> orderFields) {

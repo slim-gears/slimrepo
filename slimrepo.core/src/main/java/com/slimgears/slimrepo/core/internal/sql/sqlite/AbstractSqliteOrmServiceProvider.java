@@ -27,7 +27,12 @@ public abstract class AbstractSqliteOrmServiceProvider extends AbstractSqlOrmSer
             }
 
             @Override
-            public Class getMappedType(Field<?, Date> field) {
+            public Class getOutboundType(Field<?, Date> field) {
+                return Long.class;
+            }
+
+            @Override
+            public Class getInboundType(Field<?, Date> field) {
                 return Long.class;
             }
         });

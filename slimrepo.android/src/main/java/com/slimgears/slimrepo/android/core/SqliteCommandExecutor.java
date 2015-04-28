@@ -3,11 +3,9 @@
 package com.slimgears.slimrepo.android.core;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Build;
 
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
@@ -15,6 +13,7 @@ import com.slimgears.slimrepo.core.internal.interfaces.CloseableIterator;
 import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMapper;
 import com.slimgears.slimrepo.core.internal.sql.SqlCommand;
 import com.slimgears.slimrepo.core.internal.sql.SqlCommandExecutor;
+import com.slimgears.slimrepo.core.internal.sql.SqlOrmServiceProvider;
 import com.slimgears.slimrepo.core.internal.sql.SqlSessionServiceProvider;
 import com.slimgears.slimrepo.core.internal.sql.SqlStatementBuilder;
 
@@ -29,6 +28,7 @@ import java.util.Map;
 public class SqliteCommandExecutor implements SqlCommandExecutor {
     private final SQLiteDatabase database;
     private final FieldTypeMapper fieldTypeMapper;
+    private final SqlStatementBuilder.SyntaxProvider syntaxProvider;
 
     class CursorIteratorAdapter<T> implements CloseableIterator<FieldValueLookup<T>> {
         private final Cursor cursor;
@@ -45,7 +45,8 @@ public class SqliteCommandExecutor implements SqlCommandExecutor {
             @Override
             public <T1> T1 getValue(Field<T, T1> field) {
                 int columnIndex = getColumnIndex(field);
-                Class dbType = fieldTypeMapper.getMappedType(field);
+
+                Class dbType = fieldTypeMapper.getInboundType(field);
                 Object value = getValue(dbType, cursor, columnIndex);
                 return fieldTypeMapper.toFieldType(field, value);
             }
@@ -59,6 +60,8 @@ public class SqliteCommandExecutor implements SqlCommandExecutor {
                 if (type == Short.class) return cursor.getShort(columnIndex);
                 if (type == Long.class) return cursor.getLong(columnIndex);
                 if (type == Double.class) return cursor.getDouble(columnIndex);
+                if (type == FieldValueLookup.class) return cursor.isNull(columnIndex) ? null : this;
+
                 throw new RuntimeException("Unsupported value type: " + type.getSimpleName());
             }
         }
@@ -72,7 +75,10 @@ public class SqliteCommandExecutor implements SqlCommandExecutor {
                 fieldToIndexMap = new HashMap<>();
             }
 
-            index = cursor.getColumnIndex(field.metaInfo().getName());
+            String columnName = syntaxProvider.rawFieldAlias(field);
+            index = cursor.getColumnIndex(columnName);
+            if (index < 0) throw new RuntimeException("Column '" + columnName + "' not found");
+
             fieldToIndexMap.put(field, index);
             return index;
         }
@@ -103,7 +109,9 @@ public class SqliteCommandExecutor implements SqlCommandExecutor {
 
     public SqliteCommandExecutor(SQLiteDatabase sqliteDatabase, SqlSessionServiceProvider sessionServiceProvider) {
         database = sqliteDatabase;
-        fieldTypeMapper = sessionServiceProvider.getOrmServiceProvider().getFieldTypeMapper();
+        SqlOrmServiceProvider serviceProvider = sessionServiceProvider.getOrmServiceProvider();
+        syntaxProvider = serviceProvider.getSyntaxProvider();
+        fieldTypeMapper = serviceProvider.getFieldTypeMapper();
     }
 
     @Override

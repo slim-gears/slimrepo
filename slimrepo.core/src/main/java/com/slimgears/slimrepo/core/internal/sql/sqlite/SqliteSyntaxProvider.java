@@ -47,7 +47,7 @@ public class SqliteSyntaxProvider extends AbstractSqlSyntaxProvider {
 
     @Override
     public String typeName(Field<?, ?> field) {
-        Class mappedType = fieldTypeMapper.getMappedType(field);
+        Class mappedType = fieldTypeMapper.getOutboundType(field);
         String name = CLASS_TO_TYPE_NAME_MAP.get(mappedType);
         if (name == null) throw new RuntimeException("Field type " + field.metaInfo().getValueType().getSimpleName() + " is not supported");
         return name;
@@ -67,5 +67,11 @@ public class SqliteSyntaxProvider extends AbstractSqlSyntaxProvider {
     public <T> String valueToString(Field<?, T> field, T value) {
         if (value == null) return "NULL";
         return fieldTypeMapper.fromFieldType(field, value).toString();
+    }
+
+    @Override
+    public String rawFieldAlias(Field<?, ?> field) {
+        Field.MetaInfo metaInfo = field.metaInfo();
+        return metaInfo.getEntityType().getName() + "_" + metaInfo.getName();
     }
 }

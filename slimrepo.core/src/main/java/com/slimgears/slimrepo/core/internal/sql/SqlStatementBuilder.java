@@ -26,6 +26,8 @@ public interface SqlStatementBuilder {
         String parameterReference(int index, String name);
         <T> String valueToString(Field<?, T> field, T value);
         <T> String substituteParameter(SqlCommand.Parameters params, Field<?, T> field, T value);
+        String fieldAlias(Field<?, ?> field);
+        String rawFieldAlias(Field<?, ?> field);
     }
 
     interface PredicateBuilder {
