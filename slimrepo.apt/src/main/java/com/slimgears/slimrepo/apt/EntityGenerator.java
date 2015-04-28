@@ -6,12 +6,15 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.slimgears.slimrepo.apt.base.DataModelGenerator;
+import com.slimgears.slimrepo.core.annotations.GenerateEntity;
 import com.slimgears.slimrepo.core.annotations.Key;
+import com.slimgears.slimrepo.core.annotations.Relation;
 import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueMap;
 import com.slimgears.slimrepo.core.interfaces.fields.BlobField;
+import com.slimgears.slimrepo.core.interfaces.fields.RelationalField;
 import com.slimgears.slimrepo.core.internal.Fields;
 import com.slimgears.slimrepo.core.interfaces.fields.NumericField;
 import com.slimgears.slimrepo.core.interfaces.fields.StringField;
@@ -53,21 +56,15 @@ public class EntityGenerator extends DataModelGenerator {
         META_FIELD_BUILDER_MAP.put(TypeName.get(String.class), StringMetaFieldBuilder.INSTANCE);
     }
 
-    private static FieldSpec buildMetaField(ClassName entityType, FieldInfo field) {
-        AbstractMetaFieldBuilder builder = META_FIELD_BUILDER_MAP.get(field.type);
-        if (builder == null) builder = BlobMetaFieldBuilder.INSTANCE;
-        return builder.build(entityType, field);
-    }
-
     static abstract class AbstractMetaFieldBuilder {
         public FieldSpec build(ClassName entityType, FieldInfo field) {
             TypeName type = metaFieldType(entityType, field.type);
             FieldSpec.Builder builder = FieldSpec.builder(type, getMetaFieldName(field.name), Modifier.STATIC, Modifier.PUBLIC, Modifier.FINAL);
-            return initialize(builder, entityType, field, !field.type.isPrimitive()).build();
+            return initialize(builder, field, !field.type.isPrimitive()).build();
         }
 
         protected abstract TypeName metaFieldType(ClassName entityType, TypeName fieldType);
-        protected abstract FieldSpec.Builder initialize(FieldSpec.Builder builder, TypeName entityType, FieldInfo field, boolean isNullable);
+        protected abstract FieldSpec.Builder initialize(FieldSpec.Builder builder, FieldInfo field, boolean isNullable);
     }
 
     static class NumericMetaFieldBuilder extends AbstractMetaFieldBuilder {
@@ -79,8 +76,8 @@ public class EntityGenerator extends DataModelGenerator {
         }
 
         @Override
-        protected FieldSpec.Builder initialize(FieldSpec.Builder builder, TypeName entityType, FieldInfo field, boolean isNullable) {
-            return builder.initializer("$T.numberField($S, $T.class, $T.class, $L)", Fields.class, field.name, entityType, box(field.type), isNullable);
+        protected FieldSpec.Builder initialize(FieldSpec.Builder builder, FieldInfo field, boolean isNullable) {
+            return builder.initializer("$T.numberField($S, $T.class, $L)", Fields.class, field.name, box(field.type), isNullable);
         }
     }
 
@@ -88,8 +85,8 @@ public class EntityGenerator extends DataModelGenerator {
         static final DateMetaFieldBuilder INSTANCE = new DateMetaFieldBuilder();
 
         @Override
-        protected FieldSpec.Builder initialize(FieldSpec.Builder builder, TypeName entityType, FieldInfo field, boolean isNullable) {
-            return builder.initializer("$T.dateField($S, $T.class, $L)", Fields.class, field.name, entityType, isNullable);
+        protected FieldSpec.Builder initialize(FieldSpec.Builder builder, FieldInfo field, boolean isNullable) {
+            return builder.initializer("$T.dateField($S, $L)", Fields.class, field.name, isNullable);
         }
     }
 
@@ -102,8 +99,8 @@ public class EntityGenerator extends DataModelGenerator {
         }
 
         @Override
-        protected FieldSpec.Builder initialize(FieldSpec.Builder builder, TypeName entityType, FieldInfo field, boolean isNullable) {
-            return builder.initializer("$T.stringField($S, $T.class, $L)", Fields.class, field.name, entityType, isNullable);
+        protected FieldSpec.Builder initialize(FieldSpec.Builder builder, FieldInfo field, boolean isNullable) {
+            return builder.initializer("$T.stringField($S, $L)", Fields.class, field.name, isNullable);
         }
     }
 
@@ -116,8 +113,22 @@ public class EntityGenerator extends DataModelGenerator {
         }
 
         @Override
-        protected FieldSpec.Builder initialize(FieldSpec.Builder builder, TypeName entityType, FieldInfo field, boolean isNullable) {
-            return builder.initializer("$T.blobField($S, $T, $T, $L)", Fields.class, field.name, entityType, field.type, isNullable);
+        protected FieldSpec.Builder initialize(FieldSpec.Builder builder, FieldInfo field, boolean isNullable) {
+            return builder.initializer("$T.blobField($S, $T.class, $L)", Fields.class, field.name, field.type, isNullable);
+        }
+    }
+
+    static class RelationalMetaFieldBuilder extends AbstractMetaFieldBuilder {
+        static final RelationalMetaFieldBuilder INSTANCE = new RelationalMetaFieldBuilder();
+
+        @Override
+        protected TypeName metaFieldType(ClassName entityType, TypeName fieldType) {
+            return ParameterizedTypeName.get(ClassName.get(RelationalField.class), entityType, fieldType);
+        }
+
+        @Override
+        protected FieldSpec.Builder initialize(FieldSpec.Builder builder, FieldInfo field, boolean isNullable) {
+            return builder.initializer("$T.relationalField($S, $T.EntityMetaType, $L)", Fields.class, field.name, field.type, isNullable);
         }
     }
 
@@ -241,5 +252,18 @@ public class EntityGenerator extends DataModelGenerator {
         if (type == TypeName.FLOAT) return TypeName.get(Float.class);
         if (type == TypeName.BYTE) return TypeName.get(Byte.class);
         return type;
+    }
+
+    private FieldSpec buildMetaField(ClassName entityType, FieldInfo field) {
+        AbstractMetaFieldBuilder builder = isRelationalField(field)
+                ? RelationalMetaFieldBuilder.INSTANCE
+                : META_FIELD_BUILDER_MAP.get(field.type);
+
+        if (builder == null) builder = BlobMetaFieldBuilder.INSTANCE;
+        return builder.build(entityType, field);
+    }
+
+    private boolean isRelationalField(FieldInfo field) {
+        return field.element.getAnnotation(Relation.class) != null;
     }
 }

@@ -19,16 +19,16 @@ public abstract class AbstractOrmServiceProvider implements OrmServiceProvider {
     }
 
     protected FieldTypeMappingRegistrar getTypeMappingRegistrar() {
-        return (typeMappingRegistrar != null)
-                ? typeMappingRegistrar
-                : (typeMappingRegistrar = createTypeMappingRegistrar());
+        if (typeMappingRegistrar != null) return typeMappingRegistrar;
+        typeMappingRegistrar = createTypeMappingRegistrar();
+        onMapFieldTypes(typeMappingRegistrar);
+        return typeMappingRegistrar;
     }
 
     protected FieldTypeMappingRegistrar createTypeMappingRegistrar() {
         return new DefaultFieldTypeMapper();
     }
 
-    protected <T> void registerConverter(Class<T> valueType, FieldTypeMappingRegistrar.TypeConverter<T> converter) {
-        getTypeMappingRegistrar().registerConverter(valueType, converter);
+    protected void onMapFieldTypes(FieldTypeMappingRegistrar registrar) {
     }
 }

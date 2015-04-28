@@ -14,32 +14,14 @@ import java.util.Date;
  * <File Description>
  */
 public abstract class AbstractSqliteOrmServiceProvider extends AbstractSqlOrmServiceProvider {
-    protected AbstractSqliteOrmServiceProvider() {
-        registerConverter(Date.class, new FieldTypeMappingRegistrar.TypeConverter<Date>() {
-            @Override
-            public Date toEntityType(Field<?, Date> field, Object value) {
-                return value != null ? new Date((Long)value) : null;
-            }
-
-            @Override
-            public Object fromEntityType(Field<?, Date> field, Date value) {
-                return value != null ? value.getTime() : null;
-            }
-
-            @Override
-            public Class getOutboundType(Field<?, Date> field) {
-                return Long.class;
-            }
-
-            @Override
-            public Class getInboundType(Field<?, Date> field) {
-                return Long.class;
-            }
-        });
-    }
-
     @Override
     protected SqlStatementBuilder.SyntaxProvider createSyntaxProvider() {
         return new SqliteSyntaxProvider(this);
+    }
+
+    @Override
+    protected void onMapFieldTypes(FieldTypeMappingRegistrar registrar) {
+        super.onMapFieldTypes(registrar);
+        SqliteTypeMappers.install(registrar);
     }
 }

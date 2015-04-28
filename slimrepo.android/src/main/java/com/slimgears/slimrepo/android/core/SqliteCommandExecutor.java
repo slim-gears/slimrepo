@@ -52,15 +52,15 @@ public class SqliteCommandExecutor implements SqlCommandExecutor {
             }
 
             private Object getValue(Class type, Cursor cursor, int columnIndex) {
+                if (cursor.isNull(columnIndex)) return null;
+
                 if (type == Integer.class) return cursor.getInt(columnIndex);
                 if (type == String.class) return cursor.getString(columnIndex);
-                if (type == Boolean.class) return cursor.getShort(columnIndex) != 0;
                 if (type == Float.class) return cursor.getFloat(columnIndex);
-                if (type == Byte.class) return cursor.getShort(columnIndex);
                 if (type == Short.class) return cursor.getShort(columnIndex);
                 if (type == Long.class) return cursor.getLong(columnIndex);
                 if (type == Double.class) return cursor.getDouble(columnIndex);
-                if (type == FieldValueLookup.class) return cursor.isNull(columnIndex) ? null : this;
+                if (type == FieldValueLookup.class) return this;
 
                 throw new RuntimeException("Unsupported value type: " + type.getSimpleName());
             }
