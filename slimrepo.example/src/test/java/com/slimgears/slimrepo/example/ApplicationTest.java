@@ -47,8 +47,9 @@ public class ApplicationTest {
                 repository.saveChanges();
 
                 EntitySet<Integer, UserEntity> users = repository.users();
-                users.addNew().setFirstName("John").setLastName("Doe").setAge(20).setCountryId(countryUs.getId());
-                users.addNew().setFirstName("William").setLastName("Shakespeare").setAge(32).setCountryId(countryUk.getId());
+                users.addNew().setFirstName("John").setLastName("Doe").setAge(20).setCountry(countryUs);
+                users.addNew().setFirstName("William").setLastName("Shakespeare").setAge(32).setCountry(countryUk);
+                users.addNew().setFirstName("Mark").setLastName("Twain").setAge(40).setCountry(countryFrance);
             }
         });
 
@@ -60,5 +61,19 @@ public class ApplicationTest {
         });
 
         Assert.assertEquals(4, countries.length);
+
+        UserEntity[] users = repoService.query(new RepositoryService.QueryAction<UserRepository, UserEntity[]>() {
+            @Override
+            public UserEntity[] execute(UserRepository repository) throws IOException {
+                return repository.users().query()
+                        .where(UserEntity.Country.is(CountryEntity.Name.in("France")))
+                        .prepare()
+                        .toArray();
+            }
+        });
+
+        Assert.assertEquals(1, users.length);
+        Assert.assertNotNull(users[0].getCountry());
+        Assert.assertEquals("France", users[0].getCountry().getName());
     }
 }

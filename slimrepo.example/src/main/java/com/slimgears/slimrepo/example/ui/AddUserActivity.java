@@ -132,7 +132,7 @@ public class AddUserActivity extends Activity {
                         .setFirstName(mViewFirstName.getText().toString())
                         .setLastName(mViewLastName.getText().toString())
                         .setAge(Integer.valueOf(mViewAge.getText().toString()))
-                        .setCountryId((int)mViewCountry.getSelectedItemId());
+                        .setCountry((CountryEntity)mViewCountry.getSelectedItem());
             }
         });
         finish();

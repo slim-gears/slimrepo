@@ -14,6 +14,9 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.PrimitiveType;
+import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.SimpleTypeVisitor7;
 
 /**
  * Created by Denis on 04-Apr-15
@@ -31,7 +34,15 @@ public class DataModelGenerator extends ClassGenerator<DataModelGenerator> {
         FieldInfo(VariableElement element) {
             this.element = element;
             this.name = element.getSimpleName().toString();
-            this.type = TypeName.get(element.asType());
+            this.type = getTypeName(element.asType());
+        }
+    }
+
+    private TypeName getTypeName(final TypeMirror typeMirror) {
+        try {
+            return TypeName.get(typeMirror);
+        } catch (Throwable e) {
+            return ClassName.get(getPackageName(), ClassGenerator.simpleName(typeMirror.toString()));
         }
     }
 

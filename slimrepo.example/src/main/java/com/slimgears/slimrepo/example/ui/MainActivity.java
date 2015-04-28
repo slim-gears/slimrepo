@@ -32,11 +32,9 @@ public class MainActivity extends Activity {
 
     class UserListAdapter extends BaseAdapter {
         private final List<UserEntity> users;
-        private final Map<Integer, CountryEntity> countries;
 
-        UserListAdapter(List<UserEntity> users, Map<Integer, CountryEntity> countries) {
+        UserListAdapter(List<UserEntity> users) {
             this.users = users;
-            this.countries = countries;
         }
 
         @Override
@@ -67,7 +65,7 @@ public class MainActivity extends Activity {
             setText(convertView, R.id.item_id, user.getId());
             setText(convertView, R.id.item_name, user.getFullName());
             setText(convertView, R.id.item_age, user.getAge());
-            setText(convertView, R.id.item_country, countries.get(user.getCountryId()).getName());
+            setText(convertView, R.id.item_country, user.getCountry().getName());
 
             return convertView;
         }
@@ -104,7 +102,7 @@ public class MainActivity extends Activity {
             UserRepository repo = userRepositoryService.open();
             try {
                 ListView userListView = (ListView) findViewById(R.id.user_list_view);
-                userListView.setAdapter(new UserListAdapter(repo.users().toList(), repo.countries().toMap()));
+                userListView.setAdapter(new UserListAdapter(repo.users().toList()));
             } finally {
                 repo.close();
             }
