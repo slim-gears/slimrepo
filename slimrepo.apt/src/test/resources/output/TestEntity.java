@@ -63,7 +63,7 @@ public class TestEntity extends AbstractTestEntity implements Entity<Integer> {
     }
 
     public UserEntity getUser() {
-        return this.user;
+        return (UserEntity)this.user;
     }
 
     private static class MetaType extends AbstractEntityType<Integer, TestEntity> {

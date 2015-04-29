@@ -5,6 +5,7 @@ package com.slimgears.slimrepo.apt;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
+import com.slimgears.slimrepo.apt.base.ClassGenerator;
 import com.slimgears.slimrepo.apt.base.DataModelGenerator;
 import com.slimgears.slimrepo.core.annotations.GenerateEntity;
 import com.slimgears.slimrepo.core.annotations.Key;
@@ -34,6 +35,7 @@ import java.util.Map;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 
 import static com.google.common.collect.Iterables.find;
 import static com.google.common.collect.Iterables.transform;
@@ -137,6 +139,23 @@ public class EntityGenerator extends DataModelGenerator {
     }
 
     @Override
+    public EntityGenerator superClass(TypeName superClass) {
+        super.superClass(superClass);
+        className(generateEntityTypeName(superClass));
+        return this;
+    }
+
+    private String generateEntityTypeName(TypeName superClass) {
+        return ClassGenerator.simpleName(superClass.toString()).replace("Abstract", "");
+    }
+
+    private TypeName entityTypeFromAbstract(TypeName superClass) {
+        String simpleName = generateEntityTypeName(superClass);
+        String packageName = ClassGenerator.packageName(superClass.toString());
+        return ClassName.get(packageName, simpleName);
+    }
+
+    @Override
     protected void build(TypeSpec.Builder builder, TypeElement type, List<FieldInfo> fields) {
         FieldInfo keyField = getKeyField(fields);
         fields.remove(keyField);
@@ -165,6 +184,24 @@ public class EntityGenerator extends DataModelGenerator {
             .addType(createMetaType(keyField, keyType, fields));
 
         super.build(builder, type, fields);
+    }
+
+    @Override
+    protected void processField(TypeSpec.Builder modelBuilder, MethodSpec.Builder modelCtorBuilder, FieldInfo field) {
+        if (!isRelationalField(field)) field = field.replaceType(entityTypeFromAbstract(field.type));
+        super.processField(modelBuilder, modelCtorBuilder, field);
+    }
+
+    @Override
+    protected MethodSpec createModelGetter(FieldInfo field) {
+        MethodSpec.Builder builder = MethodSpec
+                .methodBuilder(getModelGetterName(field.name))
+                .addModifiers(Modifier.PUBLIC)
+                .returns(field.type);
+
+        return (!field.element.asType().toString().equals(field.type.toString()))
+                ? builder.addCode("return this.$L;\n", field.name).build()
+                : builder.addCode("return ($T)this.$L;\n", field.name).build();
     }
 
     private TypeSpec createMetaType(FieldInfo keyField, TypeName keyType, Iterable<FieldInfo> fields) {
@@ -264,6 +301,7 @@ public class EntityGenerator extends DataModelGenerator {
     }
 
     private boolean isRelationalField(FieldInfo field) {
-        return field.element.getAnnotation(Relation.class) != null;
+        TypeElement fieldType = getProcessingEnvironment().getElementUtils().getTypeElement(field.element.asType().toString());
+        return fieldType != null && fieldType.getAnnotation(GenerateEntity.class) != null;
     }
 }

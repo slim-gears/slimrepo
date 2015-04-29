@@ -132,11 +132,11 @@ public abstract class ClassGenerator<T extends ClassGenerator<T>> {
         return self();
     }
 
-    public T superClass(TypeElement clazz) {
+    public final T superClass(TypeElement clazz) {
         return superClass(TypeName.get(clazz.asType()));
     }
 
-    public T superClass(Type clazz) {
+    public final T superClass(Type clazz) {
         return superClass(TypeName.get(clazz));
     }
 
