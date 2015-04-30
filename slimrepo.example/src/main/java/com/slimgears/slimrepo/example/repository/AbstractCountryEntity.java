@@ -11,6 +11,6 @@ import com.slimgears.slimrepo.core.annotations.Key;
  */
 @GenerateEntity
 public class AbstractCountryEntity {
-    @Key protected int id;
+    protected int id;
     protected String name;
 }

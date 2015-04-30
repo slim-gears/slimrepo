@@ -29,7 +29,7 @@ public class DataModelGenerator extends ClassGenerator<DataModelGenerator> {
         public final String name;
         public final TypeName type;
 
-        FieldInfo(VariableElement element) {
+        public FieldInfo(VariableElement element) {
             this(element, element.getSimpleName().toString(), getTypeName(element.asType()));
         }
 
@@ -41,6 +41,10 @@ public class DataModelGenerator extends ClassGenerator<DataModelGenerator> {
 
         public FieldInfo replaceType(TypeName type) {
             return new FieldInfo(element, name, type);
+        }
+
+        public boolean requiredTypeCasting() {
+            return !element.asType().toString().equals(type.toString());
         }
     }
 
@@ -105,12 +109,16 @@ public class DataModelGenerator extends ClassGenerator<DataModelGenerator> {
         type.accept(new ElementVisitorBase<Void, Void>(){
             @Override
             public Void visitVariable(VariableElement element, Void param) {
-                fields.add(new FieldInfo(element));
+                fields.add(createFieldInfo(element));
                 return null;
             }
         }, null);
 
         build(builder, type, fields);
+    }
+
+    protected FieldInfo createFieldInfo(VariableElement element) {
+        return new FieldInfo(element);
     }
 
     protected void processFields(TypeSpec.Builder modelBuilder, MethodSpec.Builder modelCtorBuilder, Iterable<FieldInfo> fields) {
@@ -129,12 +137,14 @@ public class DataModelGenerator extends ClassGenerator<DataModelGenerator> {
     }
 
     protected MethodSpec createModelGetter(FieldInfo field) {
-        return MethodSpec
+        MethodSpec.Builder builder = MethodSpec
                 .methodBuilder(getModelGetterName(field.name))
                 .addModifiers(Modifier.PUBLIC)
-                .returns(field.type)
-                .addCode("return this.$L;\n", field.name)
-                .build();
+                .returns(field.type);
+
+        return (field.requiredTypeCasting())
+                ? builder.addCode("return ($T)this.$L;\n", field.type, field.name).build()
+                : builder.addCode("return this.$L;\n", field.name).build();
     }
 
     protected MethodSpec createModelSetter(FieldInfo field, TypeName modelType) {
