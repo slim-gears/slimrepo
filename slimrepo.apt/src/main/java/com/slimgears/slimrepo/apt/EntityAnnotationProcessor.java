@@ -19,7 +19,6 @@ public class EntityAnnotationProcessor extends AnnotationProcessorBase {
     @Override
     protected boolean processType(TypeElement typeElement) throws IOException {
         new EntityGenerator(processingEnv)
-                .className(typeElement.getQualifiedName().toString().replace("Abstract", ""))
                 .superClass(typeElement)
                 .build();
 

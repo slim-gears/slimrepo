@@ -3,8 +3,6 @@
 package com.slimgears.slimrepo.example.repository;
 
 import com.slimgears.slimrepo.core.annotations.GenerateEntity;
-import com.slimgears.slimrepo.core.annotations.Key;
-import com.slimgears.slimrepo.core.annotations.Relation;
 
 /**
  * Created by Denis on 22-Apr-15
@@ -12,11 +10,11 @@ import com.slimgears.slimrepo.core.annotations.Relation;
  */
 @GenerateEntity
 public class AbstractUserEntity {
-    protected @Key int id;
+    protected int id;
     protected String firstName;
     protected String lastName;
     protected int age;
-    protected @Relation CountryEntity country;
+    protected AbstractCountryEntity country;
 
     public String getFullName() {
         return lastName + ", " + firstName;

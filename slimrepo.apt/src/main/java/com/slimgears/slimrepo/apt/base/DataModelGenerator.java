@@ -14,9 +14,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.SimpleTypeVisitor7;
 
 /**
  * Created by Denis on 04-Apr-15
@@ -31,10 +29,22 @@ public class DataModelGenerator extends ClassGenerator<DataModelGenerator> {
         public final String name;
         public final TypeName type;
 
-        FieldInfo(VariableElement element) {
+        public FieldInfo(VariableElement element) {
+            this(element, element.getSimpleName().toString(), getTypeName(element.asType()));
+        }
+
+        private FieldInfo(VariableElement element, String name, TypeName type) {
             this.element = element;
-            this.name = element.getSimpleName().toString();
-            this.type = getTypeName(element.asType());
+            this.name = name;
+            this.type = type;
+        }
+
+        public FieldInfo replaceType(TypeName type) {
+            return new FieldInfo(element, name, type);
+        }
+
+        public boolean requiredTypeCasting() {
+            return !element.asType().toString().equals(type.toString());
         }
     }
 
@@ -99,12 +109,16 @@ public class DataModelGenerator extends ClassGenerator<DataModelGenerator> {
         type.accept(new ElementVisitorBase<Void, Void>(){
             @Override
             public Void visitVariable(VariableElement element, Void param) {
-                fields.add(new FieldInfo(element));
+                fields.add(createFieldInfo(element));
                 return null;
             }
         }, null);
 
         build(builder, type, fields);
+    }
+
+    protected FieldInfo createFieldInfo(VariableElement element) {
+        return new FieldInfo(element);
     }
 
     protected void processFields(TypeSpec.Builder modelBuilder, MethodSpec.Builder modelCtorBuilder, Iterable<FieldInfo> fields) {
@@ -114,30 +128,32 @@ public class DataModelGenerator extends ClassGenerator<DataModelGenerator> {
     }
 
     protected void processField(TypeSpec.Builder modelBuilder, MethodSpec.Builder modelCtorBuilder, FieldInfo field) {
-        modelBuilder.addMethod(createModelSetter(field.name, field.type, getTypeName()));
-        modelBuilder.addMethod(createModelGetter(field.name, field.type));
+        modelBuilder.addMethod(createModelSetter(field, getTypeName()));
+        modelBuilder.addMethod(createModelGetter(field));
         builderClassBuilder.addMethod(createBuilderSetter(field.name, field.type, builderTypeName));
         modelCtorBuilder
                 .addParameter(field.type, field.name)
                 .addCode("this.$L = $L;\n", field.name, field.name);
     }
 
-    private MethodSpec createModelGetter(String fieldName, TypeName fieldType) {
-        return MethodSpec
-                .methodBuilder(getModelGetterName(fieldName))
+    protected MethodSpec createModelGetter(FieldInfo field) {
+        MethodSpec.Builder builder = MethodSpec
+                .methodBuilder(getModelGetterName(field.name))
                 .addModifiers(Modifier.PUBLIC)
-                .returns(fieldType)
-                .addCode("return this.$L;\n", fieldName)
-                .build();
+                .returns(field.type);
+
+        return (field.requiredTypeCasting())
+                ? builder.addCode("return ($T)this.$L;\n", field.type, field.name).build()
+                : builder.addCode("return this.$L;\n", field.name).build();
     }
 
-    private MethodSpec createModelSetter(String fieldName, TypeName fieldType, TypeName modelType) {
+    protected MethodSpec createModelSetter(FieldInfo field, TypeName modelType) {
         return MethodSpec
-                .methodBuilder(getModelSetterName(fieldName))
+                .methodBuilder(getModelSetterName(field.name))
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(fieldType, fieldName)
+                .addParameter(field.type, field.name)
                 .returns(modelType)
-                .addCode("this.$L = $L;\n", fieldName, fieldName)
+                .addCode("this.$L = $L;\n", field.name, field.name)
                 .addCode("return this;\n")
                 .build();
     }

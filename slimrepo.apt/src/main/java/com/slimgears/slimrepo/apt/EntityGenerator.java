@@ -5,10 +5,10 @@ package com.slimgears.slimrepo.apt;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
+import com.slimgears.slimrepo.apt.base.ClassGenerator;
 import com.slimgears.slimrepo.apt.base.DataModelGenerator;
 import com.slimgears.slimrepo.core.annotations.GenerateEntity;
 import com.slimgears.slimrepo.core.annotations.Key;
-import com.slimgears.slimrepo.core.annotations.Relation;
 import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
@@ -26,14 +26,18 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 
 import static com.google.common.collect.Iterables.find;
 import static com.google.common.collect.Iterables.transform;
@@ -137,6 +141,23 @@ public class EntityGenerator extends DataModelGenerator {
     }
 
     @Override
+    public EntityGenerator superClass(TypeName superClass) {
+        super.superClass(superClass);
+        className(ClassGenerator.packageName(superClass.toString()), generateEntityTypeName(superClass));
+        return this;
+    }
+
+    private String generateEntityTypeName(TypeName superClass) {
+        return ClassGenerator.simpleName(superClass.toString()).replace("Abstract", "");
+    }
+
+    private TypeName entityTypeFromAbstract(TypeName superClass) {
+        String simpleName = generateEntityTypeName(superClass);
+        String packageName = ClassGenerator.packageName(superClass.toString());
+        return ClassName.get(packageName, simpleName);
+    }
+
+    @Override
     protected void build(TypeSpec.Builder builder, TypeElement type, List<FieldInfo> fields) {
         FieldInfo keyField = getKeyField(fields);
         fields.remove(keyField);
@@ -165,6 +186,13 @@ public class EntityGenerator extends DataModelGenerator {
             .addType(createMetaType(keyField, keyType, fields));
 
         super.build(builder, type, fields);
+    }
+
+    @Override
+    protected FieldInfo createFieldInfo(VariableElement element) {
+        FieldInfo field = new FieldInfo(element);
+        if (isRelationalField(field)) field = field.replaceType(entityTypeFromAbstract(field.type));
+        return field;
     }
 
     private TypeSpec createMetaType(FieldInfo keyField, TypeName keyType, Iterable<FieldInfo> fields) {
@@ -235,12 +263,31 @@ public class EntityGenerator extends DataModelGenerator {
     }
 
     private FieldInfo getKeyField(Iterable<FieldInfo> fields) {
+        FieldInfo field = findAnnotatedField(fields, Key.class);
+        return field != null ? field : findFieldByName(fields, "id", getEntityIdFieldName());
+    }
+
+    private String getEntityIdFieldName() {
+        return toCamelCase(getClassName().replace("Entity", ""), "Id");
+    }
+
+    private FieldInfo findFieldByName(Iterable<FieldInfo> fields, String... names) {
+        final Set<String> nameSet = new HashSet<>(Arrays.asList(names));
+        return find(fields, new Predicate<FieldInfo>() {
+            @Override
+            public boolean apply(FieldInfo field) {
+                return nameSet.contains(field.name);
+            }
+        });
+    }
+
+    private FieldInfo findAnnotatedField(Iterable<FieldInfo> fields, final Class annotationClass) {
         return find(fields, new Predicate<FieldInfo>() {
             @Override
             public boolean apply(FieldInfo input) {
-                return input.element.getAnnotation(Key.class) != null;
+                return input.element.getAnnotation(annotationClass) != null;
             }
-        });
+        }, null);
     }
 
     private static TypeName box(TypeName type) {
@@ -264,6 +311,7 @@ public class EntityGenerator extends DataModelGenerator {
     }
 
     private boolean isRelationalField(FieldInfo field) {
-        return field.element.getAnnotation(Relation.class) != null;
+        TypeElement fieldType = getProcessingEnvironment().getElementUtils().getTypeElement(field.element.asType().toString());
+        return (fieldType != null) && fieldType.getAnnotation(GenerateEntity.class) != null;
     }
 }

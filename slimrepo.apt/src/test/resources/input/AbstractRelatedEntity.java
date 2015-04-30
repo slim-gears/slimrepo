@@ -1,8 +1,7 @@
 import com.slimgears.slimrepo.core.annotations.GenerateEntity;
 
 @GenerateEntity
-class AbstractTestEntity {
+class AbstractRelatedEntity {
     protected int id;
     protected String name;
-    protected AbstractRelatedEntity related;
 }
