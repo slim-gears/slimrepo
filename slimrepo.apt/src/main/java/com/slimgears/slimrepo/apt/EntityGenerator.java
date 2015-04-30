@@ -143,7 +143,7 @@ public class EntityGenerator extends DataModelGenerator {
     @Override
     public EntityGenerator superClass(TypeName superClass) {
         super.superClass(superClass);
-        className(generateEntityTypeName(superClass));
+        className(ClassGenerator.packageName(superClass.toString()), generateEntityTypeName(superClass));
         return this;
     }
 
