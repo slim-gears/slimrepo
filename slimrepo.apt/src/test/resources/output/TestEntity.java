@@ -18,15 +18,18 @@ class TestEntity extends AbstractTestEntity implements Entity<Integer> {
 
     public static final RelationalField<TestEntity, RelatedEntity> Related = Fields.relationalField("related", RelatedEntity.EntityMetaType, true);
 
+    public static final NumericField<TestEntity, TestEnum> EnumValue = Fields.numberField("enumValue", TestEnum.class, true);
+
     public static final EntityType<Integer, TestEntity> EntityMetaType = new MetaType();
 
     private TestEntity() {
     }
 
-    public TestEntity(int id, String name, RelatedEntity related) {
+    public TestEntity(int id, String name, RelatedEntity related, TestEnum enumValue) {
         this.id = id;
         this.name = name;
         this.related = related;
+        this.enumValue = enumValue;
     }
 
     @Override
@@ -65,9 +68,18 @@ class TestEntity extends AbstractTestEntity implements Entity<Integer> {
         return (RelatedEntity)this.related;
     }
 
+    public TestEntity setEnumValue(TestEnum enumValue) {
+        this.enumValue = enumValue;
+        return this;
+    }
+
+    public TestEnum getEnumValue() {
+        return this.enumValue;
+    }
+
     private static class MetaType extends AbstractEntityType<Integer, TestEntity> {
         MetaType() {
-            super("TestEntity", TestEntity.class, Id, Name, Related);
+            super("TestEntity", TestEntity.class, Id, Name, Related, EnumValue);
         }
 
         @Override
@@ -85,7 +97,8 @@ class TestEntity extends AbstractTestEntity implements Entity<Integer> {
             return new TestEntity(
                     lookup.getValue(Id),
                     lookup.getValue(Name),
-                    lookup.getValue(Related));
+                    lookup.getValue(Related),
+                    lookup.getValue(EnumValue));
         }
 
         @Override
@@ -93,7 +106,8 @@ class TestEntity extends AbstractTestEntity implements Entity<Integer> {
             map
                     .putValue(Id, entity.getId())
                     .putValue(Name, entity.getName())
-                    .putValue(Related, entity.getRelated());
+                    .putValue(Related, entity.getRelated())
+                    .putValue(EnumValue, entity.getEnumValue());
         }
     }
 
@@ -116,6 +130,11 @@ class TestEntity extends AbstractTestEntity implements Entity<Integer> {
 
         public Builder related(RelatedEntity related) {
             model.setRelated(related);
+            return this;
+        }
+
+        public Builder enumValue(TestEnum enumValue) {
+            model.setEnumValue(enumValue);
             return this;
         }
     }

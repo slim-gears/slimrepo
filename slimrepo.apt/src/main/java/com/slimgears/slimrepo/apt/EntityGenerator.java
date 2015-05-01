@@ -35,9 +35,11 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
 
 import static com.google.common.collect.Iterables.find;
 import static com.google.common.collect.Iterables.transform;
@@ -302,16 +304,27 @@ public class EntityGenerator extends DataModelGenerator {
     }
 
     private FieldSpec buildMetaField(ClassName entityType, FieldInfo field) {
-        AbstractMetaFieldBuilder builder = isRelationalField(field)
-                ? RelationalMetaFieldBuilder.INSTANCE
-                : META_FIELD_BUILDER_MAP.get(field.type);
+        return getMetaFieldBuilder(field).build(entityType, field);
+    }
 
-        if (builder == null) builder = BlobMetaFieldBuilder.INSTANCE;
-        return builder.build(entityType, field);
+    private AbstractMetaFieldBuilder getMetaFieldBuilder(FieldInfo field) {
+        if (isRelationalField(field)) return RelationalMetaFieldBuilder.INSTANCE;
+        if (isEnumField(field)) return NumericMetaFieldBuilder.INSTANCE;
+        AbstractMetaFieldBuilder builder = META_FIELD_BUILDER_MAP.get(field.type);
+        return builder != null ? builder : BlobMetaFieldBuilder.INSTANCE;
+    }
+
+    private boolean isEnumField(FieldInfo field) {
+        TypeElement type = typeElementForField(field);
+        return type != null && type.getKind() == ElementKind.ENUM;
     }
 
     private boolean isRelationalField(FieldInfo field) {
-        TypeElement fieldType = getProcessingEnvironment().getElementUtils().getTypeElement(field.element.asType().toString());
-        return (fieldType != null) && fieldType.getAnnotation(GenerateEntity.class) != null;
+        TypeElement type = typeElementForField(field);
+        return (type != null) && type.getAnnotation(GenerateEntity.class) != null;
+    }
+
+    private TypeElement typeElementForField(FieldInfo field) {
+        return getElementUtils().getTypeElement(field.element.asType().toString());
     }
 }

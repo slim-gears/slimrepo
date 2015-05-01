@@ -18,7 +18,7 @@ import java.util.Date;
 public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
     static class MetaType extends AbstractEntityType<Integer, UserEntity> {
         public MetaType() {
-            super("UserEntity", UserEntity.class, UserId, UserFirstName, UserLastName, LastVisitDate, Role);
+            super("UserEntity", UserEntity.class, UserId, UserFirstName, UserLastName, LastVisitDate, Role, AccountStatus);
         }
 
         @Override
@@ -33,7 +33,8 @@ public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
                     lookup.getValue(UserFirstName),
                     lookup.getValue(UserLastName),
                     lookup.getValue(LastVisitDate),
-                    lookup.getValue(Role));
+                    lookup.getValue(Role),
+                    lookup.getValue(AccountStatus));
         }
 
         @Override
@@ -43,7 +44,8 @@ public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
                     .putValue(UserFirstName, entity.getUserFirstName())
                     .putValue(UserLastName, entity.getUserLastName())
                     .putValue(LastVisitDate, entity.getLastVisitDate())
-                    .putValue(Role, entity.getRole());
+                    .putValue(Role, entity.getRole())
+                    .putValue(AccountStatus, entity.getAccountStatus());
         }
 
         @Override
@@ -57,17 +59,19 @@ public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
     public static final StringField<UserEntity> UserLastName = Fields.stringField("userLastName", true);
     public static final NumericField<UserEntity, Date> LastVisitDate = Fields.dateField("lastVisitDate", true);
     public static final RelationalField<UserEntity, RoleEntity> Role = Fields.relationalField("role", RoleEntity.EntityMetaType, true);
+    public static final NumericField<UserEntity, AccountStatus> AccountStatus = Fields.numberField("accountStatus", AccountStatus.class, true);
     public static final EntityType<Integer, UserEntity> EntityMetaType = new MetaType();
 
     private UserEntity() {
 
     }
 
-    public UserEntity(int userId, String userFirstName, String userLastName, Date lastVisitDate, RoleEntity role) {
+    public UserEntity(int userId, String userFirstName, String userLastName, Date lastVisitDate, RoleEntity role, AccountStatus accountStatus) {
         this.userId = userId;
         this.userFirstName = userFirstName;
         this.userLastName = userLastName;
         this.lastVisitDate = lastVisitDate;
+        this.accountStatus = accountStatus;
         this.role = role;
     }
 
@@ -101,6 +105,11 @@ public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
 
         public Builder role(RoleEntity role) {
             model.setRole(role);
+            return this;
+        }
+
+        public Builder accountStatus(AccountStatus accountStatus) {
+            model.setAccountStatus(accountStatus);
             return this;
         }
 
@@ -155,6 +164,15 @@ public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
 
     public UserEntity setRole(RoleEntity role) {
         this.role = role;
+        return this;
+    }
+
+    public AccountStatus getAccountStatus() {
+        return accountStatus;
+    }
+
+    public UserEntity setAccountStatus(AccountStatus accountStatus) {
+        this.accountStatus = accountStatus;
         return this;
     }
 }

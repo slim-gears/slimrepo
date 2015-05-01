@@ -2,7 +2,7 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal.sql.sqlite;
 
-import com.slimgears.slimrepo.core.interfaces.fields.Field;
+import com.slimgears.slimrepo.core.internal.AbstractTypeConverter;
 import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMappingRegistrar;
 
 import java.util.Date;
@@ -11,46 +11,8 @@ import java.util.Date;
  * Created by ditskovi on 4/28/2015.
  */
 public class SqliteTypeMappers {
-    static abstract class AbstractTypeMapper<T, V> implements FieldTypeMappingRegistrar.TypeConverter<T> {
-        private final Class<T> sourceType;
-        private final Class<V> destinationType;
-
-        protected AbstractTypeMapper(Class<T> sourceType, Class<V> destinationType) {
-            this.sourceType = sourceType;
-            this.destinationType = destinationType;
-        }
-
-        protected abstract V toOutbound(T value);
-        protected abstract T fromInbound(V value);
-
-        @Override
-        public T toEntityType(Field<?, T> field, Object value) {
-            //noinspection unchecked
-            return fromInbound((V)value);
-        }
-
-        @Override
-        public Object fromEntityType(Field<?, T> field, T value) {
-            return toOutbound(value);
-        }
-
-        @Override
-        public Class getOutboundType(Field<?, T> field) {
-            return destinationType;
-        }
-
-        @Override
-        public Class getInboundType(Field<?, T> field) {
-            return destinationType;
-        }
-
-        public void install(FieldTypeMappingRegistrar registrar) {
-            registrar.registerConverter(sourceType, this);
-        }
-    }
-
-    private final static AbstractTypeMapper<Date, Long> DATE_TYPE_MAPPER =
-            new AbstractTypeMapper<Date, Long>(Date.class, Long.class) {
+    private final static AbstractTypeConverter<Date, Long> DATE_TYPE_MAPPER =
+            new AbstractTypeConverter<Date, Long>(Date.class, Long.class) {
                 @Override
                 protected Long toOutbound(Date value) {
                     return value != null ? value.getTime() : null;
@@ -62,8 +24,8 @@ public class SqliteTypeMappers {
                 }
             };
 
-    private final static AbstractTypeMapper<Boolean, Integer> BOOLEAN_TYPE_MAPPER =
-            new AbstractTypeMapper<Boolean, Integer>(Boolean.class, Integer.class) {
+    private final static AbstractTypeConverter<Boolean, Integer> BOOLEAN_TYPE_MAPPER =
+            new AbstractTypeConverter<Boolean, Integer>(Boolean.class, Integer.class) {
                 @Override
                 protected Integer toOutbound(Boolean value) {
                     return value ? 1 : 0;
@@ -75,8 +37,8 @@ public class SqliteTypeMappers {
                 }
             };
 
-    private final static AbstractTypeMapper<Byte, Short> BYTE_TYPE_MAPPER =
-            new AbstractTypeMapper<Byte, Short>(Byte.class, Short.class) {
+    private final static AbstractTypeConverter<Byte, Short> BYTE_TYPE_MAPPER =
+            new AbstractTypeConverter<Byte, Short>(Byte.class, Short.class) {
                 @Override
                 protected Short toOutbound(Byte value) {
                     return (short)value;

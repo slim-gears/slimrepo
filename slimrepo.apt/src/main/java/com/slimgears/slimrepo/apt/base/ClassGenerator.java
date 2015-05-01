@@ -30,6 +30,7 @@ import javax.lang.model.util.Types;
 public abstract class ClassGenerator<T extends ClassGenerator<T>> {
     private ProcessingEnvironment processingEnvironment;
     private Elements elementUtils;
+    private Types typeUtils;
     private String className;
     private String packageName;
     private TypeName superClass;
@@ -39,6 +40,7 @@ public abstract class ClassGenerator<T extends ClassGenerator<T>> {
     protected ClassGenerator(ProcessingEnvironment processingEnvironment) {
         this.processingEnvironment = processingEnvironment;
         this.elementUtils = processingEnvironment.getElementUtils();
+        this.typeUtils = processingEnvironment.getTypeUtils();
     }
 
     @SuppressWarnings("unchecked")
@@ -176,5 +178,13 @@ public abstract class ClassGenerator<T extends ClassGenerator<T>> {
 
     protected ProcessingEnvironment getProcessingEnvironment() {
         return processingEnvironment;
+    }
+
+    protected Elements getElementUtils() {
+        return elementUtils;
+    }
+
+    protected Types getTypeUtils() {
+        return typeUtils;
     }
 }

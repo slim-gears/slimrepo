@@ -16,6 +16,7 @@ import java.util.Map;
  * <File Description>
  */
 public class DefaultFieldTypeMapper implements FieldTypeMapper, FieldTypeMappingRegistrar {
+
     @SuppressWarnings("unchecked")
     class MappingTypeConverter implements Matcher, TypeConverter {
         private final Map<Class, TypeConverter> converterMap = new HashMap<>();

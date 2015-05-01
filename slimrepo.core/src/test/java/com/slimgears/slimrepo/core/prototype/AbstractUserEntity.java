@@ -2,6 +2,8 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.prototype;
 
+import com.slimgears.slimrepo.core.prototype.generated.AccountStatus;
+
 import java.util.Date;
 
 /**
@@ -14,4 +16,5 @@ public class AbstractUserEntity {
     protected String userLastName;
     protected Date lastVisitDate;
     protected AbstractRoleEntity role;
+    protected AccountStatus accountStatus;
 }

@@ -6,6 +6,7 @@ import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
 import com.slimgears.slimrepo.core.interfaces.conditions.Conditions;
 import com.slimgears.slimrepo.core.internal.interfaces.OrmServiceProvider;
 import com.slimgears.slimrepo.core.prototype.UserRepository;
+import com.slimgears.slimrepo.core.prototype.generated.AccountStatus;
 import com.slimgears.slimrepo.core.prototype.generated.GeneratedUserRepositoryService;
 import com.slimgears.slimrepo.core.prototype.generated.RoleEntity;
 import com.slimgears.slimrepo.core.prototype.generated.UserEntity;
@@ -149,6 +150,18 @@ public class RepositoryServicePrototypeTest {
         Assert.assertNotNull(allUsers[0].getRole());
         Assert.assertEquals(2, allUsers[0].getRole().getRoleId());
         Assert.assertEquals("User", allUsers[1].getRole().getRoleDescription());
+    }
+
+    @Test
+    public void enumStoredAndRestored() throws IOException {
+        addUsers(
+                UserEntity.create().userFirstName("John").accountStatus(AccountStatus.ACTIVE).build(),
+                UserEntity.create().userFirstName("Bob").accountStatus(AccountStatus.DISABLED).build(),
+                UserEntity.create().userFirstName("Ben").accountStatus(AccountStatus.PAUSED).build());
+
+        Assert.assertEquals(AccountStatus.ACTIVE, queryUsersWhere(UserEntity.UserFirstName.equal("John"))[0].getAccountStatus());
+        Assert.assertEquals(AccountStatus.DISABLED, queryUsersWhere(UserEntity.UserFirstName.equal("Bob"))[0].getAccountStatus());
+        Assert.assertEquals(AccountStatus.PAUSED, queryUsersWhere(UserEntity.UserFirstName.equal("Ben"))[0].getAccountStatus());
     }
 
     private UserEntity[] addUsers(final UserEntity... users) throws IOException {

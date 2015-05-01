@@ -18,7 +18,7 @@ public abstract class AbstractOrmServiceProvider implements OrmServiceProvider {
         return getTypeMappingRegistrar();
     }
 
-    protected FieldTypeMappingRegistrar getTypeMappingRegistrar() {
+    final protected FieldTypeMappingRegistrar getTypeMappingRegistrar() {
         if (typeMappingRegistrar != null) return typeMappingRegistrar;
         typeMappingRegistrar = createTypeMappingRegistrar();
         onMapFieldTypes(typeMappingRegistrar);
@@ -30,5 +30,6 @@ public abstract class AbstractOrmServiceProvider implements OrmServiceProvider {
     }
 
     protected void onMapFieldTypes(FieldTypeMappingRegistrar registrar) {
+        TypeMappers.install(registrar);
     }
 }

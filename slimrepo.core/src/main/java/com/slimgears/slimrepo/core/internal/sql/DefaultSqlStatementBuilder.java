@@ -95,8 +95,8 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
     @Override
     public <TKey, TEntity extends Entity<TKey>> String createTableStatement(EntityType<TKey, TEntity> entityType) {
         return
-                "CREATE TABLE IF NOT EXISTS " + tableName(entityType) + "\n" +
-                " (" + columnDefinitions(entityType) + ")";
+                "CREATE TABLE IF NOT EXISTS " + tableName(entityType) + " (\n    " +
+                        columnDefinitions(entityType) + ")";
     }
 
     @Override
@@ -273,7 +273,11 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
     }
 
     private String columnDefinition(EntityType entityType, Field field) {
-        return columnName(field) + " " + columnType(field) + " " + columnConstraints(entityType, field);
+        String columnDef = columnName(field) + " " + columnType(field);
+        String constraints = columnConstraints(entityType, field);
+        return  constraints.isEmpty()
+                ? columnDef
+                : columnDef + " " + constraints;
     }
 
     private String fieldName(Field field) {
@@ -291,7 +295,7 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
 
     private String columnDefinitions(final EntityType entityType) {
         return Joiner
-                .on(", ")
+                .on(",\n    ")
                 .join(transform(entityType.getFields(), new Function<Field, String>() {
                     @Override
                     public String apply(Field field) {
