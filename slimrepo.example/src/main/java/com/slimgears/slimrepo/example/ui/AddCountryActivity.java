@@ -65,8 +65,7 @@ public class AddCountryActivity extends Activity {
     private void onProceed() throws IOException {
         mUserRepositoryService.countries().add(CountryEntity
                         .create()
-                        .name(mViewName.getText().toString())
-                        .build());
+                        .setName(mViewName.getText().toString()));
         finish();
     }
 

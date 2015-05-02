@@ -125,7 +125,7 @@ public class AddUserActivity extends Activity {
     }
 
     private void onProceed() throws IOException {
-        mUserRepositoryService.users().add(UserEntity.create()
+        mUserRepositoryService.users().add(UserEntity.builder()
                 .firstName(mViewFirstName.getText().toString())
                 .lastName(mViewLastName.getText().toString())
                 .age(Integer.valueOf(mViewAge.getText().toString()))
