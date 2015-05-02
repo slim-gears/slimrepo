@@ -14,7 +14,7 @@ import java.io.Closeable;
  */
 public interface SessionServiceProvider extends RepositorySessionNotifier, RepositorySessionNotifier.Listener, Closeable {
     <TKey, TEntity extends Entity<TKey>> SessionEntityServiceProvider<TKey, TEntity> getEntityServiceProvider(EntityType<TKey, TEntity> entityType);
-    <TKey, TEntity extends Entity<TKey>>EntitySet.Provider<TKey, TEntity> getEntitySetProvider(EntityType<TKey, TEntity> entityType);
+    <TKey, TEntity extends Entity<TKey>>EntitySet.Provider<TEntity> getEntitySetProvider(EntityType<TKey, TEntity> entityType);
     TransactionProvider getTransactionProvider();
     RepositoryCreator getRepositoryCreator();
     OrmServiceProvider getOrmServiceProvider();

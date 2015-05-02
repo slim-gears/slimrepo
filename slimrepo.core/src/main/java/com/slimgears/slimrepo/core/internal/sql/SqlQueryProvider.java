@@ -5,9 +5,7 @@ package com.slimgears.slimrepo.core.internal.sql;
 import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
-import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.internal.interfaces.CloseableIterator;
-import com.slimgears.slimrepo.core.internal.interfaces.EntityCache;
 import com.slimgears.slimrepo.core.internal.query.DeleteQueryParams;
 import com.slimgears.slimrepo.core.internal.query.InsertQueryParams;
 import com.slimgears.slimrepo.core.internal.query.PreparedQuery;
@@ -21,7 +19,6 @@ import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlStatementBuilder;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.concurrent.Callable;
 
 /**
  * Created by Denis on 13-Apr-15
@@ -32,45 +29,6 @@ public class SqlQueryProvider<TKey, TEntity extends Entity<TKey>> implements Que
     protected final SqlSessionServiceProvider serviceProvider;
     private SqlStatementBuilder sqlBuilder;
     private SqlCommandExecutor sqlExecutor;
-
-    class EntityIterator implements CloseableIterator<TEntity> {
-        private final EntityCache<TKey, TEntity> entityCache;
-        private final CloseableIterator<FieldValueLookup<TEntity>> rowIterator;
-        private final Field<TEntity, TKey> keyField;
-
-        EntityIterator(CloseableIterator<FieldValueLookup<TEntity>> rowIterator) {
-            this.entityCache = serviceProvider.getEntityServiceProvider(entityType).getEntityCache();
-            this.rowIterator = rowIterator;
-            this.keyField = entityType.getKeyField();
-        }
-
-        @Override
-        public void close() throws IOException {
-            rowIterator.close();
-        }
-
-        @Override
-        public boolean hasNext() {
-            return rowIterator.hasNext();
-        }
-
-        @Override
-        public TEntity next() {
-            final FieldValueLookup<TEntity> row = rowIterator.next();
-            TKey id = row.getValue(keyField);
-            return entityCache.get(id, new Callable<TEntity>() {
-                @Override
-                public TEntity call() throws Exception {
-                    return entityType.newInstance(row);
-                }
-            });
-        }
-
-        @Override
-        public void remove() {
-            throw new RuntimeException("Remove is not supported");
-        }
-    }
 
     public SqlQueryProvider(SqlSessionServiceProvider serviceProvider, EntityType<TKey, TEntity> entityType) {
         this.entityType = entityType;
@@ -95,18 +53,17 @@ public class SqlQueryProvider<TKey, TEntity extends Entity<TKey>> implements Que
     }
 
     @Override
-    public PreparedQuery<CloseableIterator<TEntity>> prepareSelect(final SelectQueryParams<TKey, TEntity> query) {
+    public PreparedQuery<CloseableIterator<FieldValueLookup<TEntity>>> prepareSelect(final SelectQueryParams<TKey, TEntity> query) {
         final SqlCommand command = new SqlLazyCommand(getBuilder(), new SqlLazyCommand.CommandBuilder() {
             @Override
             public String buildCommand(SqlStatementBuilder sqlBuilder, SqlCommand.Parameters parameters) {
                 return sqlBuilder.selectStatement(query, parameters);
             }
         });
-        return new PreparedQuery<CloseableIterator<TEntity>>() {
+        return new PreparedQuery<CloseableIterator<FieldValueLookup<TEntity>>>() {
             @Override
-            public CloseableIterator<TEntity> execute() throws IOException {
-                CloseableIterator<FieldValueLookup<TEntity>> rowIterator = getExecutor().select(command);
-                return new EntityIterator(rowIterator);
+            public CloseableIterator<FieldValueLookup<TEntity>> execute() throws IOException {
+                return getExecutor().select(command);
             }
         };
     }

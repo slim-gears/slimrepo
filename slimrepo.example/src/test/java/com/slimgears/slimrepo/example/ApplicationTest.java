@@ -18,9 +18,6 @@ import org.robolectric.annotation.Config;
 
 import java.io.IOException;
 
-/**
- * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
- */
 @RunWith(RobolectricTestRunner.class)
 @Config(emulateSdk = 18, manifest=Config.NONE)
 public class ApplicationTest {
@@ -39,38 +36,28 @@ public class ApplicationTest {
         repoService.update(new RepositoryService.UpdateAction<UserRepository>() {
             @Override
             public void execute(UserRepository repository) throws IOException {
-                EntitySet<Integer, CountryEntity> countries = repository.countries();
-                CountryEntity countryUs = countries.addNew().setName("United States");
-                CountryEntity countryUk = countries.addNew().setName("United Kingdom");
-                CountryEntity countryFrance = countries.addNew().setName("France");
-                CountryEntity countryItaly = countries.addNew().setName("Italy");
+                EntitySet<CountryEntity> countries = repository.countries();
+                CountryEntity countryUs = countries.add(CountryEntity.builder().name("United States").build());
+                CountryEntity countryUk = countries.add(CountryEntity.builder().name("United Kingdom").build());
+                CountryEntity countryFrance = countries.add(CountryEntity.builder().name("France").build());
+                CountryEntity countryItaly = countries.add(CountryEntity.builder().name("Italy").build());
                 repository.saveChanges();
 
-                EntitySet<Integer, UserEntity> users = repository.users();
-                users.addNew().setFirstName("John").setLastName("Doe").setAge(20).setCountry(countryUs);
-                users.addNew().setFirstName("William").setLastName("Shakespeare").setAge(32).setCountry(countryUk);
-                users.addNew().setFirstName("Mark").setLastName("Twain").setAge(40).setCountry(countryFrance);
+                EntitySet<UserEntity> users = repository.users();
+                users.add(UserEntity.builder().firstName("John").lastName("Doe").age(20).country(countryUs).build());
+                users.add(UserEntity.builder().firstName("William").lastName("Shakespeare").age(32).country(countryUk).build());
+                users.add(UserEntity.builder().firstName("Mark").lastName("Twain").age(40).country(countryFrance).build());
             }
         });
 
-        CountryEntity[] countries = repoService.query(new RepositoryService.QueryAction<UserRepository, CountryEntity[]>() {
-            @Override
-            public CountryEntity[] execute(UserRepository repository) throws IOException {
-                return repository.countries().toArray();
-            }
-        });
+        CountryEntity[] countries = repoService.countries().toArray();
 
         Assert.assertEquals(4, countries.length);
 
-        UserEntity[] users = repoService.query(new RepositoryService.QueryAction<UserRepository, UserEntity[]>() {
-            @Override
-            public UserEntity[] execute(UserRepository repository) throws IOException {
-                return repository.users().query()
-                        .where(UserEntity.Country.is(CountryEntity.Name.in("France")))
-                        .prepare()
-                        .toArray();
-            }
-        });
+        UserEntity[] users = repoService.users().query()
+            .where(UserEntity.Country.is(CountryEntity.Name.in("France")))
+            .prepare()
+            .toArray();
 
         Assert.assertEquals(1, users.length);
         Assert.assertNotNull(users[0].getCountry());

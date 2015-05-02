@@ -83,8 +83,11 @@ public class RoleEntity extends AbstractRoleEntity implements Entity<Integer> {
         }
     }
 
-    public static Builder create() {
+    public static Builder builder() {
         return new Builder();
+    }
+    public static RoleEntity create() {
+        return new RoleEntity();
     }
 
     public int getRoleId() {

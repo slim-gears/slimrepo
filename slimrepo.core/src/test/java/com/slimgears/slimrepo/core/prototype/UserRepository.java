@@ -12,6 +12,6 @@ import com.slimgears.slimrepo.core.interfaces.Repository;
  * <File Description>
  */
 public interface UserRepository extends Repository {
-    EntitySet<Integer, UserEntity> users();
-    EntitySet<Integer, RoleEntity> roles();
+    EntitySet<UserEntity> users();
+    EntitySet<RoleEntity> roles();
 }

@@ -2,28 +2,29 @@ import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.core.internal.AbstractRepository;
 import com.slimgears.slimrepo.core.internal.DefaultRepositoryModel;
 import com.slimgears.slimrepo.core.internal.interfaces.SessionServiceProvider;
-import java.lang.Integer;
+import com.slimgears.slimrepo.core.prototype.generated.RoleEntity;
+import com.slimgears.slimrepo.core.prototype.generated.UserEntity;
 import java.lang.Override;
 import java.lang.String;
 
 public class GeneratedTestRepository extends AbstractRepository implements TestRepository {
-    private final EntitySet.Provider<Integer, com.slimgears.slimrepo.core.prototype.generated.RoleEntity> rolesEntitySet;
+    private final EntitySet.Provider<RoleEntity> rolesEntitySet;
 
-    private final EntitySet.Provider<Integer, com.slimgears.slimrepo.core.prototype.generated.UserEntity> usersEntitySet;
+    private final EntitySet.Provider<UserEntity> usersEntitySet;
 
     GeneratedTestRepository(SessionServiceProvider sessionServiceProvider) {
         super(sessionServiceProvider);
-        this.rolesEntitySet = sessionServiceProvider.getEntitySetProvider(com.slimgears.slimrepo.core.prototype.generated.RoleEntity.EntityMetaType);
-        this.usersEntitySet = sessionServiceProvider.getEntitySetProvider(com.slimgears.slimrepo.core.prototype.generated.UserEntity.EntityMetaType);
+        this.rolesEntitySet = sessionServiceProvider.getEntitySetProvider(RoleEntity.EntityMetaType);
+        this.usersEntitySet = sessionServiceProvider.getEntitySetProvider(UserEntity.EntityMetaType);
     }
 
     @Override
-    public final EntitySet<Integer, com.slimgears.slimrepo.core.prototype.generated.RoleEntity> roles() {
+    public final EntitySet<RoleEntity> roles() {
         return this.rolesEntitySet.get();
     }
 
     @Override
-    public final EntitySet<Integer, com.slimgears.slimrepo.core.prototype.generated.UserEntity> users() {
+    public final EntitySet<UserEntity> users() {
         return this.usersEntitySet.get();
     }
 
@@ -35,7 +36,7 @@ public class GeneratedTestRepository extends AbstractRepository implements TestR
         private static final String Name = "TestRepository";
 
         private Model() {
-            super(Name, Version, com.slimgears.slimrepo.core.prototype.generated.RoleEntity.EntityMetaType, com.slimgears.slimrepo.core.prototype.generated.UserEntity.EntityMetaType);
+            super(Name, Version, RoleEntity.EntityMetaType, UserEntity.EntityMetaType);
         }
     }
 }

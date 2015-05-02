@@ -12,6 +12,6 @@ import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
  */
 @GenerateRepository(version = 1, name = "UserDatabase")
 public interface UserRepository extends Repository {
-    EntitySet<Integer, UserEntity> users();
-    EntitySet<Integer, CountryEntity> countries();
+    EntitySet<UserEntity> users();
+    EntitySet<CountryEntity> countries();
 }

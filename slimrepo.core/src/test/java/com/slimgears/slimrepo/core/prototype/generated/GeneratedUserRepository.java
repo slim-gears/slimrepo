@@ -14,8 +14,8 @@ import com.slimgears.slimrepo.core.internal.interfaces.SessionServiceProvider;
  * <File Description>
  */
 public class GeneratedUserRepository extends AbstractRepository implements UserRepository {
-    private final EntitySet.Provider<Integer, UserEntity> usersEntitySet;
-    private final EntitySet.Provider<Integer, RoleEntity> rolesEntitySet;
+    private final EntitySet.Provider<UserEntity> usersEntitySet;
+    private final EntitySet.Provider<RoleEntity> rolesEntitySet;
 
     public GeneratedUserRepository(SessionServiceProvider sessionServiceProvider) {
         super(sessionServiceProvider);
@@ -33,13 +33,12 @@ public class GeneratedUserRepository extends AbstractRepository implements UserR
     }
 
     @Override
-    public EntitySet<Integer, UserEntity> users() {
+    public EntitySet<UserEntity> users() {
         return usersEntitySet.get();
     }
 
     @Override
-    public EntitySet<Integer, RoleEntity> roles() {
+    public EntitySet<RoleEntity> roles() {
         return rolesEntitySet.get();
     }
-
 }

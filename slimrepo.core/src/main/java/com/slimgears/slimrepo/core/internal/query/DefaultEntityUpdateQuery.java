@@ -3,12 +3,11 @@
 package com.slimgears.slimrepo.core.internal.query;
 
 import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueMap;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
-import com.slimgears.slimrepo.core.interfaces.queries.UpdateQuery;
+import com.slimgears.slimrepo.core.interfaces.queries.EntityUpdateQuery;
 import com.slimgears.slimrepo.core.internal.UpdateFieldInfo;
 
 import java.io.IOException;
@@ -20,15 +19,15 @@ import static com.google.common.collect.Collections2.filter;
  * Created by Denis on 07-Apr-15
  * <File Description>
  */
-public class EntityUpdateQuery<TKey, TEntity extends Entity<TKey>>
-        extends AbstractEntityQuery<TKey, TEntity, UpdateQuery, UpdateQuery.Builder<TEntity>, UpdateQueryParams<TKey, TEntity>>
-        implements UpdateQuery, UpdateQuery.Builder<TEntity> {
+public class DefaultEntityUpdateQuery<TKey, TEntity extends Entity<TKey>>
+        extends AbstractEntityQuery<TKey, TEntity, EntityUpdateQuery, EntityUpdateQuery.Builder<TEntity>, UpdateQueryParams<TKey, TEntity>>
+        implements EntityUpdateQuery, EntityUpdateQuery.Builder<TEntity> {
 
-    public EntityUpdateQuery(EntityType<TKey, TEntity> entityType, QueryProvider<TKey, TEntity> queryProvider) {
+    public DefaultEntityUpdateQuery(EntityType<TKey, TEntity> entityType, QueryProvider<TKey, TEntity> queryProvider) {
         super(new UpdateQueryParams<>(entityType, null, null, null), queryProvider);
     }
 
-    private EntityUpdateQuery(UpdateQueryParams<TKey, TEntity> queryParams, QueryProvider<TKey, TEntity> queryProvider) {
+    private DefaultEntityUpdateQuery(UpdateQueryParams<TKey, TEntity> queryParams, QueryProvider<TKey, TEntity> queryProvider) {
         super(queryParams, queryProvider);
     }
 
@@ -75,7 +74,7 @@ public class EntityUpdateQuery<TKey, TEntity extends Entity<TKey>>
 
     @Override
     protected Builder<TEntity> fork(UpdateQueryParams<TKey, TEntity> queryParams, QueryProvider<TKey, TEntity> queryProvider) {
-        return new EntityUpdateQuery<>(queryParams, queryProvider);
+        return new DefaultEntityUpdateQuery<>(queryParams, queryProvider);
     }
 
     @Override
@@ -84,7 +83,7 @@ public class EntityUpdateQuery<TKey, TEntity extends Entity<TKey>>
     }
 
     @Override
-    public UpdateQuery prepare() {
+    public EntityUpdateQuery prepare() {
         preparedUpdateQuery = queryProvider.prepareUpdate(queryParams);
         return this;
     }

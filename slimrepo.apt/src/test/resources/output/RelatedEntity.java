@@ -1,4 +1,5 @@
 import com.slimgears.slimrepo.core.interfaces.entities.Entity;
+import com.slimgears.slimrepo.core.interfaces.entities.EntityBuilder;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueMap;
@@ -30,8 +31,12 @@ class RelatedEntity extends AbstractRelatedEntity implements Entity<Integer> {
         return this.id;
     }
 
-    public static Builder create() {
+    public static Builder builder() {
         return new Builder();
+    }
+
+    public static RelatedEntity create() {
+        return new RelatedEntity();
     }
 
     public RelatedEntity setId(int id) {
@@ -82,7 +87,7 @@ class RelatedEntity extends AbstractRelatedEntity implements Entity<Integer> {
         }
     }
 
-    public static class Builder {
+    public static class Builder implements EntityBuilder<RelatedEntity> {
         private RelatedEntity model = new RelatedEntity();
 
         public RelatedEntity build() {

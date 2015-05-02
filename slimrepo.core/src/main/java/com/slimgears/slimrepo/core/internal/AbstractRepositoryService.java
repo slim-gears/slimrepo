@@ -2,19 +2,35 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal;
 
-import com.slimgears.slimrepo.core.interfaces.RepositoryService;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.slimgears.slimrepo.core.interfaces.Repository;
+import com.slimgears.slimrepo.core.interfaces.RepositoryService;
+import com.slimgears.slimrepo.core.interfaces.entities.Entity;
+import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
+import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.internal.interfaces.OrmServiceProvider;
 import com.slimgears.slimrepo.core.internal.interfaces.RepositoryModel;
 import com.slimgears.slimrepo.core.internal.interfaces.SessionServiceProvider;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by Denis on 09-Apr-15
  * <File Description>
  */
 public abstract class AbstractRepositoryService<TRepository extends Repository> implements RepositoryService<TRepository> {
+    LoadingCache<EntityType, AutoEntitySet> sessionEntityServiceProviderCache = CacheBuilder.newBuilder()
+            .build(new CacheLoader<EntityType, AutoEntitySet>() {
+                @Override
+                public AutoEntitySet load(EntityType entityType) throws Exception {
+                    //noinspection unchecked
+                    return new AutoEntitySet(ormServiceProvider, entityType, repositoryModel, AbstractRepositoryService.this);
+                }
+            });
+
     private final OrmServiceProvider ormServiceProvider;
     private final RepositoryModel repositoryModel;
 
@@ -48,4 +64,13 @@ public abstract class AbstractRepositoryService<TRepository extends Repository> 
     }
 
     protected abstract TRepository createRepository(SessionServiceProvider sessionServiceProvider);
+
+    protected <TKey, TEntity extends Entity<TKey>> EntitySet<TEntity> getEntitySet(EntityType<TKey, TEntity> entityType) {
+        try {
+            //noinspection unchecked
+            return sessionEntityServiceProviderCache.get(entityType);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

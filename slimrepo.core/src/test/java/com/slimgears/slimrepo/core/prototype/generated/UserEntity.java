@@ -118,8 +118,12 @@ public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
         }
     }
 
-    public static Builder create() {
+    public static Builder builder() {
         return new Builder();
+    }
+
+    public static UserEntity create() {
+        return new UserEntity();
     }
 
     public int getUserId() {

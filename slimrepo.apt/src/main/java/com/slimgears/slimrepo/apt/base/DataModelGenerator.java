@@ -60,37 +60,51 @@ public class DataModelGenerator extends ClassGenerator<DataModelGenerator> {
         super(processingEnvironment);
     }
 
+    protected TypeSpec.Builder createModelBuilder(String name) {
+        return TypeSpec
+                .classBuilder(name)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+    }
+
     protected void build(TypeSpec.Builder builder, TypeElement type, List<FieldInfo> fields) {
         builder.addModifiers(toModifiersArray(type.getModifiers()));
 
-        builderClassBuilder = TypeSpec
-                .classBuilder("Builder")
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
-
-        builderTypeName = ClassName.get(getPackageName(), getClassName(), "Builder");
+        String modelBuilderName = "Builder";
+        builderClassBuilder = createModelBuilder(modelBuilderName);
+        builderTypeName = ClassName.get(getPackageName(), getClassName(), modelBuilderName);
 
         TypeName modelType = getTypeName();
 
-        builderClassBuilder.addField(FieldSpec
-                .builder(modelType, "model", Modifier.PRIVATE)
-                .initializer("new $T()", modelType)
-                .build());
+        builderClassBuilder
+                .addField(FieldSpec
+                        .builder(modelType, "model", Modifier.PRIVATE)
+                        .initializer("new $T()", modelType)
+                        .build())
 
-        builderClassBuilder.addMethod(MethodSpec
-                .methodBuilder("build")
-                .addModifiers(Modifier.PUBLIC)
-                .returns(modelType)
-                .addCode("return model;\n")
-                .build());
+                .addMethod(MethodSpec
+                        .methodBuilder("build")
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(modelType)
+                        .addCode("return model;\n")
+                        .build());
 
-        builder.addMethod(MethodSpec
-                .methodBuilder("create")
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .returns(builderTypeName)
-                .addCode("return new Builder();\n")
-                .build());
-
-        builder.addMethod(MethodSpec.constructorBuilder().addModifiers(Modifier.PRIVATE).build());
+        builder
+                .addMethod(MethodSpec
+                        .methodBuilder("builder")
+                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                        .returns(builderTypeName)
+                        .addCode("return new $L();\n", modelBuilderName)
+                        .build())
+                .addMethod(MethodSpec
+                        .methodBuilder("create")
+                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                        .returns(modelType)
+                        .addCode("return new $T();\n", modelType)
+                        .build())
+                .addMethod(MethodSpec
+                        .constructorBuilder()
+                        .addModifiers(Modifier.PRIVATE)
+                        .build());
 
         MethodSpec.Builder modelCtorBuilder = MethodSpec
                 .constructorBuilder()

@@ -7,6 +7,6 @@ import java.lang.Integer;
 
 @GenerateRepository(version = 10, name = "TestRepository")
 public interface TestRepository extends Repository {
-    EntitySet<Integer, RoleEntity> roles();
-    EntitySet<Integer, UserEntity> users();
+    EntitySet<RoleEntity> roles();
+    EntitySet<UserEntity> users();
 }

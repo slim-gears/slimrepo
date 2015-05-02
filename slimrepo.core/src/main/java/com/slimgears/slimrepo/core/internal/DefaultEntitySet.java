@@ -4,27 +4,28 @@ package com.slimgears.slimrepo.core.internal;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
-import com.slimgears.slimrepo.core.interfaces.queries.DeleteQuery;
+import com.slimgears.slimrepo.core.interfaces.Repository;
 import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
-import com.slimgears.slimrepo.core.interfaces.queries.Query;
-import com.slimgears.slimrepo.core.interfaces.Repository;
-import com.slimgears.slimrepo.core.interfaces.queries.UpdateQuery;
+import com.slimgears.slimrepo.core.interfaces.fields.Field;
+import com.slimgears.slimrepo.core.interfaces.queries.EntityDeleteQuery;
+import com.slimgears.slimrepo.core.interfaces.queries.EntitySelectQuery;
+import com.slimgears.slimrepo.core.interfaces.queries.EntityUpdateQuery;
 import com.slimgears.slimrepo.core.internal.interfaces.EntityCache;
 import com.slimgears.slimrepo.core.internal.interfaces.EntityStateTracker;
 import com.slimgears.slimrepo.core.internal.interfaces.RepositorySessionNotifier;
 import com.slimgears.slimrepo.core.internal.interfaces.SessionEntityServiceProvider;
 import com.slimgears.slimrepo.core.internal.interfaces.SessionServiceProvider;
-import com.slimgears.slimrepo.core.internal.query.EntityDeleteQuery;
-import com.slimgears.slimrepo.core.internal.query.EntitySelectQuery;
-import com.slimgears.slimrepo.core.internal.query.EntityUpdateQuery;
+import com.slimgears.slimrepo.core.internal.query.DefaultEntityDeleteQuery;
+import com.slimgears.slimrepo.core.internal.query.DefaultEntitySelectQuery;
+import com.slimgears.slimrepo.core.internal.query.DefaultEntityUpdateQuery;
 import com.slimgears.slimrepo.core.internal.query.QueryProvider;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -34,17 +35,16 @@ import static com.google.common.collect.Collections2.transform;
  * Created by Denis on 05-Apr-15
  * <File Description>
  */
-public class DefaultEntitySet<TKey, TEntity extends Entity<TKey>> implements EntitySet<TKey, TEntity>,
+public class DefaultEntitySet<TKey, TEntity extends Entity<TKey>> implements EntitySet<TEntity>,
         RepositorySessionNotifier.Listener {
-    private final SessionEntityServiceProvider<TKey, TEntity> sessionEntityServiceProvider;
-    private final SessionServiceProvider sessionServiceProvider;
-    private final EntityType<TKey, TEntity> entityType;
+    protected final SessionEntityServiceProvider<TKey, TEntity> sessionEntityServiceProvider;
+    protected final EntityType<TKey, TEntity> entityType;
     private EntityCache<TKey, TEntity> entityCache;
     private EntityStateTracker<TKey, TEntity> stateTracker;
     private QueryProvider<TKey, TEntity> queryProvider;
 
-    public static class Provider<TKey, TEntity extends Entity<TKey>> implements EntitySet.Provider<TKey, TEntity> {
-        private EntitySet<TKey, TEntity> entitySet = null;
+    public static class Provider<TKey, TEntity extends Entity<TKey>> implements EntitySet.Provider<TEntity> {
+        private EntitySet<TEntity> entitySet = null;
         private final SessionServiceProvider sessionServiceProvider;
         private final EntityType<TKey, TEntity> entityType;
         private final Object syncRoot = new Object();
@@ -54,36 +54,35 @@ public class DefaultEntitySet<TKey, TEntity extends Entity<TKey>> implements Ent
             this.entityType = entityType;
         }
 
-        public EntitySet<TKey, TEntity> get() {
+        public EntitySet<TEntity> get() {
             if (entitySet != null) return entitySet;
             synchronized (syncRoot) {
                 if (entitySet != null) return entitySet;
-                return entitySet = new DefaultEntitySet<>(sessionServiceProvider, entityType);
+                DefaultEntitySet<TKey, TEntity> instance = new DefaultEntitySet<>(sessionServiceProvider.getEntityServiceProvider(entityType), entityType);
+                sessionServiceProvider.addListener(instance);
+                return entitySet = instance;
             }
         }
     }
 
-    private DefaultEntitySet(SessionServiceProvider sessionServiceProvider, EntityType<TKey, TEntity> entityType) {
-        this.sessionServiceProvider = sessionServiceProvider;
-        this.sessionEntityServiceProvider = sessionServiceProvider.getEntityServiceProvider(entityType);
+    public DefaultEntitySet(SessionEntityServiceProvider<TKey, TEntity> sessionEntityServiceProvider, EntityType<TKey, TEntity> entityType) {
+        this.sessionEntityServiceProvider = sessionEntityServiceProvider;
         this.entityType = entityType;
-
-        sessionServiceProvider.addListener(this);
     }
 
     @Override
-    public Query.Builder<TEntity> query() {
-        return new EntitySelectQuery<>(entityType, getQueryProvider());
+    public EntitySelectQuery.Builder<TEntity> query() {
+        return new DefaultEntitySelectQuery<>(entityType, getQueryProvider(), getCache());
     }
 
     @Override
-    public DeleteQuery.Builder<TEntity> deleteQuery() {
-        return new EntityDeleteQuery<>(entityType, getQueryProvider());
+    public EntityDeleteQuery.Builder<TEntity> deleteQuery() {
+        return new DefaultEntityDeleteQuery<>(entityType, getQueryProvider());
     }
 
     @Override
-    public UpdateQuery.Builder<TEntity> updateQuery() {
-        return new EntityUpdateQuery<>(entityType, getQueryProvider());
+    public EntityUpdateQuery.Builder<TEntity> updateQuery() {
+        return new DefaultEntityUpdateQuery<>(entityType, getQueryProvider());
     }
 
     @Override
@@ -97,37 +96,46 @@ public class DefaultEntitySet<TKey, TEntity extends Entity<TKey>> implements Ent
     }
 
     @Override
-    public Map<TKey, TEntity> toMap() {
-        Map<TKey, TEntity> map = new HashMap<>();
-        for (Iterator<TEntity> it = query().prepare().iterator(); it.hasNext(); ) {
-            TEntity entity = it.next();
-            map.put(entity.getEntityId(), entity);
-        }
-        return map;
+    public <T> Map<T, TEntity> toMap(Field<TEntity, T> keyField) throws IOException {
+        return query().prepare().toMap(keyField);
     }
 
     @Override
-    public TEntity addNew() {
-        return add(entityType.newInstance());
+    public <K, V> Map<K, V> toMap(Field<TEntity, K> keyField, Field<TEntity, V> valueField) throws IOException {
+        return query().selectToMap(keyField, valueField);
     }
 
     @Override
-    public TEntity add(TEntity entity) {
-        getStateTracker().entityAdded(entity);
+    @SafeVarargs
+    public final TEntity[] add(TEntity... entities) throws IOException {
+        addAll(Arrays.asList(entities));
+        return entities;
+    }
+
+    @Override
+    public final TEntity add(TEntity entity) throws IOException {
+        addAll(Collections.singletonList(entity));
         return entity;
     }
 
     @Override
-    public void add(Iterable<TEntity> entities) {
+    public void addAll(Iterable<TEntity> entities) throws IOException {
         for (TEntity entity : entities) {
-            add(entity);
+            getStateTracker().entityAdded(entity);
         }
     }
 
     @Override
-    public void remove(TEntity entity) {
-        getCache().invalidate(entity.getEntityId());
-        getStateTracker().entityDeleted(entity);
+    public void remove(TEntity entity) throws IOException {
+        removeAll(Collections.singletonList(entity));
+    }
+
+    @Override
+    public void removeAll(Iterable<TEntity> entities) throws IOException {
+        for (TEntity entity : entities) {
+            getCache().invalidate(entity.getEntityId());
+            getStateTracker().entityDeleted(entity);
+        }
     }
 
     @Override
@@ -189,17 +197,17 @@ public class DefaultEntitySet<TKey, TEntity extends Entity<TKey>> implements Ent
         });
     }
 
-    private QueryProvider<TKey, TEntity> getQueryProvider() {
+    protected QueryProvider<TKey, TEntity> getQueryProvider() {
         if (queryProvider != null) return queryProvider;
         return queryProvider = sessionEntityServiceProvider.getQueryProvider();
     }
 
-    private EntityCache<TKey, TEntity> getCache() {
+    protected EntityCache<TKey, TEntity> getCache() {
         if (entityCache != null) return entityCache;
         return entityCache = sessionEntityServiceProvider.getEntityCache();
     }
 
-    private EntityStateTracker<TKey, TEntity> getStateTracker() {
+    protected EntityStateTracker<TKey, TEntity> getStateTracker() {
         if (stateTracker != null) return stateTracker;
         return stateTracker = sessionEntityServiceProvider.getEntityStateTracker();
     }

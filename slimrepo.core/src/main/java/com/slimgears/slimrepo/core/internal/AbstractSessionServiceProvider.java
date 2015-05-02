@@ -48,7 +48,7 @@ public abstract class AbstractSessionServiceProvider implements SessionServicePr
     protected abstract <TKey, TEntity extends Entity<TKey>> SessionEntityServiceProvider<TKey, TEntity> createEntityServiceProvider(EntityType<TKey, TEntity> entityType);
     protected abstract RepositoryCreator createRepositoryCreator();
 
-    protected <TKey, TEntity extends Entity<TKey>> EntitySet.Provider<TKey, TEntity> createEntitySetProvider(EntityType<TKey, TEntity> entityType) {
+    protected <TKey, TEntity extends Entity<TKey>> EntitySet.Provider<TEntity> createEntitySetProvider(EntityType<TKey, TEntity> entityType) {
         return new DefaultEntitySet.Provider<>(this, entityType);
     }
 
@@ -63,7 +63,7 @@ public abstract class AbstractSessionServiceProvider implements SessionServicePr
     }
 
     @Override
-    public <TKey, TEntity extends Entity<TKey>> EntitySet.Provider<TKey, TEntity> getEntitySetProvider(EntityType<TKey, TEntity> entityType) {
+    public <TKey, TEntity extends Entity<TKey>> EntitySet.Provider<TEntity> getEntitySetProvider(EntityType<TKey, TEntity> entityType) {
         try {
             //noinspection unchecked
             return entitySetProviderCache.get(entityType);

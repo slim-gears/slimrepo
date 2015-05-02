@@ -5,11 +5,6 @@ package com.slimgears.slimrepo.core;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import com.slimgears.slimrepo.core.prototype.UserRepository;
-import com.slimgears.slimrepo.core.prototype.generated.RoleEntity;
-import com.slimgears.slimrepo.core.prototype.generated.UserEntity;
-import com.slimgears.slimrepo.core.prototype.generated.GeneratedUserRepositoryService;
-import com.slimgears.slimrepo.core.prototype.generated.GeneratedUserRepository;
 import com.slimgears.slimrepo.core.interfaces.RepositoryService;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimrepo.core.internal.EntityFieldValueMap;
@@ -23,6 +18,11 @@ import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommand;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommandExecutor;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlOrmServiceProvider;
 import com.slimgears.slimrepo.core.internal.sql.sqlite.AbstractSqliteOrmServiceProvider;
+import com.slimgears.slimrepo.core.prototype.UserRepository;
+import com.slimgears.slimrepo.core.prototype.generated.GeneratedUserRepository;
+import com.slimgears.slimrepo.core.prototype.generated.GeneratedUserRepositoryService;
+import com.slimgears.slimrepo.core.prototype.generated.RoleEntity;
+import com.slimgears.slimrepo.core.prototype.generated.UserEntity;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
@@ -46,8 +46,6 @@ import java.util.List;
 
 import static com.slimgears.slimrepo.core.interfaces.conditions.Conditions.and;
 import static com.slimgears.slimrepo.core.interfaces.conditions.Conditions.or;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.verify;
 
 /**
  * Created by Denis on 07-Apr-15
@@ -211,7 +209,7 @@ public class PrototypeTest {
         for (int i = 0; i < count; ++i) {
             rows[i] = new EntityFieldValueMap<>(
                     UserEntity.EntityMetaType,
-                    UserEntity.create()
+                    UserEntity.builder()
                             .userId(i)
                             .userFirstName("John")
                             .userLastName("Doe")

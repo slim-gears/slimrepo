@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false" />
+  <component name="Encoding" defaultCharsetForPropertiesFiles="UTF-8">
+    <file url="file://$PROJECT_DIR$/slimrepo.android/src/test/java/com/slimgears/slimrepo/android/RepositoryServicePrototypeTest.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/slimrepo.apt/src/test/java/com/slimgears/slimrepo/apt/RepositoryServiceGeneratorTest.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/slimrepo.core/src/main/java/com/slimgears/slimrepo/core/internal/query/DefaultEntitySelectQuery.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/slimrepo.core/src/test/java/com/slimgears/slimrepo/core/prototype/generated/UserRepositoryService.java" charset="UTF-8" />
+    <file url="PROJECT" charset="UTF-8" />
+  </component>
 </project>
-

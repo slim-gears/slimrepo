@@ -10,15 +10,16 @@ import com.slimgears.slimrepo.apt.base.DataModelGenerator;
 import com.slimgears.slimrepo.core.annotations.GenerateEntity;
 import com.slimgears.slimrepo.core.annotations.Key;
 import com.slimgears.slimrepo.core.interfaces.entities.Entity;
+import com.slimgears.slimrepo.core.interfaces.entities.EntityBuilder;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueMap;
 import com.slimgears.slimrepo.core.interfaces.fields.BlobField;
-import com.slimgears.slimrepo.core.interfaces.fields.RelationalField;
-import com.slimgears.slimrepo.core.internal.Fields;
 import com.slimgears.slimrepo.core.interfaces.fields.NumericField;
+import com.slimgears.slimrepo.core.interfaces.fields.RelationalField;
 import com.slimgears.slimrepo.core.interfaces.fields.StringField;
 import com.slimgears.slimrepo.core.internal.AbstractEntityType;
+import com.slimgears.slimrepo.core.internal.Fields;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
@@ -39,7 +40,6 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.TypeMirror;
 
 import static com.google.common.collect.Iterables.find;
 import static com.google.common.collect.Iterables.transform;
@@ -157,6 +157,12 @@ public class EntityGenerator extends DataModelGenerator {
         String simpleName = generateEntityTypeName(superClass);
         String packageName = ClassGenerator.packageName(superClass.toString());
         return ClassName.get(packageName, simpleName);
+    }
+
+    @Override
+    protected TypeSpec.Builder createModelBuilder(String name) {
+        return super.createModelBuilder(name)
+                .addSuperinterface(ParameterizedTypeName.get(ClassName.get(EntityBuilder.class), ClassName.get(getPackageName(), getClassName())));
     }
 
     @Override

@@ -24,6 +24,7 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.SimpleTypeVisitor7;
+import javax.lang.model.util.Types;
 
 /**
  * Created by Denis on 02-Apr-15
@@ -34,60 +35,82 @@ public class RepositoryGenerator extends ClassGenerator<RepositoryGenerator> {
         super(processingEnvironment);
     }
 
+    public static class EntitySetType {
+        public final TypeName entityType;
+        public final TypeName entitySetType;
+
+        public EntitySetType(TypeName entityType) {
+            this.entityType = entityType;
+            this.entitySetType = ParameterizedTypeName.get(ClassName.get(EntitySet.class), entityType);
+        }
+    }
+
     class Visitor extends ElementVisitorBase<Void, Void> {
         private final TypeSpec.Builder builder;
         private final MethodSpec.Builder modelCtorBuilder;
         private final MethodSpec.Builder ctorBuilder;
-        private final ProcessingEnvironment environment;
 
         Visitor(TypeSpec.Builder builder, MethodSpec.Builder modelCtorBuilder, MethodSpec.Builder ctorBuilder) {
             this.builder = builder;
             this.modelCtorBuilder = modelCtorBuilder;
             this.ctorBuilder = ctorBuilder;
-            this.environment = getProcessingEnvironment();
         }
 
         @Override
         public Void visitExecutable(ExecutableElement method, Void param) {
+            validateEntitySetGetter(getTypeUtils(), method);
             TypeMirror returnType = method.getReturnType();
-            if (!isEntitySet(returnType)) throw new RuntimeException("Only entity set getters are supported");
-
-            final List<TypeMirror> returnTypeArguments = new ArrayList<>();
-            returnType.accept(new SimpleTypeVisitor7<Void, Void>() {
-                @Override
-                public Void visitDeclared(DeclaredType declaredType, Void param) {
-                    returnTypeArguments.addAll(declaredType.getTypeArguments());
-                    return null;
-                }
-            }, null);
-
-            TypeName keyType = TypeName.get(returnTypeArguments.get(0));
-            TypeName entityType = ClassName.get(getPackageName(), returnTypeArguments.get(1).toString());
+            EntitySetType entitySetType = getEntitySetType(getPackageName(), returnType);
 
             String name = method.getSimpleName().toString();
             String fieldName = (name.startsWith("get") ? toCamelCase("", name.substring(3)) : name) + "EntitySet";
-            TypeName fieldType = ParameterizedTypeName.get(ClassName.get(EntitySet.Provider.class), keyType, entityType);
+            TypeName fieldType = ParameterizedTypeName.get(ClassName.get(EntitySet.Provider.class), entitySetType.entityType);
 
             builder.addField(fieldType, fieldName, Modifier.FINAL, Modifier.PRIVATE);
-            ctorBuilder.addCode("this.$L = sessionServiceProvider.getEntitySetProvider($T.EntityMetaType);\n", fieldName, entityType);
-            modelCtorBuilder.addCode(", $T.EntityMetaType", entityType);
+            ctorBuilder.addCode("this.$L = sessionServiceProvider.getEntitySetProvider($T.EntityMetaType);\n", fieldName, entitySetType.entityType);
+            modelCtorBuilder.addCode(", $T.EntityMetaType", entitySetType.entityType);
 
             builder.addMethod(MethodSpec.methodBuilder(name)
                     .addAnnotation(Override.class)
                     .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                    .returns(ParameterizedTypeName.get(ClassName.get(EntitySet.class), keyType, entityType))
+                    .returns(ParameterizedTypeName.get(ClassName.get(EntitySet.class), entitySetType.entityType))
                     .addCode("return this.$L.get();\n", fieldName)
                     .build());
 
             return null;
         }
+    }
 
-        private boolean isEntitySet(TypeMirror type) {
-            TypeMirror erasure = environment.getTypeUtils().erasure(type);
-            String typeStr = erasure.toString();
-            String classStr = EntitySet.class.getCanonicalName();
-            return typeStr.equals(classStr);
-        }
+    public static EntitySetType getEntitySetType(String packageName, TypeMirror entitySetType) {
+        final List<TypeMirror> returnTypeArguments = new ArrayList<>();
+        entitySetType.accept(new SimpleTypeVisitor7<Void, Void>() {
+            @Override
+            public Void visitDeclared(DeclaredType declaredType, Void param) {
+                returnTypeArguments.addAll(declaredType.getTypeArguments());
+                return null;
+            }
+        }, null);
+
+        TypeMirror entityTypeMirror = returnTypeArguments.get(0);
+        String entityTypeFullName = entityTypeMirror.toString();
+        String entityTypePackageName = ClassGenerator.packageName(entityTypeFullName);
+        if (entityTypePackageName.isEmpty()) entityTypePackageName = packageName;
+        TypeName entityType = ClassName.get(entityTypePackageName, simpleName(entityTypeMirror.toString()));
+
+        return new EntitySetType(entityType);
+    }
+
+    public static void validateEntitySetGetter(Types typeUtils, ExecutableElement method) {
+        TypeMirror returnType = method.getReturnType();
+        if (!isEntitySet(typeUtils, returnType)) throw new RuntimeException("Only entity set getters are supported");
+        if (method.getParameters().size() > 0) throw new RuntimeException("Entity set getter should not take any parameters");
+    }
+
+    public static boolean isEntitySet(Types typeUtils, TypeMirror type) {
+        TypeMirror erasure = typeUtils.erasure(type);
+        String typeStr = erasure.toString();
+        String classStr = EntitySet.class.getCanonicalName();
+        return typeStr.equals(classStr);
     }
 
     @Override

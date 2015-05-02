@@ -3,6 +3,9 @@
 package com.slimgears.slimrepo.core.internal;
 
 import com.slimgears.slimrepo.core.interfaces.Repository;
+import com.slimgears.slimrepo.core.interfaces.entities.Entity;
+import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
+import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.internal.interfaces.SessionServiceProvider;
 import com.slimgears.slimrepo.core.internal.interfaces.TransactionProvider;
 
@@ -19,6 +22,11 @@ public class AbstractRepository implements Repository {
     protected AbstractRepository(SessionServiceProvider sessionServiceProvider) {
         this.sessionServiceProvider = sessionServiceProvider;
         this.transactionProvider = sessionServiceProvider.getTransactionProvider();
+    }
+
+    @Override
+    public <TKey, TEntity extends Entity<TKey>> EntitySet<TEntity> entities(EntityType<TKey, TEntity> entityType) {
+        return sessionServiceProvider.getEntitySetProvider(entityType).get();
     }
 
     @Override
