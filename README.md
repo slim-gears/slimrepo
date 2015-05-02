@@ -159,7 +159,7 @@ UserEntity[] users = repoService.users()
 **Using and / or condition compositions**
 
 ```java
-UserEntity[] repoService.query(repo -> {
+UserEntity[] users = repoService.query(repo -> {
 	return repo.users().query()
 		.where(Conditions
 			.and(
