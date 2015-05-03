@@ -197,6 +197,20 @@ public class PrototypeTest {
         assertSqlEquals("query-related-field.sql");
     }
 
+    @Test
+    public void querySelectedFieldsToMap() throws IOException {
+        testQuery(new RepositoryService.QueryAction<UserRepository, Object>() {
+            @Override
+            public Object execute(UserRepository repository) throws IOException {
+                return repository.users().query()
+                        .where(UserEntity.UserFirstName.in("John", "Jake"))
+                        .selectToMap(UserEntity.UserFirstName, UserEntity.UserLastName);
+            }
+        });
+        Mockito.verify(executorMock).select(Matchers.any(SqlCommand.class));
+        assertSqlEquals("query-selected-to-map.sql");
+    }
+
     private <T> T testQuery(RepositoryService.QueryAction<UserRepository, T> queryAction) throws IOException {
         RepositoryService<UserRepository> repo = new GeneratedUserRepositoryService(ormServiceProviderMock);
         T result = repo.query(queryAction);

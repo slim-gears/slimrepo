@@ -5,14 +5,13 @@ package com.slimgears.slimrepo.core.internal.sql;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.Iterables;
 import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
 import com.slimgears.slimrepo.core.interfaces.conditions.RelationalCondition;
 import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
-import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.interfaces.fields.ComparableField;
+import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.interfaces.fields.RelationalField;
 import com.slimgears.slimrepo.core.internal.EntityFieldValueMap;
 import com.slimgears.slimrepo.core.internal.OrderFieldInfo;
@@ -26,11 +25,14 @@ import com.slimgears.slimrepo.core.internal.query.UpdateQueryParams;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommand;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlStatementBuilder;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
+import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.transform;
 
 /**
@@ -59,10 +61,17 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
 
     @Override
     public <TKey, TEntity extends Entity<TKey>> String selectStatement(SelectQueryParams<TKey, TEntity> params, SqlCommand.Parameters sqlParams) {
+        Iterable<RelationalField> relationalFields = (params.fields != null)
+                ? findRelationalFields(params.fields)
+                : getAllRelationalFields(params.entityType);
+        Iterable<Field<TEntity, ?>> fields = params.fields != null
+                ? params.fields
+                : params.entityType.getFields();
+
         return
-                selectClause(params.entityType) +
+                selectClause(params.entityType, fields) +
                 fromClause(params.entityType) +
-                joinClauses(params.entityType) +
+                joinClauses(relationalFields) +
                 whereClause(params.condition, sqlParams) +
                 orderByClause(params.order) +
                 limitClause(params.pagination);
@@ -130,7 +139,7 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
 
     private Iterable<Field> fieldsToInsert(final EntityType entityType) {
         //noinspection unchecked
-        return Iterables.filter((Iterable<Field>)entityType.getFields(), new com.google.common.base.Predicate<Field>() {
+        return filter((Iterable<Field>) entityType.getFields(), new com.google.common.base.Predicate<Field>() {
             @Override
             public boolean apply(Field field) {
                 return !isAutoIncremented(entityType, field);
@@ -158,12 +167,6 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
         return builder.toString();
     }
 
-    private String joinClauses(EntityType entityType) {
-        StringBuilder builder = new StringBuilder();
-        addJoinClauses(builder, new HashSet<EntityType>(), entityType);
-        return builder.toString();
-    }
-
     private void addJoinClauses(StringBuilder builder, Set<EntityType> processedTypes, EntityType entityType) {
         if (processedTypes.add(entityType)) {
             //noinspection unchecked
@@ -172,7 +175,7 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
     }
 
     private void addJoinClauses(StringBuilder builder, Set<EntityType> processedTypes, Iterable<RelationalField> relationalFields) {
-        for (RelationalField<?, ?> relationalField : relationalFields) {
+        for (RelationalField relationalField : relationalFields) {
             builder.append(joinClause(relationalField));
             builder.append('\n');
 
@@ -191,8 +194,8 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
         return "SELECT COUNT(*)\n";
     }
 
-    private String selectClause(EntityType entityType) {
-        return "SELECT\n    " + Joiner.on(",\n    ").join(fieldsAsAliases(allRelatedFields(entityType))) + "\n";
+    private <TEntity> String selectClause(EntityType entityType, Iterable<Field<TEntity, ?>> fields) {
+        return "SELECT\n    " + Joiner.on(",\n    ").join(fieldsAsAliases(allRelatedFields(entityType, fields))) + "\n";
     }
 
     private Iterable<String> fieldsAsAliases(Iterable<Field> fields) {
@@ -345,19 +348,29 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
         return syntaxProvider.qualifiedFieldName(field);
     }
 
-    private Iterable<Field> allRelatedFields(EntityType<?, ?> entityType) {
+    private Iterable<Field> allRelatedFields(EntityType entityType) {
+        //noinspection unchecked
+        return allRelatedFields(entityType, entityType.getFields());
+    }
+
+    private <TEntity> Iterable<Field> allRelatedFields(EntityType entityType, Iterable<Field<TEntity, ?>> selectedFields) {
         Set<Field> fields = new LinkedHashSet<>();
-        addAllRelatedFields(fields, new HashSet<EntityType>(), entityType);
+        addAllRelatedFields(fields, new HashSet<EntityType>(), entityType, selectedFields);
         return fields;
     }
 
-    private void addAllRelatedFields(Set<Field> fields, Set<EntityType> processedEntityTypes, EntityType<?, ?> entityType) {
+    private void addAllRelatedFields(Set<Field> fields, Set<EntityType> processedEntityTypes, EntityType entityType) {
+        //noinspection unchecked
+        addAllRelatedFields(fields, processedEntityTypes, entityType, entityType.getFields());
+    }
+
+    private <TEntity> void addAllRelatedFields(Set<Field> fields, Set<EntityType> processedEntityTypes, EntityType entityType, Iterable<Field<TEntity, ?>> selectedFields) {
         if (!processedEntityTypes.add(entityType)) return;
 
-        for (Field<?, ?> field : entityType.getFields()) {
+        for (Field field : selectedFields) {
             if (fields.add(field)) {
                 if (field instanceof RelationalField) {
-                    RelationalField<?, ?> relationalField = (RelationalField<?, ?>)field;
+                    RelationalField relationalField = (RelationalField)field;
                     addAllRelatedFields(fields, processedEntityTypes, relationalField.metaInfo().getRelatedEntityType());
                 }
             }
@@ -379,5 +392,20 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
         //noinspection unchecked
         visitor.visit(condition);
         return relationalFields;
+    }
+
+    private <TEntity> Iterable<RelationalField> findRelationalFields(Iterable<Field<TEntity, ?>> fields) {
+        List<RelationalField> relationalFields = new ArrayList<>();
+        for (Field<?, ?> field : fields) {
+            if (field instanceof RelationalField) {
+                relationalFields.add((RelationalField<?, ?>)field);
+            }
+        }
+        return relationalFields;
+    }
+
+    private Iterable<RelationalField> getAllRelationalFields(EntityType entityType) {
+        //noinspection unchecked
+        return entityType.getRelationalFields();
     }
 }

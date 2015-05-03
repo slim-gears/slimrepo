@@ -23,6 +23,7 @@ import org.robolectric.annotation.Config;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Map;
 
 import static com.slimgears.slimrepo.core.utilities.Dates.addDays;
 import static com.slimgears.slimrepo.core.utilities.Dates.fromDate;
@@ -235,6 +236,20 @@ public class RepositoryServicePrototypeTest {
         }
 
         Assert.assertEquals(1, repositoryService.users().countAllWhere(UserEntity.Role.is(RoleEntity.RoleDescription.startsWith("New"))));
+    }
+
+    @Test
+    public void querySelectToMap() throws IOException {
+        repositoryService.users().add(
+                UserEntity.builder().userFirstName("John").userLastName("Doe").build(),
+                UserEntity.builder().userFirstName("Jake").userLastName("Smith").build(),
+                UserEntity.builder().userFirstName("Bill").userLastName("Doors").build(),
+                UserEntity.builder().userFirstName("Bred").userLastName("Beat").build());
+
+        Map<String, String> firstNameToLastName = repositoryService.users().toMap(UserEntity.UserFirstName, UserEntity.UserLastName);
+        Assert.assertEquals(4, firstNameToLastName.size());
+        Assert.assertEquals("Doe", firstNameToLastName.get("John"));
+        Assert.assertEquals("Smith", firstNameToLastName.get("Jake"));
     }
 
     private UserEntity[] addUsers(final UserEntity... users) throws IOException {

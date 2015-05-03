@@ -179,7 +179,10 @@ public class DefaultEntitySelectQuery<TKey, TEntity extends Entity<TKey>>
     @Override
     public <K, V> Map<K, V> selectToMap(final Field<TEntity, K> keyField, final Field<TEntity, V> valueField) throws IOException {
         final Map<K, V> map = new HashMap<>();
-        iterateRows(getPreparedSelectQuery(), new Function<FieldValueLookup<TEntity>, Void>() {
+        SelectQueryParams<TKey, TEntity> queryParams = this.queryParams.fork();
+        queryParams.fields = Arrays.asList(keyField, valueField);
+
+        iterateRows(queryProvider.prepareSelect(queryParams), new Function<FieldValueLookup<TEntity>, Void>() {
             @Override
             public Void apply(FieldValueLookup<TEntity> input) {
                 map.put(input.getValue(keyField), input.getValue(valueField));

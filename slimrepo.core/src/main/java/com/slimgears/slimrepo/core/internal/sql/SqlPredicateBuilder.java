@@ -109,7 +109,7 @@ public class SqlPredicateBuilder implements SqlStatementBuilder.PredicateBuilder
 
     @Override
     protected <V> String visitCollection(CollectionCondition<T, V> predicate) {
-        return fieldOperator(predicate, substituteArgs(predicate, predicate.getValues()));
+        return fieldOperator(predicate, joinStrings(substituteArgs(predicate, predicate.getValues())));
     }
 
     @Override
@@ -171,5 +171,9 @@ public class SqlPredicateBuilder implements SqlStatementBuilder.PredicateBuilder
         return Joiner
                 .on(", ")
                 .join(strValues);
+    }
+
+    private String joinStrings(String... strings) {
+        return Joiner.on(", ").join(strings);
     }
 }
