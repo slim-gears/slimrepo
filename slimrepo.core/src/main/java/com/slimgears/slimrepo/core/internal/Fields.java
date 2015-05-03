@@ -11,14 +11,13 @@ import com.slimgears.slimrepo.core.interfaces.conditions.UnaryCondition;
 import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.fields.BlobField;
+import com.slimgears.slimrepo.core.interfaces.fields.ComparableField;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
-import com.slimgears.slimrepo.core.interfaces.fields.NumericField;
 import com.slimgears.slimrepo.core.interfaces.fields.RelationalField;
 import com.slimgears.slimrepo.core.interfaces.fields.StringField;
 import com.slimgears.slimrepo.core.interfaces.fields.ValueField;
 
 import java.util.Collection;
-import java.util.Date;
 
 /**
  * Created by Denis on 11-Apr-15
@@ -89,12 +88,12 @@ public class Fields {
         }
 
         @Override
-        public BinaryCondition<TEntity, T> equal(T value) {
+        public BinaryCondition<TEntity, T> eq(T value) {
             return Conditions.equals(this, value);
         }
 
         @Override
-        public BinaryCondition<TEntity, T> notEqual(T value) {
+        public BinaryCondition<TEntity, T> notEq(T value) {
             return Conditions.notEquals(this, value);
         }
 
@@ -123,8 +122,8 @@ public class Fields {
         }
     }
 
-    static class NumericFieldImplementation<TEntity, T> extends AbstractValueField<TEntity, T> implements NumericField<TEntity, T> {
-        NumericFieldImplementation(String name, Class<T> type, boolean nullable) {
+    static class ComparableFieldImplementation<TEntity, T> extends AbstractValueField<TEntity, T> implements ComparableField<TEntity, T> {
+        ComparableFieldImplementation(String name, Class<T> type, boolean nullable) {
             super(name, type, nullable);
         }
 
@@ -139,12 +138,12 @@ public class Fields {
         }
 
         @Override
-        public BinaryCondition<TEntity, T> greaterOrEqual(T value) {
+        public BinaryCondition<TEntity, T> greaterOrEq(T value) {
             return Conditions.greaterOrEqual(this, value);
         }
 
         @Override
-        public BinaryCondition<TEntity, T> lessOrEqual(T value) {
+        public BinaryCondition<TEntity, T> lessOrEq(T value) {
             return Conditions.lessOrEqual(this, value);
         }
 
@@ -222,16 +221,12 @@ public class Fields {
         }
     }
 
-    public static <TEntity, T> NumericField<TEntity, T> numberField(String name, Class<T> fieldType, boolean nullable) {
-        return new NumericFieldImplementation<>(name, fieldType, nullable);
+    public static <TEntity, T> ComparableField<TEntity, T> comparableField(String name, Class<T> fieldType, boolean nullable) {
+        return new ComparableFieldImplementation<>(name, fieldType, nullable);
     }
 
     public static <TEntity> StringField<TEntity> stringField(String name, boolean nullable) {
         return new StringFieldImplementation<>(name, nullable);
-    }
-
-    public static <TEntity> NumericField<TEntity, Date> dateField(String name, boolean nullable) {
-        return numberField(name, Date.class, nullable);
     }
 
     public static <TEntity, T> BlobField<TEntity, T> blobField(String name, Class<T> fieldType, boolean nullable) {

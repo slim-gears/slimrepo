@@ -15,7 +15,7 @@ import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueMap;
 import com.slimgears.slimrepo.core.interfaces.fields.BlobField;
-import com.slimgears.slimrepo.core.interfaces.fields.NumericField;
+import com.slimgears.slimrepo.core.interfaces.fields.ComparableField;
 import com.slimgears.slimrepo.core.interfaces.fields.RelationalField;
 import com.slimgears.slimrepo.core.interfaces.fields.StringField;
 import com.slimgears.slimrepo.core.internal.AbstractEntityType;
@@ -52,13 +52,13 @@ public class EntityGenerator extends DataModelGenerator {
     private static final Map<TypeName, AbstractMetaFieldBuilder> META_FIELD_BUILDER_MAP = new HashMap<>();
 
     static {
-        META_FIELD_BUILDER_MAP.put(TypeName.INT, NumericMetaFieldBuilder.INSTANCE);
-        META_FIELD_BUILDER_MAP.put(TypeName.SHORT, NumericMetaFieldBuilder.INSTANCE);
-        META_FIELD_BUILDER_MAP.put(TypeName.LONG, NumericMetaFieldBuilder.INSTANCE);
-        META_FIELD_BUILDER_MAP.put(TypeName.BYTE, NumericMetaFieldBuilder.INSTANCE);
-        META_FIELD_BUILDER_MAP.put(TypeName.DOUBLE, NumericMetaFieldBuilder.INSTANCE);
-        META_FIELD_BUILDER_MAP.put(TypeName.FLOAT, NumericMetaFieldBuilder.INSTANCE);
-        META_FIELD_BUILDER_MAP.put(TypeName.get(Date.class), DateMetaFieldBuilder.INSTANCE);
+        META_FIELD_BUILDER_MAP.put(TypeName.INT, ComparableMetaFieldBuilder.INSTANCE);
+        META_FIELD_BUILDER_MAP.put(TypeName.SHORT, ComparableMetaFieldBuilder.INSTANCE);
+        META_FIELD_BUILDER_MAP.put(TypeName.LONG, ComparableMetaFieldBuilder.INSTANCE);
+        META_FIELD_BUILDER_MAP.put(TypeName.BYTE, ComparableMetaFieldBuilder.INSTANCE);
+        META_FIELD_BUILDER_MAP.put(TypeName.DOUBLE, ComparableMetaFieldBuilder.INSTANCE);
+        META_FIELD_BUILDER_MAP.put(TypeName.FLOAT, ComparableMetaFieldBuilder.INSTANCE);
+        META_FIELD_BUILDER_MAP.put(TypeName.get(Date.class), ComparableMetaFieldBuilder.INSTANCE);
         META_FIELD_BUILDER_MAP.put(TypeName.get(String.class), StringMetaFieldBuilder.INSTANCE);
     }
 
@@ -73,26 +73,17 @@ public class EntityGenerator extends DataModelGenerator {
         protected abstract FieldSpec.Builder initialize(FieldSpec.Builder builder, FieldInfo field, boolean isNullable);
     }
 
-    static class NumericMetaFieldBuilder extends AbstractMetaFieldBuilder {
-        static final NumericMetaFieldBuilder INSTANCE = new NumericMetaFieldBuilder();
+    static class ComparableMetaFieldBuilder extends AbstractMetaFieldBuilder {
+        static final ComparableMetaFieldBuilder INSTANCE = new ComparableMetaFieldBuilder();
 
         @Override
         protected TypeName metaFieldType(ClassName entityType, TypeName fieldType) {
-            return ParameterizedTypeName.get(ClassName.get(NumericField.class), entityType, box(fieldType));
+            return ParameterizedTypeName.get(ClassName.get(ComparableField.class), entityType, box(fieldType));
         }
 
         @Override
         protected FieldSpec.Builder initialize(FieldSpec.Builder builder, FieldInfo field, boolean isNullable) {
-            return builder.initializer("$T.numberField($S, $T.class, $L)", Fields.class, field.name, box(field.type), isNullable);
-        }
-    }
-
-    static class DateMetaFieldBuilder extends NumericMetaFieldBuilder {
-        static final DateMetaFieldBuilder INSTANCE = new DateMetaFieldBuilder();
-
-        @Override
-        protected FieldSpec.Builder initialize(FieldSpec.Builder builder, FieldInfo field, boolean isNullable) {
-            return builder.initializer("$T.dateField($S, $L)", Fields.class, field.name, isNullable);
+            return builder.initializer("$T.comparableField($S, $T.class, $L)", Fields.class, field.name, box(field.type), isNullable);
         }
     }
 
@@ -315,7 +306,7 @@ public class EntityGenerator extends DataModelGenerator {
 
     private AbstractMetaFieldBuilder getMetaFieldBuilder(FieldInfo field) {
         if (isRelationalField(field)) return RelationalMetaFieldBuilder.INSTANCE;
-        if (isEnumField(field)) return NumericMetaFieldBuilder.INSTANCE;
+        if (isEnumField(field)) return ComparableMetaFieldBuilder.INSTANCE;
         AbstractMetaFieldBuilder builder = META_FIELD_BUILDER_MAP.get(field.type);
         return builder != null ? builder : BlobMetaFieldBuilder.INSTANCE;
     }

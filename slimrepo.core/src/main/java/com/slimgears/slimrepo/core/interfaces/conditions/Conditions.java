@@ -2,8 +2,8 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.interfaces.conditions;
 
+import com.slimgears.slimrepo.core.interfaces.fields.ComparableField;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
-import com.slimgears.slimrepo.core.interfaces.fields.NumericField;
 import com.slimgears.slimrepo.core.interfaces.fields.RelationalField;
 import com.slimgears.slimrepo.core.interfaces.fields.StringField;
 import com.slimgears.slimrepo.core.interfaces.fields.ValueField;
@@ -178,23 +178,23 @@ public class Conditions {
         return new CollectionConditionImplementation<>(PredicateType.VALUE_FIELD_NOT_IN, field, values);
     }
 
-    public static <TEntity, T> BinaryCondition<TEntity, T> greaterThan(NumericField<TEntity, T> field, T value) {
+    public static <TEntity, T> BinaryCondition<TEntity, T> greaterThan(ComparableField<TEntity, T> field, T value) {
         return new BinaryConditionImplementation<>(PredicateType.NUMBER_FIELD_GREATER, field, value);
     }
 
-    public static <TEntity, T> BinaryCondition<TEntity, T> greaterOrEqual(NumericField<TEntity, T> field, T value) {
+    public static <TEntity, T> BinaryCondition<TEntity, T> greaterOrEqual(ComparableField<TEntity, T> field, T value) {
         return new BinaryConditionImplementation<>(PredicateType.NUMBER_FIELD_GREATER_EQUAL, field, value);
     }
 
-    public static <TEntity, T> BinaryCondition<TEntity, T> lessThan(NumericField<TEntity, T> field, T value) {
+    public static <TEntity, T> BinaryCondition<TEntity, T> lessThan(ComparableField<TEntity, T> field, T value) {
         return new BinaryConditionImplementation<>(PredicateType.NUMBER_FIELD_LESS, field, value);
     }
 
-    public static <TEntity, T> BinaryCondition<TEntity, T> lessOrEqual(NumericField<TEntity, T> field, T value) {
+    public static <TEntity, T> BinaryCondition<TEntity, T> lessOrEqual(ComparableField<TEntity, T> field, T value) {
         return new BinaryConditionImplementation<>(PredicateType.NUMBER_FIELD_LESS_EQUAL, field, value);
     }
 
-    public static <TEntity, T> TernaryCondition<TEntity, T> between(NumericField<TEntity, T> field, T lowest, T highest) {
+    public static <TEntity, T> TernaryCondition<TEntity, T> between(ComparableField<TEntity, T> field, T lowest, T highest) {
         return new TernaryConditionImplementation<>(PredicateType.NUMBER_FIELD_BETWEEN, field, lowest, highest);
     }
 

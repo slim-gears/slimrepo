@@ -9,6 +9,7 @@ import com.slimgears.slimrepo.core.interfaces.Repository;
 import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
+import com.slimgears.slimrepo.core.internal.interfaces.EntitySessionNotifier;
 import com.slimgears.slimrepo.core.internal.interfaces.RepositoryCreator;
 import com.slimgears.slimrepo.core.internal.interfaces.RepositorySessionNotifier;
 import com.slimgears.slimrepo.core.internal.interfaces.SessionEntityServiceProvider;
@@ -26,6 +27,7 @@ import java.util.concurrent.ExecutionException;
 public abstract class AbstractSessionServiceProvider implements SessionServiceProvider {
     private final List<RepositorySessionNotifier.Listener> sessionListeners = new ArrayList<>();
     private RepositoryCreator repositoryCreator;
+    private EntitySessionNotifier entitySessionNotifier;
 
     private final LoadingCache<EntityType, SessionEntityServiceProvider> entityServiceProviderCache = CacheBuilder.newBuilder()
             .build(new CacheLoader<EntityType, SessionEntityServiceProvider>() {
@@ -80,6 +82,13 @@ public abstract class AbstractSessionServiceProvider implements SessionServicePr
     }
 
     @Override
+    public EntitySessionNotifier getEntitySessionNotifier() {
+        return entitySessionNotifier != null
+                ? entitySessionNotifier
+                : (entitySessionNotifier = createEntitySessionNotifier());
+    }
+
+    @Override
     public void addListener(RepositorySessionNotifier.Listener listener) {
         sessionListeners.add(listener);
     }
@@ -108,5 +117,9 @@ public abstract class AbstractSessionServiceProvider implements SessionServicePr
         for (RepositorySessionNotifier.Listener listener : sessionListeners) {
             listener.onClosing(session);
         }
+    }
+
+    protected EntitySessionNotifier createEntitySessionNotifier() {
+        return new DefaultEntitySessionNotifier(this);
     }
 }

@@ -9,7 +9,7 @@ import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueMap;
 import com.slimgears.slimrepo.core.internal.Fields;
-import com.slimgears.slimrepo.core.interfaces.fields.NumericField;
+import com.slimgears.slimrepo.core.interfaces.fields.ComparableField;
 import com.slimgears.slimrepo.core.interfaces.fields.StringField;
 import com.slimgears.slimrepo.core.internal.AbstractEntityType;
 
@@ -54,12 +54,12 @@ public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
         }
     }
 
-    public static final NumericField<UserEntity, Integer> UserId = Fields.numberField("userId", Integer.class, false);
+    public static final ComparableField<UserEntity, Integer> UserId = Fields.comparableField("userId", Integer.class, false);
     public static final StringField<UserEntity> UserFirstName = Fields.stringField("userFirstName", true);
     public static final StringField<UserEntity> UserLastName = Fields.stringField("userLastName", true);
-    public static final NumericField<UserEntity, Date> LastVisitDate = Fields.dateField("lastVisitDate", true);
+    public static final ComparableField<UserEntity, Date> LastVisitDate = Fields.comparableField("lastVisitDate", Date.class, true);
     public static final RelationalField<UserEntity, RoleEntity> Role = Fields.relationalField("role", RoleEntity.EntityMetaType, true);
-    public static final NumericField<UserEntity, AccountStatus> AccountStatus = Fields.numberField("accountStatus", AccountStatus.class, true);
+    public static final ComparableField<UserEntity, AccountStatus> AccountStatus = Fields.comparableField("accountStatus", AccountStatus.class, true);
     public static final EntityType<Integer, UserEntity> EntityMetaType = new MetaType();
 
     private UserEntity() {

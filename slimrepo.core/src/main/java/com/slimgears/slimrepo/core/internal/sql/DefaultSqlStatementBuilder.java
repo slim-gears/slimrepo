@@ -12,7 +12,7 @@ import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
-import com.slimgears.slimrepo.core.interfaces.fields.NumericField;
+import com.slimgears.slimrepo.core.interfaces.fields.ComparableField;
 import com.slimgears.slimrepo.core.interfaces.fields.RelationalField;
 import com.slimgears.slimrepo.core.internal.EntityFieldValueMap;
 import com.slimgears.slimrepo.core.internal.OrderFieldInfo;
@@ -326,7 +326,7 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
     }
 
     private boolean isAutoIncremented(EntityType entityType, Field field) {
-        return isPrimaryKey(entityType, field) && field instanceof NumericField;
+        return isPrimaryKey(entityType, field) && field instanceof ComparableField;
     }
 
     private String columnName(Field field) {

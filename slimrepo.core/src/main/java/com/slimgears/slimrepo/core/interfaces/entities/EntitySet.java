@@ -2,7 +2,9 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.interfaces.entities;
 
+import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
+import com.slimgears.slimrepo.core.interfaces.fields.ValueField;
 import com.slimgears.slimrepo.core.interfaces.queries.EntityDeleteQuery;
 import com.slimgears.slimrepo.core.interfaces.queries.EntitySelectQuery;
 import com.slimgears.slimrepo.core.interfaces.queries.EntityUpdateQuery;
@@ -23,6 +25,14 @@ public interface EntitySet<TEntity extends Entity<?>> {
     EntitySelectQuery.Builder<TEntity> query();
     EntityDeleteQuery.Builder<TEntity> deleteQuery();
     EntityUpdateQuery.Builder<TEntity> updateQuery();
+
+    long countAll() throws IOException;
+    long countAllWhere(Condition<TEntity> predicate) throws IOException;
+
+    <T> TEntity findFirst(ValueField<TEntity, T> field, T value) throws IOException;
+    TEntity findFirstWhere(Condition<TEntity> predicate) throws IOException;
+    <T> TEntity[] findAllBy(ValueField<TEntity, T> field, T value) throws IOException;
+    TEntity[] findAllWhere(Condition<TEntity> predicate) throws IOException;
 
     TEntity[] toArray() throws IOException;
     List<TEntity> toList() throws IOException;

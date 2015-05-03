@@ -3,7 +3,7 @@ import com.slimgears.slimrepo.core.interfaces.entities.EntityBuilder;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueMap;
-import com.slimgears.slimrepo.core.interfaces.fields.NumericField;
+import com.slimgears.slimrepo.core.interfaces.fields.ComparableField;
 import com.slimgears.slimrepo.core.interfaces.fields.StringField;
 import com.slimgears.slimrepo.core.internal.AbstractEntityType;
 import com.slimgears.slimrepo.core.internal.Fields;
@@ -12,7 +12,7 @@ import java.lang.Override;
 import java.lang.String;
 
 class RelatedEntity extends AbstractRelatedEntity implements Entity<Integer> {
-    public static final NumericField<RelatedEntity, Integer> Id = Fields.numberField("id", Integer.class, false);
+    public static final ComparableField<RelatedEntity, Integer> Id = Fields.comparableField("id", Integer.class, false);
 
     public static final StringField<RelatedEntity> Name = Fields.stringField("name", true);
 
