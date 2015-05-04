@@ -15,6 +15,7 @@ public class Calendars {
 
     public static Calendar newInstance(int year, int month, int day) {
         Calendar instance = now();
+        instance.setTimeInMillis(0);
         instance.set(year, month, day);
         return instance;
     }

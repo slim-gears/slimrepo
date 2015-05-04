@@ -6,6 +6,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.slimgears.slimrepo.core.interfaces.RepositoryService;
+import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimrepo.core.internal.EntityFieldValueMap;
 import com.slimgears.slimrepo.core.internal.interfaces.CloseableIterator;
@@ -19,10 +20,12 @@ import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommandExecutor;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlOrmServiceProvider;
 import com.slimgears.slimrepo.core.internal.sql.sqlite.AbstractSqliteOrmServiceProvider;
 import com.slimgears.slimrepo.core.prototype.UserRepository;
+import com.slimgears.slimrepo.core.prototype.generated.AccountStatus;
 import com.slimgears.slimrepo.core.prototype.generated.GeneratedUserRepository;
 import com.slimgears.slimrepo.core.prototype.generated.GeneratedUserRepositoryService;
 import com.slimgears.slimrepo.core.prototype.generated.RoleEntity;
 import com.slimgears.slimrepo.core.prototype.generated.UserEntity;
+import com.slimgears.slimrepo.core.utilities.Dates;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
@@ -41,11 +44,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 import static com.slimgears.slimrepo.core.interfaces.conditions.Conditions.and;
 import static com.slimgears.slimrepo.core.interfaces.conditions.Conditions.or;
+import static com.slimgears.slimrepo.core.utilities.Dates.addDays;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 /**
  * Created by Denis on 07-Apr-15
@@ -209,6 +215,61 @@ public class PrototypeTest {
         });
         Mockito.verify(executorMock).select(Matchers.any(SqlCommand.class));
         assertSqlEquals("query-selected-to-map.sql");
+    }
+
+    @Test
+    public void updateWithWhereTranslatedToSql() throws IOException {
+        testUpdate(new RepositoryService.UpdateAction<UserRepository>() {
+            @Override
+            public void execute(UserRepository repository) throws IOException {
+                repository.users().updateQuery()
+                        .where(UserEntity.UserFirstName.eq("John"))
+                        .set(UserEntity.UserLastName, "Doe")
+                        .prepare()
+                        .execute();
+            }
+        });
+        Mockito.verify(executorMock).execute(Matchers.any(SqlCommand.class));
+        assertSqlEquals("update-fields.sql");
+    }
+
+    @Test
+    public void queryPredicatesTranslatedToSql() throws IOException {
+        final Date fromDate = Dates.fromDate(2000, 1, 1);
+        final Date toDate = addDays(fromDate, 1);
+        testQuery(new RepositoryService.QueryAction<UserRepository, Object>() {
+            @Override
+            public Object execute(UserRepository repository) throws IOException {
+                EntitySet<UserEntity> users = repository.users();
+                users.findAllWhere(UserEntity.UserLastName.isNull());
+                users.findAllWhere(UserEntity.UserFirstName.isNotNull());
+                users.findAllWhere(UserEntity.AccountStatus.eq(AccountStatus.PAUSED));
+                users.findAllWhere(UserEntity.AccountStatus.notEq(AccountStatus.ACTIVE));
+                users.findAllWhere(UserEntity.AccountStatus.in(AccountStatus.PAUSED, AccountStatus.DISABLED));
+                users.findAllWhere(UserEntity.AccountStatus.in(Arrays.asList(AccountStatus.PAUSED, AccountStatus.DISABLED)));
+                users.findAllWhere(UserEntity.AccountStatus.notIn(AccountStatus.ACTIVE, AccountStatus.DISABLED));
+                users.findAllWhere(UserEntity.AccountStatus.notIn(Arrays.asList(AccountStatus.ACTIVE, AccountStatus.DISABLED)));
+                users.findAllWhere(UserEntity.LastVisitDate.between(fromDate, toDate));
+                users.findAllWhere(UserEntity.LastVisitDate.greaterOrEq(fromDate));
+                users.findAllWhere(UserEntity.LastVisitDate.lessOrEq(toDate));
+                users.findAllWhere(UserEntity.LastVisitDate.greaterThan(fromDate));
+                users.findAllWhere(UserEntity.LastVisitDate.lessThan(toDate));
+                users.findAllWhere(UserEntity.Role.is(RoleEntity.RoleDescription.startsWith("A")));
+                users.findAllWhere(UserEntity.Role.is(RoleEntity.RoleDescription.endsWith("B")));
+                users.findAllWhere(UserEntity.Role.is(RoleEntity.RoleDescription.contains("C")));
+                users.findAllWhere(UserEntity.UserFirstName.notStartsWith("A"));
+                users.findAllWhere(UserEntity.UserFirstName.notEndsWith("B"));
+                users.findAllWhere(UserEntity.UserFirstName.notContains("C"));
+                return users;
+            }
+        });
+        Mockito.verify(executorMock, times(19)).select(Matchers.any(SqlCommand.class));
+        assertSqlEquals("query-predicates.sql");
+    }
+
+    private void testUpdate(RepositoryService.UpdateAction<UserRepository> updateAction) throws IOException {
+        RepositoryService<UserRepository> repo = new GeneratedUserRepositoryService(ormServiceProviderMock);
+        repo.update(updateAction);
     }
 
     private <T> T testQuery(RepositoryService.QueryAction<UserRepository, T> queryAction) throws IOException {

@@ -9,7 +9,6 @@ import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
  * Created by Denis on 06-Apr-15
  * <File Description>
  */
-@SuppressWarnings("unused")
 public interface Field<TEntity, T> {
 
     interface MetaInfo<T> {

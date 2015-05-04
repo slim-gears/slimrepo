@@ -8,7 +8,6 @@ import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
  * Created by Denis on 06-Apr-15
  * <File Description>
  */
-@SuppressWarnings("unused")
 public interface StringField<TEntity> extends ValueField<TEntity, String> {
     Condition<TEntity> contains(String substr);
     Condition<TEntity> notContains(String substr);
