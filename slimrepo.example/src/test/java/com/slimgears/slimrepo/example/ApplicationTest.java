@@ -1,13 +1,14 @@
 package com.slimgears.slimrepo.example;
 
-import com.slimgears.slimrepo.android.core.SqliteOrmServiceProvider;
+import android.os.Bundle;
+
 import com.slimgears.slimrepo.core.interfaces.RepositoryService;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.example.repository.CountryEntity;
-import com.slimgears.slimrepo.example.repository.GeneratedUserRepositoryService;
 import com.slimgears.slimrepo.example.repository.UserEntity;
 import com.slimgears.slimrepo.example.repository.UserRepository;
 import com.slimgears.slimrepo.example.repository.UserRepositoryService;
+import com.slimgears.slimrepo.example.ui.SqliteUserRepositoryService;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -32,7 +33,7 @@ public class ApplicationTest {
         Assert.assertNotNull(UserEntity.EntityMetaType.getKeyField());
 
         Assert.assertNotNull(RuntimeEnvironment.application);
-        UserRepositoryService repoService = new GeneratedUserRepositoryService(new SqliteOrmServiceProvider(RuntimeEnvironment.application));
+        UserRepositoryService repoService = new SqliteUserRepositoryService(RuntimeEnvironment.application);
         repoService.update(new RepositoryService.UpdateAction<UserRepository>() {
             @Override
             public void execute(UserRepository repository) throws IOException {
@@ -43,10 +44,30 @@ public class ApplicationTest {
                 CountryEntity countryItaly = countries.add(CountryEntity.builder().name("Italy").build());
                 repository.saveChanges();
 
+                Bundle status = new Bundle();
+                status.putInt("Integer", 1);
+                status.putString("String", "test");
+
                 EntitySet<UserEntity> users = repository.users();
-                users.add(UserEntity.builder().firstName("John").lastName("Doe").age(20).country(countryUs).build());
-                users.add(UserEntity.builder().firstName("William").lastName("Shakespeare").age(32).country(countryUk).build());
-                users.add(UserEntity.builder().firstName("Mark").lastName("Twain").age(40).country(countryFrance).build());
+                users.add(
+                        UserEntity.create()
+                                .setFirstName("John")
+                                .setLastName("Doe")
+                                .setAge(20)
+                                .setCountry(countryUs)
+                                .setStatus(status),
+                        UserEntity.create()
+                                .setFirstName("William")
+                                .setLastName("Shakespeare")
+                                .setAge(32)
+                                .setCountry(countryUk)
+                                .setStatus(status),
+                        UserEntity.create()
+                                .setFirstName("Mark")
+                                .setLastName("Twain")
+                                .setAge(40)
+                                .setCountry(countryFrance)
+                                .setStatus(status));
             }
         });
 
@@ -62,5 +83,7 @@ public class ApplicationTest {
         Assert.assertEquals(1, users.length);
         Assert.assertNotNull(users[0].getCountry());
         Assert.assertEquals("France", users[0].getCountry().getName());
+        Assert.assertEquals(1, users[0].getStatus().getInt("Integer"));
+        Assert.assertEquals("test", users[0].getStatus().getString("String"));
     }
 }

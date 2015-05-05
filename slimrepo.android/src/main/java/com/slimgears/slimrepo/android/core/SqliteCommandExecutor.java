@@ -60,6 +60,7 @@ public class SqliteCommandExecutor implements SqlCommandExecutor {
                 if (type == Short.class) return cursor.getShort(columnIndex);
                 if (type == Long.class) return cursor.getLong(columnIndex);
                 if (type == Double.class) return cursor.getDouble(columnIndex);
+                if (type == byte[].class) return cursor.getBlob(columnIndex);
                 if (type == FieldValueLookup.class) return this;
 
                 throw new RuntimeException("Unsupported value type: " + type.getSimpleName());

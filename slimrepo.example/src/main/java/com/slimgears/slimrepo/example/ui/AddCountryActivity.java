@@ -10,10 +10,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.slimgears.slimrepo.android.core.SqliteOrmServiceProvider;
 import com.slimgears.slimrepo.example.R;
 import com.slimgears.slimrepo.example.repository.CountryEntity;
-import com.slimgears.slimrepo.example.repository.GeneratedUserRepositoryService;
 import com.slimgears.slimrepo.example.repository.UserRepositoryService;
 
 import java.io.IOException;
@@ -55,7 +53,7 @@ public class AddCountryActivity extends Activity {
             }
         });
 
-        mUserRepositoryService = new GeneratedUserRepositoryService(new SqliteOrmServiceProvider(this));
+        mUserRepositoryService = new SqliteUserRepositoryService(this);
     }
 
     public static void show(Context context) {

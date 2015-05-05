@@ -23,6 +23,7 @@ public class SqliteSyntaxProvider extends AbstractSqlSyntaxProvider {
         registerType("INTEGER", int.class, Integer.class, short.class, Short.class, long.class, Long.class, Date.class);
         registerType("REAL", float.class, Float.class, double.class, Double.class);
         registerType("TEXT", String.class);
+        registerType("BLOB", byte[].class);
     }
 
     public SqliteSyntaxProvider(OrmServiceProvider ormServiceProvider) {
@@ -49,7 +50,9 @@ public class SqliteSyntaxProvider extends AbstractSqlSyntaxProvider {
     public String typeName(Field<?, ?> field) {
         Class mappedType = fieldTypeMapper.getOutboundType(field);
         String name = CLASS_TO_TYPE_NAME_MAP.get(mappedType);
-        if (name == null) throw new RuntimeException("Field type " + field.metaInfo().getValueType().getSimpleName() + " is not supported");
+        if (name == null) {
+            throw new RuntimeException("Field type " + mappedType.getSimpleName() + " is not supported");
+        }
         return name;
     }
 

@@ -10,4 +10,5 @@ import java.io.IOException;
  */
 public interface RepositoryCreator {
     void createRepository(RepositoryModel model) throws IOException;
+    void upgradeRepository(RepositoryModel newModel);
 }

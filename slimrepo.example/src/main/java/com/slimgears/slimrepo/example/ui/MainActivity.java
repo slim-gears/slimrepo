@@ -8,21 +8,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.slimgears.slimrepo.android.core.SqliteOrmServiceProvider;
 import com.slimgears.slimrepo.example.R;
-import com.slimgears.slimrepo.example.repository.CountryEntity;
-import com.slimgears.slimrepo.example.repository.GeneratedUserRepositoryService;
 import com.slimgears.slimrepo.example.repository.UserEntity;
 import com.slimgears.slimrepo.example.repository.UserRepository;
 import com.slimgears.slimrepo.example.repository.UserRepositoryService;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Denis on 22-Apr-15
@@ -82,7 +77,7 @@ public class MainActivity extends Activity {
 
         setContentView(R.layout.activity_main);
 
-        UserRepositoryService userRepositoryService = new GeneratedUserRepositoryService(new SqliteOrmServiceProvider(this));
+        UserRepositoryService userRepositoryService = new SqliteUserRepositoryService(this);
 
         setOnClickListener(R.id.button_add_user, new View.OnClickListener() {
             @Override

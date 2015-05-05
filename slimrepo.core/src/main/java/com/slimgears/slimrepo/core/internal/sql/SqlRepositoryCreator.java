@@ -46,6 +46,11 @@ public class SqlRepositoryCreator implements RepositoryCreator {
         transactionProvider.commitTransaction();
     }
 
+    @Override
+    public void upgradeRepository(RepositoryModel newModel) {
+        throw new RuntimeException("Not implemented");
+    }
+
     private void createEntityType(Set<EntityType> createdEntityTypes, final EntityType<?, ?> entityType) throws IOException {
         if (!createdEntityTypes.add(entityType)) return;
 
