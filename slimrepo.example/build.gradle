@@ -54,9 +54,9 @@ dependencies {
 //    compile 'com.github.slim-gears.slimrepo:slimrepo-android:0.3-SNAPSHOT'
 //    apt 'com.github.slim-gears.slimrepo:slimrepo-apt:0.3-SNAPSHOT'
 
-//    compile project(':slimrepo.core')
-//    compile project(':slimrepo.android')
-//    apt project(':slimrepo.apt')
+    compile project(':slimrepo.core')
+    compile project(':slimrepo.android')
+    apt project(':slimrepo.apt')
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.0.5-beta'

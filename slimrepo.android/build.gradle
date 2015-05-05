@@ -48,11 +48,9 @@ publishing {
 
     publications {
         maven(MavenPublication) {
-            artifact "${project.buildDir}/outputs/aar/${project.name}-release.aar"
             artifactId 'slimrepo-android'
-            artifact sourceJar {
-                classifier 'sources'
-            }
+            artifact '${project.buildDir}/outputs/aar/${project.name}-release.aar'
+            artifact (sourceJar)
         }
     }
 }

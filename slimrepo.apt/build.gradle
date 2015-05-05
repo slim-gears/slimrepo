@@ -34,9 +34,7 @@ publishing {
         mavenJava(MavenPublication) {
             artifactId 'slimrepo-apt'
             from components.java
-            artifact sourceJar {
-                classifier 'sources'
-            }
+            artifact (sourceJar)
         }
     }
 }
