@@ -3,7 +3,6 @@
 package com.slimgears.slimrepo.example.repository;
 
 import com.slimgears.slimrepo.core.annotations.GenerateEntity;
-import com.slimgears.slimrepo.core.annotations.Key;
 
 /**
  * Created by Denis on 22-Apr-15
