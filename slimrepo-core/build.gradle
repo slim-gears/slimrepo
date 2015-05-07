@@ -1,0 +1,86 @@
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+apply plugin: 'idea'
+apply plugin: 'com.jfrog.bintray'
+
+configurations {
+    testOutput.extendsFrom (testCompile)
+}
+
+task copyTestResources(type: Copy) {
+    from "${projectDir}/src/test/resources"
+    into "${buildDir}/classes/test"
+}
+
+task copyResources(type: Copy) {
+    from "${projectDir}/src/main/resources"
+    into "${buildDir}/classes/main"
+}
+
+processTestResources.dependsOn copyTestResources
+processResources.dependsOn copyResources
+
+test {
+    afterTest { descriptor, result ->
+        println "TEST ${result.resultType} - ${descriptor.name}"
+    }
+}
+
+task testJar(type: Jar, dependsOn: testClasses) {
+    classifier = 'tests'
+    from sourceSets.test.output
+}
+
+task sourceJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allJava
+}
+
+publishing {
+    repositories {
+        mavenLocal()
+    }
+    publications {
+        maven(MavenPublication) {
+            from components.java
+            artifact (sourceJar)
+        }
+    }
+}
+
+if (hasProperty('bintrayUser') && hasProperty('bintrayKey')) {
+    bintray {
+        user = bintrayUser
+        key = bintrayKey
+        publications = ['maven'] //When uploading Maven-based publication files
+        dryRun = false //Whether to run this as dry-run, without deploying
+        publish = true //If version should be auto published after an upload
+        pkg {
+            repo = bintrayRepo
+            name = 'slimrepo-core'
+            userOrg = bintrayOrg //An optional organization name when the repo belongs to one of the user's orgs
+            desc = 'Slim Repository Core Library'
+            websiteUrl = bintrayWebsiteUrl
+            issueTrackerUrl = bintrayIssueTrackerUrl
+            vcsUrl = bintrayVcsUrl
+            licenses = ['Apache-2.0']
+            labels = ['java','orm','sqlite']
+            publicDownloadNumbers = bintrayPublicDownloadNumbers
+            version {
+                name = project.version //Bintray logical version name
+            }
+        }
+    }
+}
+
+artifacts {
+    testOutput testJar
+}
+
+dependencies {
+    compile 'com.google.guava:guava:18.0'
+
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-core:2.0.5-beta'
+    testCompile 'commons-io:commons-io:2.4'
+}
