@@ -72,9 +72,9 @@ if (hasProperty('bintrayUser') && hasProperty('bintrayKey')) {
 dependencies {
     compile 'com.squareup:javapoet:1.0.0'
     compile 'com.google.guava:guava:18.0'
-    compile project(':slimrepo.core')
+    compile project(':slimrepo-core')
 
-    testCompile project(path: ':slimrepo.core', configuration: 'testOutput')
+    testCompile project(path: ':slimrepo-core', configuration: 'testOutput')
     testCompile 'junit:junit:4.12'
     testCompile 'com.google.testing.compile:compile-testing:0.6'
     testCompile 'com.google.truth:truth:0.25'

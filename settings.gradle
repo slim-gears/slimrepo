@@ -1,1 +1,1 @@
-include ':slimrepo.core', ':slimrepo.apt', ':slimrepo.android', ':slimrepo.example'
+include ':slimrepo-core', ':slimrepo-apt', ':slimrepo-android', ':slimrepo-example'
