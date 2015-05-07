@@ -43,22 +43,7 @@ robolectric {
     }
 }
 
-repositories {
-	maven {
-		url 'http://jitpack.io'
-	}
-}
-
 dependencies {
-//    compile 'com.github.slim-gears.slimrepo:slimrepo-core:0.3-SNAPSHOT'
-//    compile 'com.github.slim-gears.slimrepo:slimrepo-android:0.3-SNAPSHOT'
-//    apt 'com.github.slim-gears.slimrepo:slimrepo-apt:0.3-SNAPSHOT'
-
-//    compile 'slimrepo:slimrepo-core:0.5.1'
-//    compile 'slimrepo:slimrepo-android:0.5.1'
-//    apt 'slimrepo:slimrepo-apt:0.5.1'
-
-    //compile project(':slimrepo-core')
     compile project(':slimrepo-android')
     apt project(':slimrepo-apt')
 
