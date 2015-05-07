@@ -41,8 +41,7 @@ publishing {
         mavenLocal()
     }
     publications {
-        mavenJava(MavenPublication) {
-            artifactId 'slimrepo-core'
+        maven(MavenPublication) {
             from components.java
             artifact (sourceJar)
         }
@@ -53,7 +52,7 @@ if (hasProperty('bintrayUser') && hasProperty('bintrayKey')) {
     bintray {
         user = bintrayUser
         key = bintrayKey
-        publications = ['mavenJava'] //When uploading Maven-based publication files
+        publications = ['maven'] //When uploading Maven-based publication files
         dryRun = false //Whether to run this as dry-run, without deploying
         publish = true //If version should be auto published after an upload
         pkg {
