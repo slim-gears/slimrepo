@@ -1,4 +1,4 @@
-# Slim Repo [![Build Status](https://travis-ci.org/slim-gears/slimrepo.svg?branch=master)](https://travis-ci.org/slim-gears/slimrepo) [ ![Download](https://api.bintray.com/packages/slim-gears/slimrepo/slimrepo-android/images/download.svg) ](https://bintray.com/slim-gears/slimrepo/slimrepo-android/_latestVersion)
+# Slim Repo [![Build Status](https://travis-ci.org/slim-gears/slimrepo.svg?branch=master)](https://travis-ci.org/slim-gears/slimrepo) [![Maven Repository](https://img.shields.io/github/release/slim-gears/slimrepo.svg?label=JitPack%20Maven)](https://bintray.com/slim-gears/slimrepo/slimrepo-android/_latestVersion)
 ### Light-weight modular ORM for Java and Android
 
 ##### The library is still under development. Stay tuned for updates.
