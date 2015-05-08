@@ -5,6 +5,7 @@ package com.slimgears.slimrepo.core.internal;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMapper;
 import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMappingRegistrar;
+import com.slimgears.slimrepo.core.internal.interfaces.TypeConverter;
 
 import java.util.ArrayList;
 import java.util.Collection;

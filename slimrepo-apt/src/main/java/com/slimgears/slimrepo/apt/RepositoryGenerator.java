@@ -3,6 +3,7 @@ package com.slimgears.slimrepo.apt;// Copyright 2015 Denis Itskovich
 
 import com.slimgears.slimrepo.apt.base.ClassGenerator;
 import com.slimgears.slimrepo.apt.base.ElementVisitorBase;
+import com.slimgears.slimrepo.apt.base.TypeUtils;
 import com.slimgears.slimrepo.core.annotations.GenerateRepository;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.core.internal.DefaultRepositoryModel;
@@ -63,7 +64,7 @@ public class RepositoryGenerator extends ClassGenerator<RepositoryGenerator> {
             EntitySetType entitySetType = getEntitySetType(getPackageName(), returnType);
 
             String name = method.getSimpleName().toString();
-            String fieldName = (name.startsWith("get") ? toCamelCase("", name.substring(3)) : name) + "EntitySet";
+            String fieldName = (name.startsWith("get") ? TypeUtils.toCamelCase("", name.substring(3)) : name) + "EntitySet";
             TypeName fieldType = ParameterizedTypeName.get(ClassName.get(EntitySet.Provider.class), entitySetType.entityType);
 
             builder.addField(fieldType, fieldName, Modifier.FINAL, Modifier.PRIVATE);
@@ -93,9 +94,9 @@ public class RepositoryGenerator extends ClassGenerator<RepositoryGenerator> {
 
         TypeMirror entityTypeMirror = returnTypeArguments.get(0);
         String entityTypeFullName = entityTypeMirror.toString();
-        String entityTypePackageName = ClassGenerator.packageName(entityTypeFullName);
+        String entityTypePackageName = TypeUtils.packageName(entityTypeFullName);
         if (entityTypePackageName.isEmpty()) entityTypePackageName = packageName;
-        TypeName entityType = ClassName.get(entityTypePackageName, simpleName(entityTypeMirror.toString()));
+        TypeName entityType = ClassName.get(entityTypePackageName, TypeUtils.simpleName(entityTypeMirror.toString()));
 
         return new EntitySetType(entityType);
     }

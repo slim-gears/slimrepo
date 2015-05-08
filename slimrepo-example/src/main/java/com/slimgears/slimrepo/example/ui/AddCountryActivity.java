@@ -12,6 +12,7 @@ import android.widget.EditText;
 
 import com.slimgears.slimrepo.example.R;
 import com.slimgears.slimrepo.example.repository.CountryEntity;
+import com.slimgears.slimrepo.example.repository.GeneratedUserRepositoryService;
 import com.slimgears.slimrepo.example.repository.UserRepositoryService;
 
 import java.io.IOException;
@@ -53,7 +54,7 @@ public class AddCountryActivity extends Activity {
             }
         });
 
-        mUserRepositoryService = new SqliteUserRepositoryService(this);
+        mUserRepositoryService = new GeneratedUserRepositoryService(this);
     }
 
     public static void show(Context context) {

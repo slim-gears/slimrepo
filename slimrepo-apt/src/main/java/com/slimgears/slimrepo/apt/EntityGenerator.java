@@ -5,10 +5,13 @@ package com.slimgears.slimrepo.apt;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
-import com.slimgears.slimrepo.apt.base.ClassGenerator;
 import com.slimgears.slimrepo.apt.base.DataModelGenerator;
+import com.slimgears.slimrepo.apt.base.TypeUtils;
+import com.slimgears.slimrepo.core.annotations.BlobSemantics;
+import com.slimgears.slimrepo.core.annotations.ComparableSemantics;
 import com.slimgears.slimrepo.core.annotations.GenerateEntity;
 import com.slimgears.slimrepo.core.annotations.Key;
+import com.slimgears.slimrepo.core.annotations.ValueSemantics;
 import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityBuilder;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
@@ -18,6 +21,7 @@ import com.slimgears.slimrepo.core.interfaces.fields.BlobField;
 import com.slimgears.slimrepo.core.interfaces.fields.ComparableField;
 import com.slimgears.slimrepo.core.interfaces.fields.RelationalField;
 import com.slimgears.slimrepo.core.interfaces.fields.StringField;
+import com.slimgears.slimrepo.core.interfaces.fields.ValueField;
 import com.slimgears.slimrepo.core.internal.AbstractEntityType;
 import com.slimgears.slimrepo.core.internal.Fields;
 import com.squareup.javapoet.ClassName;
@@ -27,6 +31,7 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
+import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -40,6 +45,7 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.MirroredTypesException;
 
 import static com.google.common.collect.Iterables.find;
 import static com.google.common.collect.Iterables.transform;
@@ -62,6 +68,27 @@ public class EntityGenerator extends DataModelGenerator {
         META_FIELD_BUILDER_MAP.put(TypeName.get(String.class), StringMetaFieldBuilder.INSTANCE);
     }
 
+    private static TypeUtils.AnnotationTypesGetter<ComparableSemantics> TYPES_FROM_COMPARABLE_SEMANTICS = new TypeUtils.AnnotationTypesGetter<ComparableSemantics>() {
+        @Override
+        public Class[] getTypes(ComparableSemantics annotation) throws MirroredTypesException {
+            return annotation.value();
+        }
+    };
+
+    private static TypeUtils.AnnotationTypesGetter<ValueSemantics> TYPES_FROM_VALUE_SEMANTICS = new TypeUtils.AnnotationTypesGetter<ValueSemantics>() {
+        @Override
+        public Class[] getTypes(ValueSemantics annotation) throws MirroredTypesException {
+            return annotation.value();
+        }
+    };
+
+    private static TypeUtils.AnnotationTypesGetter<BlobSemantics> TYPES_FROM_BLOB_SEMANTICS = new TypeUtils.AnnotationTypesGetter<BlobSemantics>() {
+        @Override
+        public Class[] getTypes(BlobSemantics annotation) throws MirroredTypesException {
+            return annotation.value();
+        }
+    };
+
     static abstract class AbstractMetaFieldBuilder {
         public FieldSpec build(ClassName entityType, FieldInfo field) {
             TypeName type = metaFieldType(entityType, field.type);
@@ -71,6 +98,20 @@ public class EntityGenerator extends DataModelGenerator {
 
         protected abstract TypeName metaFieldType(ClassName entityType, TypeName fieldType);
         protected abstract FieldSpec.Builder initialize(FieldSpec.Builder builder, FieldInfo field, boolean isNullable);
+    }
+
+    static class ValueMetaFieldBuilder extends AbstractMetaFieldBuilder {
+        static final ValueMetaFieldBuilder INSTANCE = new ValueMetaFieldBuilder();
+
+        @Override
+        protected TypeName metaFieldType(ClassName entityType, TypeName fieldType) {
+            return ParameterizedTypeName.get(ClassName.get(ValueField.class), entityType, box(fieldType));
+        }
+
+        @Override
+        protected FieldSpec.Builder initialize(FieldSpec.Builder builder, FieldInfo field, boolean isNullable) {
+            return builder.initializer("$T.valueField($S, $T.class, $L)", Fields.class, field.name, box(field.type), isNullable);
+        }
     }
 
     static class ComparableMetaFieldBuilder extends AbstractMetaFieldBuilder {
@@ -129,6 +170,8 @@ public class EntityGenerator extends DataModelGenerator {
         }
     }
 
+    private Map<TypeName, AbstractMetaFieldBuilder> metaFieldBuilderMap = new HashMap<>(META_FIELD_BUILDER_MAP);
+
     public EntityGenerator(ProcessingEnvironment processingEnvironment) {
         super(processingEnvironment);
     }
@@ -136,17 +179,17 @@ public class EntityGenerator extends DataModelGenerator {
     @Override
     public EntityGenerator superClass(TypeName superClass) {
         super.superClass(superClass);
-        className(ClassGenerator.packageName(superClass.toString()), generateEntityTypeName(superClass));
+        className(TypeUtils.packageName(superClass.toString()), generateEntityTypeName(superClass));
         return this;
     }
 
     private String generateEntityTypeName(TypeName superClass) {
-        return ClassGenerator.simpleName(superClass.toString()).replace("Abstract", "");
+        return TypeUtils.simpleName(superClass.toString()).replace("Abstract", "");
     }
 
     private TypeName entityTypeFromAbstract(TypeName superClass) {
         String simpleName = generateEntityTypeName(superClass);
-        String packageName = ClassGenerator.packageName(superClass.toString());
+        String packageName = TypeUtils.packageName(superClass.toString());
         return ClassName.get(packageName, simpleName);
     }
 
@@ -158,6 +201,10 @@ public class EntityGenerator extends DataModelGenerator {
 
     @Override
     protected void build(TypeSpec.Builder builder, TypeElement type, List<FieldInfo> fields) {
+        mapFieldTypesFromAnnotation(type, ComparableSemantics.class, TYPES_FROM_COMPARABLE_SEMANTICS, ComparableMetaFieldBuilder.INSTANCE);
+        mapFieldTypesFromAnnotation(type, BlobSemantics.class, TYPES_FROM_BLOB_SEMANTICS, BlobMetaFieldBuilder.INSTANCE);
+        mapFieldTypesFromAnnotation(type, ValueSemantics.class, TYPES_FROM_VALUE_SEMANTICS, ValueMetaFieldBuilder.INSTANCE);
+
         FieldInfo keyField = getKeyField(fields);
         fields.remove(keyField);
         fields.add(0, keyField);
@@ -258,7 +305,7 @@ public class EntityGenerator extends DataModelGenerator {
     }
 
     private static String getMetaFieldName(String fieldName) {
-        return toCamelCase("", fieldName);
+        return TypeUtils.toCamelCase("", fieldName);
     }
 
     private FieldInfo getKeyField(Iterable<FieldInfo> fields) {
@@ -267,7 +314,7 @@ public class EntityGenerator extends DataModelGenerator {
     }
 
     private String getEntityIdFieldName() {
-        return toCamelCase(getClassName().replace("Entity", ""), "Id");
+        return TypeUtils.toCamelCase(getClassName().replace("Entity", ""), "Id");
     }
 
     private FieldInfo findFieldByName(Iterable<FieldInfo> fields, String... names) {
@@ -307,7 +354,7 @@ public class EntityGenerator extends DataModelGenerator {
     private AbstractMetaFieldBuilder getMetaFieldBuilder(FieldInfo field) {
         if (isRelationalField(field)) return RelationalMetaFieldBuilder.INSTANCE;
         if (isEnumField(field)) return ComparableMetaFieldBuilder.INSTANCE;
-        AbstractMetaFieldBuilder builder = META_FIELD_BUILDER_MAP.get(field.type);
+        AbstractMetaFieldBuilder builder = metaFieldBuilderMap.get(field.type);
         return builder != null ? builder : BlobMetaFieldBuilder.INSTANCE;
     }
 
@@ -323,5 +370,14 @@ public class EntityGenerator extends DataModelGenerator {
 
     private TypeElement typeElementForField(FieldInfo field) {
         return getElementUtils().getTypeElement(field.element.asType().toString());
+    }
+
+    private <TAnnotation extends Annotation> void mapFieldTypesFromAnnotation(TypeElement typeElement, Class<TAnnotation> annotationType, TypeUtils.AnnotationTypesGetter<TAnnotation> getter, AbstractMetaFieldBuilder builder) {
+        TAnnotation annotation = typeElement.getAnnotation(annotationType);
+        if (annotation == null) return;
+
+        for (TypeName type : TypeUtils.getTypesFromAnnotation(annotation, getter)) {
+            metaFieldBuilderMap.put(type, builder);
+        }
     }
 }

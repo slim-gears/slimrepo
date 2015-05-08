@@ -9,4 +9,5 @@ package com.slimgears.slimrepo.core.internal.interfaces;
 public interface OrmServiceProvider {
     SessionServiceProvider createSessionServiceProvider(RepositoryModel model);
     FieldTypeMapper getFieldTypeMapper();
+    FieldTypeMappingRegistrar getFieldTypeMapperRegistrar();
 }

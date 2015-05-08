@@ -52,7 +52,7 @@ public class DataModelGenerator extends ClassGenerator<DataModelGenerator> {
         try {
             return TypeName.get(typeMirror);
         } catch (Throwable e) {
-            return ClassName.get(getPackageName(), ClassGenerator.simpleName(typeMirror.toString()));
+            return ClassName.get(getPackageName(), TypeUtils.simpleName(typeMirror.toString()));
         }
     }
 
@@ -184,10 +184,10 @@ public class DataModelGenerator extends ClassGenerator<DataModelGenerator> {
     }
 
     protected String getModelGetterName(String fieldName) {
-        return toCamelCase("get", fieldName);
+        return TypeUtils.toCamelCase("get", fieldName);
     }
 
     protected String getModelSetterName(String fieldName) {
-        return toCamelCase("set", fieldName);
+        return TypeUtils.toCamelCase("set", fieldName);
     }
 }

@@ -122,6 +122,12 @@ public class Fields {
         }
     }
 
+    static class ValueFieldImplementation<TEntity, T> extends AbstractValueField<TEntity, T> {
+        ValueFieldImplementation(String name, Class<T> type, boolean nullable) {
+            super(name, type, nullable);
+        }
+    }
+
     static class ComparableFieldImplementation<TEntity, T> extends AbstractValueField<TEntity, T> implements ComparableField<TEntity, T> {
         ComparableFieldImplementation(String name, Class<T> type, boolean nullable) {
             super(name, type, nullable);
@@ -223,6 +229,10 @@ public class Fields {
 
     public static <TEntity, T> ComparableField<TEntity, T> comparableField(String name, Class<T> fieldType, boolean nullable) {
         return new ComparableFieldImplementation<>(name, fieldType, nullable);
+    }
+
+    public static <TEntity, T> ValueField<TEntity, T> valueField(String name, Class<T> fieldType, boolean nullable) {
+        return new ValueFieldImplementation<>(name, fieldType, nullable);
     }
 
     public static <TEntity> StringField<TEntity> stringField(String name, boolean nullable) {

@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.slimgears.slimrepo.core.interfaces.RepositoryService;
 import com.slimgears.slimrepo.example.R;
 import com.slimgears.slimrepo.example.repository.CountryEntity;
+import com.slimgears.slimrepo.example.repository.GeneratedUserRepositoryService;
 import com.slimgears.slimrepo.example.repository.UserEntity;
 import com.slimgears.slimrepo.example.repository.UserRepository;
 import com.slimgears.slimrepo.example.repository.UserRepositoryService;
@@ -109,7 +110,7 @@ public class AddUserActivity extends Activity {
             }
         });
 
-        mUserRepositoryService = new SqliteUserRepositoryService(this);
+        mUserRepositoryService = new GeneratedUserRepositoryService(this);
 
         try {
             mViewCountry.setAdapter(new CountriesAdapter(mUserRepositoryService));

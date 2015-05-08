@@ -15,10 +15,11 @@ public abstract class AbstractOrmServiceProvider implements OrmServiceProvider {
 
     @Override
     public FieldTypeMapper getFieldTypeMapper() {
-        return getTypeMappingRegistrar();
+        return getFieldTypeMapperRegistrar();
     }
 
-    final protected FieldTypeMappingRegistrar getTypeMappingRegistrar() {
+    @Override
+    public final FieldTypeMappingRegistrar getFieldTypeMapperRegistrar() {
         if (typeMappingRegistrar != null) return typeMappingRegistrar;
         typeMappingRegistrar = createTypeMappingRegistrar();
         onMapFieldTypes(typeMappingRegistrar);

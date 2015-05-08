@@ -6,11 +6,13 @@ import com.slimgears.slimrepo.core.interfaces.entities.FieldValueMap;
 import com.slimgears.slimrepo.core.interfaces.fields.ComparableField;
 import com.slimgears.slimrepo.core.interfaces.fields.RelationalField;
 import com.slimgears.slimrepo.core.interfaces.fields.StringField;
+import com.slimgears.slimrepo.core.interfaces.fields.ValueField;
 import com.slimgears.slimrepo.core.internal.AbstractEntityType;
 import com.slimgears.slimrepo.core.internal.Fields;
 import java.lang.Integer;
 import java.lang.Override;
 import java.lang.String;
+
 
 class TestEntity extends AbstractTestEntity implements Entity<Integer> {
     public static final ComparableField<TestEntity, Integer> Id = Fields.comparableField("id", Integer.class, false);
@@ -21,16 +23,19 @@ class TestEntity extends AbstractTestEntity implements Entity<Integer> {
 
     public static final ComparableField<TestEntity, TestEnum> EnumValue = Fields.comparableField("enumValue", TestEnum.class, true);
 
+    public static final ValueField<TestEntity, CustomType> CustomTypeValue = Fields.valueField("customTypeValue", CustomType.class, true);
+
     public static final EntityType<Integer, TestEntity> EntityMetaType = new MetaType();
 
     private TestEntity() {
     }
 
-    public TestEntity(int id, String name, RelatedEntity related, TestEnum enumValue) {
+    public TestEntity(int id, String name, RelatedEntity related, TestEnum enumValue, CustomType customTypeValue) {
         this.id = id;
         this.name = name;
         this.related = related;
         this.enumValue = enumValue;
+        this.customTypeValue = customTypeValue;
     }
 
     @Override
@@ -82,9 +87,18 @@ class TestEntity extends AbstractTestEntity implements Entity<Integer> {
         return this.enumValue;
     }
 
+    public TestEntity setCustomTypeValue(CustomType customTypeValue) {
+        this.customTypeValue = customTypeValue;
+        return this;
+    }
+
+    public CustomType getCustomTypeValue() {
+        return this.customTypeValue;
+    }
+
     private static class MetaType extends AbstractEntityType<Integer, TestEntity> {
         MetaType() {
-            super("TestEntity", TestEntity.class, Id, Name, Related, EnumValue);
+            super("TestEntity", TestEntity.class, Id, Name, Related, EnumValue, CustomTypeValue);
         }
 
         @Override
@@ -103,7 +117,8 @@ class TestEntity extends AbstractTestEntity implements Entity<Integer> {
                     lookup.getValue(Id),
                     lookup.getValue(Name),
                     lookup.getValue(Related),
-                    lookup.getValue(EnumValue));
+                    lookup.getValue(EnumValue),
+                    lookup.getValue(CustomTypeValue));
         }
 
         @Override
@@ -112,7 +127,8 @@ class TestEntity extends AbstractTestEntity implements Entity<Integer> {
                     .putValue(Id, entity.getId())
                     .putValue(Name, entity.getName())
                     .putValue(Related, entity.getRelated())
-                    .putValue(EnumValue, entity.getEnumValue());
+                    .putValue(EnumValue, entity.getEnumValue())
+                    .putValue(CustomTypeValue, entity.getCustomTypeValue());
         }
     }
 
@@ -140,6 +156,11 @@ class TestEntity extends AbstractTestEntity implements Entity<Integer> {
 
         public Builder enumValue(TestEnum enumValue) {
             model.setEnumValue(enumValue);
+            return this;
+        }
+
+        public Builder customTypeValue(CustomType customTypeValue) {
+            model.setCustomTypeValue(customTypeValue);
             return this;
         }
     }

@@ -102,7 +102,6 @@ public class PrototypeTest {
             }
         };
 
-
         sessionServiceProviderMock = new AbstractSqlSessionServiceProvider(ormServiceProviderMock) {
             @Override
             protected SqlCommandExecutor createCommandExecutor() {

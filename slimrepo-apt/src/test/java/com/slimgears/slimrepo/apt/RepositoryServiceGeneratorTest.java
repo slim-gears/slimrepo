@@ -67,4 +67,12 @@ public class RepositoryServiceGeneratorTest {
                 inputFiles("TestRepository.java"),
                 expectedFiles("GeneratedTestRepository.java", "TestRepositoryService.java", "GeneratedTestRepositoryService.java"));
     }
+
+    @Test
+    public void repositoryWithCustomOrmServiceGeneration() {
+        testAnnotationProcessing(
+                new RepositoryAnnotationProcessor(),
+                inputFiles("CustomOrmRepository.java"),
+                expectedFiles("GeneratedCustomOrmRepository.java", "CustomOrmRepositoryService.java", "GeneratedCustomOrmRepositoryService.java"));
+    }
 }

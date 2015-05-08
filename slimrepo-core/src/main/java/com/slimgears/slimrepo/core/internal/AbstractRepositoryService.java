@@ -10,6 +10,8 @@ import com.slimgears.slimrepo.core.interfaces.RepositoryService;
 import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
+import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMappingInstaller;
+import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMappingRegistrar;
 import com.slimgears.slimrepo.core.internal.interfaces.OrmServiceProvider;
 import com.slimgears.slimrepo.core.internal.interfaces.RepositoryModel;
 import com.slimgears.slimrepo.core.internal.interfaces.SessionServiceProvider;
@@ -34,9 +36,16 @@ public abstract class AbstractRepositoryService<TRepository extends Repository> 
     private final OrmServiceProvider ormServiceProvider;
     private final RepositoryModel repositoryModel;
 
-    protected AbstractRepositoryService(OrmServiceProvider ormServiceProvider, RepositoryModel repositoryModel) {
+    protected AbstractRepositoryService(OrmServiceProvider ormServiceProvider, RepositoryModel repositoryModel, FieldTypeMappingInstaller... typeMapperInstallers) {
         this.ormServiceProvider = ormServiceProvider;
         this.repositoryModel = repositoryModel;
+
+        if (typeMapperInstallers.length > 0) {
+            FieldTypeMappingRegistrar registrar = ormServiceProvider.getFieldTypeMapperRegistrar();
+            for (FieldTypeMappingInstaller installer : typeMapperInstallers) {
+                installer.install(registrar);
+            }
+        }
     }
 
     @Override

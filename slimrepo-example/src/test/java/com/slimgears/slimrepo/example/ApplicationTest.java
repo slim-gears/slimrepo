@@ -1,14 +1,15 @@
 package com.slimgears.slimrepo.example;
 
+import android.graphics.Rect;
 import android.os.Bundle;
 
 import com.slimgears.slimrepo.core.interfaces.RepositoryService;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.example.repository.CountryEntity;
+import com.slimgears.slimrepo.example.repository.GeneratedUserRepositoryService;
 import com.slimgears.slimrepo.example.repository.UserEntity;
 import com.slimgears.slimrepo.example.repository.UserRepository;
 import com.slimgears.slimrepo.example.repository.UserRepositoryService;
-import com.slimgears.slimrepo.example.ui.SqliteUserRepositoryService;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -33,7 +34,7 @@ public class ApplicationTest {
         Assert.assertNotNull(UserEntity.EntityMetaType.getKeyField());
 
         Assert.assertNotNull(RuntimeEnvironment.application);
-        UserRepositoryService repoService = new SqliteUserRepositoryService(RuntimeEnvironment.application);
+        UserRepositoryService repoService = new GeneratedUserRepositoryService(RuntimeEnvironment.application);
         repoService.update(new RepositoryService.UpdateAction<UserRepository>() {
             @Override
             public void execute(UserRepository repository) throws IOException {
@@ -67,7 +68,8 @@ public class ApplicationTest {
                                 .setLastName("Twain")
                                 .setAge(40)
                                 .setCountry(countryFrance)
-                                .setStatus(status));
+                                .setStatus(status)
+                                .setRect(new Rect(-10, -20, 10, 20)));
             }
         });
 
@@ -85,5 +87,7 @@ public class ApplicationTest {
         Assert.assertEquals("France", users[0].getCountry().getName());
         Assert.assertEquals(1, users[0].getStatus().getInt("Integer"));
         Assert.assertEquals("test", users[0].getStatus().getString("String"));
+        Assert.assertEquals(-10, users[0].getRect().left);
+        Assert.assertEquals(10, users[0].getRect().right);
     }
 }

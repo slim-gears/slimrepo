@@ -9,13 +9,6 @@ import com.slimgears.slimrepo.core.interfaces.fields.Field;
  * <File Description>
  */
 public interface FieldTypeMappingRegistrar extends FieldTypeMapper {
-    interface TypeConverter<T> {
-        T toEntityType(Field<?, T> field, Object value);
-        Object fromEntityType(Field<?, T> field, T value);
-        Class getOutboundType(Field<?, T> field);
-        Class getInboundType(Field<?, T> field);
-    }
-
     interface Matcher {
         boolean match(Field field);
     }

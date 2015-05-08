@@ -4,9 +4,7 @@ package com.slimgears.slimrepo.apt.base;// Copyright 2015 Denis Itskovich
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
@@ -16,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
-import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
@@ -87,26 +84,8 @@ public abstract class ClassGenerator<T extends ClassGenerator<T>> {
 
     protected abstract void build(TypeSpec.Builder builder, TypeElement type, TypeElement... interfaces);
 
-    public static String packageName(String qualifiedClassName) {
-        int pos = qualifiedClassName.lastIndexOf('.');
-        return (pos >= 0) ? qualifiedClassName.substring(0, pos) : "";
-    }
-
-    public static String simpleName(String qualifiedClassName) {
-        String packageName = packageName(qualifiedClassName);
-        return packageName.isEmpty() ? qualifiedClassName : qualifiedClassName.substring(packageName.length() + 1);
-    }
-
-    public static String qualifiedName(String packageName, String simpleName) {
-        return packageName.isEmpty() ? simpleName : packageName + "." + simpleName;
-    }
-
-    public static ClassName getClassName(String qualifiedClassName) {
-        return ClassName.get(packageName(qualifiedClassName), simpleName(qualifiedClassName));
-    }
-
     public T className(String qualifiedClassName) {
-        return className(packageName(qualifiedClassName), simpleName(qualifiedClassName));
+        return className(TypeUtils.packageName(qualifiedClassName), TypeUtils.simpleName(qualifiedClassName));
     }
 
     public T className(String packageName, String className) {
@@ -166,14 +145,6 @@ public abstract class ClassGenerator<T extends ClassGenerator<T>> {
                     }
                 })
                 .toArray(new TypeName[typeElements.length]);
-    }
-
-    public static String toCamelCase(String begin, String... parts) {
-        String name = begin;
-        for (String part : parts) {
-            name += Character.toUpperCase(part.charAt(0)) + part.substring(1);
-        }
-        return name;
     }
 
     protected ProcessingEnvironment getProcessingEnvironment() {

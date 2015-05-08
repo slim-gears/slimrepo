@@ -12,6 +12,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.slimgears.slimrepo.example.R;
+import com.slimgears.slimrepo.example.repository.GeneratedUserRepositoryService;
 import com.slimgears.slimrepo.example.repository.UserEntity;
 import com.slimgears.slimrepo.example.repository.UserRepository;
 import com.slimgears.slimrepo.example.repository.UserRepositoryService;
@@ -77,7 +78,7 @@ public class MainActivity extends Activity {
 
         setContentView(R.layout.activity_main);
 
-        UserRepositoryService userRepositoryService = new SqliteUserRepositoryService(this);
+        UserRepositoryService userRepositoryService = new GeneratedUserRepositoryService(this);
 
         setOnClickListener(R.id.button_add_user, new View.OnClickListener() {
             @Override

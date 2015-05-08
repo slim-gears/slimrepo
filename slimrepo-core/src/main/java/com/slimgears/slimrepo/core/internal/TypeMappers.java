@@ -4,6 +4,7 @@ package com.slimgears.slimrepo.core.internal;
 
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMappingRegistrar;
+import com.slimgears.slimrepo.core.internal.interfaces.TypeConverter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +14,7 @@ import java.util.Map;
  * <File Description>
  */
 public class TypeMappers {
-    static class EnumTypeConverter implements FieldTypeMappingRegistrar.TypeConverter, FieldTypeMappingRegistrar.Matcher {
+    static class EnumTypeConverter implements TypeConverter, FieldTypeMappingRegistrar.Matcher {
         private final Map<Class, Object[]> enumValuesCache = new HashMap<>();
 
         static final EnumTypeConverter INSTANCE = new EnumTypeConverter();

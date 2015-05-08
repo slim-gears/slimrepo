@@ -4,12 +4,13 @@ package com.slimgears.slimrepo.core.internal;
 
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMappingRegistrar;
+import com.slimgears.slimrepo.core.internal.interfaces.TypeConverter;
 
 /**
 * Created by Denis on 30-Apr-15
 * <File Description>
 */
-public abstract class AbstractTypeConverter<TSource, TDestination> implements FieldTypeMappingRegistrar.TypeConverter<TSource> {
+public abstract class AbstractTypeConverter<TSource, TDestination> implements TypeConverter<TSource> {
     protected final Class<TSource> sourceType;
     protected final Class<TDestination> destinationType;
 
@@ -24,12 +25,12 @@ public abstract class AbstractTypeConverter<TSource, TDestination> implements Fi
     @Override
     public TSource toEntityType(Field<?, TSource> field, Object value) {
         //noinspection unchecked
-        return fromInbound((TDestination)value);
+        return value != null ? fromInbound((TDestination)value) : null;
     }
 
     @Override
     public Object fromEntityType(Field<?, TSource> field, TSource value) {
-        return toOutbound(value);
+        return value != null ? toOutbound(value) : null;
     }
 
     @Override
