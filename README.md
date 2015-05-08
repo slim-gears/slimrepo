@@ -1,4 +1,4 @@
-# Slim Repo [![Build Status](https://travis-ci.org/slim-gears/slimrepo.svg?branch=master)](https://travis-ci.org/slim-gears/slimrepo) [![Maven Repository](https://img.shields.io/github/tag/slim-gears/slimrepo.svg?label=maven)](https://jitpack.io/#slim-gears/slimrepo)
+# Slim Repo [![Build Status](https://travis-ci.org/slim-gears/slimrepo.svg?branch=master)](https://travis-ci.org/slim-gears/slimrepo) [![Maven Repository](https://img.shields.io/github/release/slim-gears/slimrepo.svg?label=JitPack%20Maven)](https://jitpack.io/#slim-gears/slimrepo)
 ### Light-weight modular ORM for Java and Android
 
 ##### The library is still under development. Stay tuned for updates.
@@ -18,13 +18,49 @@ The library was inspired by [GreenDAO](http://greendao-orm.com/ "GreenDAO") and 
 
 #### Features
 
-* **Modularity** - same Front-End (`Repository` and `Entities`), being able working transparently with different Back-Ends (underlying persistent storages - e.g. Sqlite, document db, remote RESTful service, etc.)
-* **Annotation processing based** - no reflection usage in run-time, *proguard-friendly*
 * **Intuitive syntax** - intuitive, type-safe and highly readable syntax
-* **Bulk operations support** *Bulk update* and *bulk delete* are supported
-* **Light-weight**
+(underlying persistent storages - e.g. Sqlite, document db, remote RESTful service, etc.)
+* **Annotation processing based** - no reflection usage in run-time, *proguard-friendly*
+* **Bulk operations support** - *Bulk update* and *bulk delete* are supported
+* **Light-weight** - simple and has a low package footprint
 
 ---
+
+Installation for Android project
+---
+**Step 1.** Enable annotation processing for your project (if not enabled yet)
+```groovy
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
+    }
+}
+
+apply plugin: 'com.neenbedankt.android-apt'
+
+configurations {
+    apt
+}
+```
+**Step 2.** Add http://jitpack.io repository
+```groovy
+repositories {
+	maven {
+		url 'http://jitpack.io'
+	}
+}
+```
+**Step 3.** Add dependencies
+```groovy
+dependencies {
+    compile 'com.github.slim-gears.slimrepo:slimrepo-android:0.6.0'
+    apt 'com.github.slim-gears.slimrepo:slimrepo-apt:0.6.0'
+}
+
+```
 
 Repository Definition
 ---
