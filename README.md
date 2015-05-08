@@ -26,6 +26,40 @@ The library was inspired by [GreenDAO](http://greendao-orm.com/ "GreenDAO") and 
 
 ---
 
+Installation for Android project
+---
+**Step 1.** Enable annotation processing for your project (if not enabled yet)
+```groovy
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
+    }
+}
+
+configurations {
+    apt
+}
+```
+**Step 2.** Add http://jitpack.io repository
+```groovy
+repositories {
+	maven {
+		url 'http://jitpack.io'
+	}
+}
+```
+**Step 3.** Add dependencies
+```groovy
+dependencies {
+    compile 'com.github.slim-gears.slimrepo:slimrepo-android:0.6.0'
+    apt 'com.github.slim-gears.slimrepo:slimrepo-apt:0.6.0'
+}
+
+```
+
 Repository Definition
 ---
 
