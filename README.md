@@ -39,6 +39,8 @@ buildscript {
     }
 }
 
+apply plugin: 'com.neenbedankt.android-apt'
+
 configurations {
     apt
 }
