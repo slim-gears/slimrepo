@@ -29,7 +29,7 @@ The library was inspired by [GreenDAO](http://greendao-orm.com/ "GreenDAO") and 
 Installation for Android project
 ---
 **Step 1.** Enable annotation processing for your project (if not enabled yet)
-```groovy
+```gradle
 buildscript {
     repositories {
         jcenter()
@@ -46,13 +46,13 @@ configurations {
 }
 ```
 **Step 2.** Add jCenter repository (if not added yet)
-```groovy
+```gradle
 repositories {
 	jcenter()
 }
 ```
 **Step 3.** Add dependencies
-```groovy
+```gradle
 dependencies {
     compile 'com.slimgears.slimrepo:slimrepo-android:0.7.0'
     apt 'com.slimgears.slimrepo:slimrepo-apt:0.7.0'
