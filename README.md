@@ -1,4 +1,4 @@
-# Slim Repo [![Build Status](https://travis-ci.org/slim-gears/slimrepo.svg?branch=master)](https://travis-ci.org/slim-gears/slimrepo) [![Maven Repository](https://img.shields.io/github/release/slim-gears/slimrepo.svg?label=Maven)](https://bintray.com/slim-gears/slimrepo/slimrepo-android/_latestVersion)
+# Slim Repo [![Build Status](https://travis-ci.org/slim-gears/slimrepo.svg?branch=master)](https://travis-ci.org/slim-gears/slimrepo) [![Maven Repository](https://img.shields.io/github/release/slim-gears/slimrepo.svg?label=Maven)](https://bintray.com/slim-gears/slimrepo/slimrepo-android/_latestVersion) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Slim%20Repo-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/1778)
 ### Light-weight modular ORM for Java and Android
 
 ##### The library is still under development. Stay tuned for updates.
