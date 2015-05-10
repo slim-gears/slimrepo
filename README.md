@@ -215,7 +215,7 @@ Update
 
 ```java
 repoService.update(repo -> {
-	UserEntity user = repo.users().findById(2);
+	UserEntity user = repo.users().findFirst(UserEntity.UserId, 2);
 	user.setLastName("Smith");
 });
 ```
