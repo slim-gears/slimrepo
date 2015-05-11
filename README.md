@@ -26,7 +26,7 @@ The library was inspired by [GreenDAO](http://greendao-orm.com/ "GreenDAO") and 
 * **Bulk operations support** - *Bulk update* and *bulk delete* are supported
 * **Light-weight** - simple and has a low package footprint
 
-## Installation for Android project
+## Gradle config for Android project
 
 **Step 1.** Enable annotation processing for your project (if not enabled yet)
 ```gradle
