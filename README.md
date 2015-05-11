@@ -64,3 +64,4 @@ dependencies {
 
 * [Quick getting started](https://github.com/slim-gears/slimrepo/wiki/Getting-started)
 * [Slim Repo Wikipedia (not complete yet)](https://github.com/slim-gears/slimrepo/wiki)
+* [Sample android project](https://github.com/slim-gears/slimrepo/tree/master/slimrepo-example)
