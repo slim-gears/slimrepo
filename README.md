@@ -7,8 +7,7 @@
 
 ##### The library is still under development. Stay tuned for updates.
 
-Background
----
+## Background
 
 The library was inspired by [GreenDAO](http://greendao-orm.com/ "GreenDAO") and [Microsoft Entity Framework Code First](https://msdn.microsoft.com/en-us/data/ee712907) 
 
@@ -60,6 +59,8 @@ dependencies {
 }
 
 ```
-### Usage
+
+## Usage
+
 * [Quick getting started](https://github.com/slim-gears/slimrepo/wiki/Getting-started)
 * [Slim Repo Wikipedia (not complete yet)](https://github.com/slim-gears/slimrepo/wiki)
