@@ -61,5 +61,5 @@ dependencies {
 
 ```
 ### Documentation links
-* [Quick getting started](wiki/Getting-started)
-* [Slim Repo Wikipedia](wiki)
+* [Quick getting started](https://github.com/slim-gears/slimrepo/wiki/Getting-started)
+* [Slim Repo Wikipedia](https://github.com/slim-gears/slimrepo/wiki)
