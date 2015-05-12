@@ -3,16 +3,8 @@
 package com.slimgears.slimrepo.android.core;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.gesture.Gesture;
-import android.graphics.Bitmap;
-import android.location.Address;
-import android.location.Location;
-import android.net.Uri;
-import android.os.Bundle;
-import android.os.Parcelable;
 
 import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMappingRegistrar;
 import com.slimgears.slimrepo.core.internal.interfaces.RepositoryModel;
@@ -84,19 +76,9 @@ public class SqliteOrmServiceProvider extends AbstractSqliteOrmServiceProvider {
         return new SqliteSessionServiceProvider(this, database, closer);
     }
 
-    protected static <T extends Parcelable> void registerParcelable(FieldTypeMappingRegistrar registrar, Class<T> clazz, Parcelable.Creator<T> creator) {
-        registrar.registerConverter(clazz, ParcelableTypeConverter.create(clazz, creator));
-    }
-
     @Override
     protected void onMapFieldTypes(FieldTypeMappingRegistrar registrar) {
         super.onMapFieldTypes(registrar);
-        registerParcelable(registrar, Bundle.class, Bundle.CREATOR);
-        registerParcelable(registrar, Bitmap.class, Bitmap.CREATOR);
-        registerParcelable(registrar, Address.class, Address.CREATOR);
-        registerParcelable(registrar, Location.class, Location.CREATOR);
-        registerParcelable(registrar, Intent.class, Intent.CREATOR);
-        registerParcelable(registrar, Gesture.class, Gesture.CREATOR);
-        registerParcelable(registrar, Uri.class, Uri.CREATOR);
+        installTypeMappings(registrar, new ParcelableTypeMappingInstaller());
     }
 }

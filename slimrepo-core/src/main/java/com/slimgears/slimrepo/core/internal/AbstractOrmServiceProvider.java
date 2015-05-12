@@ -3,6 +3,7 @@
 package com.slimgears.slimrepo.core.internal;
 
 import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMapper;
+import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMappingInstaller;
 import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMappingRegistrar;
 import com.slimgears.slimrepo.core.internal.interfaces.OrmServiceProvider;
 
@@ -32,5 +33,11 @@ public abstract class AbstractOrmServiceProvider implements OrmServiceProvider {
 
     protected void onMapFieldTypes(FieldTypeMappingRegistrar registrar) {
         TypeMappers.install(registrar);
+    }
+
+    protected void installTypeMappings(FieldTypeMappingRegistrar registrar, FieldTypeMappingInstaller... installers) {
+        for (FieldTypeMappingInstaller installer : installers) {
+            installer.install(registrar);
+        }
     }
 }
