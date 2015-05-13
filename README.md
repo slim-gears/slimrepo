@@ -5,10 +5,6 @@
 [![Join the chat at https://gitter.im/slim-gears/slimrepo](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/slim-gears/slimrepo?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 ### Light-weight modular ORM for Java and Android
 
-##### The library is still under development. Stay tuned for updates.
-
-## Background
-
 The library was inspired by [GreenDAO](http://greendao-orm.com/ "GreenDAO") and [Microsoft Entity Framework Code First](https://msdn.microsoft.com/en-us/data/ee712907) 
 
 Slim Repo is intended to completely decouple data persistence from underlying storage. CRUD operations performed using simple, readable, intuitive and type safe syntax. Because of Slim Repo's modular design, it's possible to add any other SQL, NoSQL or In-memory storage support, without changing the user code.
