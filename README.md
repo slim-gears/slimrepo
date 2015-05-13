@@ -10,10 +10,10 @@ The library was inspired by [GreenDAO](http://greendao-orm.com/ "GreenDAO") and 
 #### Features (design goals)
 
 * **Ease of use** - intuitive, type-safe and highly readable syntax
-* **Performance** - annotation processing based, fast, no reflection usage in run-time, *proguard-friendly*
+* **Performance** - annotation processing based, fast, no reflection usage in run-time, *proguard*-friendly
 * **Bulk operations support** - *Bulk update* and *bulk delete* are supported
 * **Light-weight** - simple and has a low package footprint
-* **Modularity** - Underlying storage providers (e.g. SQLite) are extensions. Other SQL or NoSQL storage providers can be used without changing the user code    
+* **Modularity** - Underlying storage providers (e.g. *SQLite*) are extensions. Other *SQL* or *NoSQL* storage providers can be used without changing the user code
 
 ## Gradle configuration for Android project
 
