@@ -11,19 +11,22 @@
 
 The library was inspired by [GreenDAO](http://greendao-orm.com/ "GreenDAO") and [Microsoft Entity Framework Code First](https://msdn.microsoft.com/en-us/data/ee712907) 
 
+Slim Repo is intended to completely decouple data persistence from underlying storage. It can be replaced in any moment to other SQL, NoSQL or In-memory storage. CRUD operations performed using simple, readable, intuitive and type safe syntax
+
 #### Terminology
 
-`Entity` - Data object, POJO 
- 
-`Repository` - represents abstract working session, *unit-of-work* against ORM
-
-`RepositoryService` - factory, allowing to create `Repository` instances 
+| Term                | Explanation                                                     |
+|---------------------|-----------------------------------------------------------------|
+| `Entity`            | Generated data object, POJO                                     |
+| `Repository`        | Represents abstract working session, *unit-of-work* against ORM |
+| `RepositoryService` | Represents a factory, allowing to create `Repository` instances |
 
 #### Features
 
 * **Intuitive syntax** - intuitive, type-safe and highly readable syntax
-* **Annotation processing based** - no reflection usage in run-time, *proguard-friendly*
+* **Annotation processing based** - fast, no reflection usage in run-time, *proguard-friendly*
 * **Bulk operations support** - *Bulk update* and *bulk delete* are supported
+* **Modular design** - Underlying storage providers (e.g. SQLite) are extensions. Other SQL or NoSQL storage providers can be used without changing the user code    
 * **Light-weight** - simple and has a low package footprint
 
 ## Gradle configuration for Android project
