@@ -13,14 +13,6 @@ The library was inspired by [GreenDAO](http://greendao-orm.com/ "GreenDAO") and 
 
 Slim Repo is intended to completely decouple data persistence from underlying storage. It can be replaced in any moment to other SQL, NoSQL or In-memory storage. CRUD operations performed using simple, readable, intuitive and type safe syntax
 
-#### Terminology
-
-| Term                | Explanation                                                     |
-|---------------------|-----------------------------------------------------------------|
-| `Entity`            | Generated data object, POJO                                     |
-| `Repository`        | Represents abstract working session, *unit-of-work* against ORM |
-| `RepositoryService` | Represents a factory, allowing to create `Repository` instances |
-
 #### Features
 
 * **Intuitive syntax** - intuitive, type-safe and highly readable syntax
