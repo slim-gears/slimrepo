@@ -7,7 +7,7 @@
 
 The library was inspired by [GreenDAO](http://greendao-orm.com/ "GreenDAO") and [Microsoft Entity Framework Code First](https://msdn.microsoft.com/en-us/data/ee712907) 
 
-**Slim Repo** is intended to completely decouple data persistence from underlying storage. CRUD operations performed using simple, readable, intuitive and type safe syntax. Because of Slim Repo's modular design, it's possible to add any other SQL, NoSQL or In-memory storage support, without changing the user code.
+**Slim Repo** is intended to completely decouple data persistence logic in your application from the underlying storage. CRUD operations performed using simple, readable, intuitive and type safe syntax. Because of Slim Repo's modular design, it's possible to add any other SQL, NoSQL or In-memory storage support, without changing the user code.
 
 #### Features (design goals)
 
