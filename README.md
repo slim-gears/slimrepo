@@ -3,6 +3,7 @@
 [![Maven Repository](https://img.shields.io/github/release/slim-gears/slimrepo.svg?label=Maven)](https://bintray.com/slim-gears/slimrepo/slimrepo-android/_latestVersion)
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Slim%20Repo-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/1778)
 [![Join the chat at https://gitter.im/slim-gears/slimrepo](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/slim-gears/slimrepo?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ---
 ### Light-weight modular ORM for Java and Android
 
