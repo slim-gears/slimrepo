@@ -1,30 +1,19 @@
 # Slim Repo
-[![Build Status](https://travis-ci.org/slim-gears/slimrepo.svg?branch=master)](https://travis-ci.org/slim-gears/slimrepo)
-[![Maven Repository](https://img.shields.io/github/release/slim-gears/slimrepo.svg?label=Maven)](https://bintray.com/slim-gears/slimrepo/slimrepo-android/_latestVersion)
-[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Slim%20Repo-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/1778)
-[![Join the chat at https://gitter.im/slim-gears/slimrepo](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/slim-gears/slimrepo?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://travis-ci.org/slim-gears/slimrepo.svg?branch=master)](https://travis-ci.org/slim-gears/slimrepo) [![Maven Repository](https://img.shields.io/github/release/slim-gears/slimrepo.svg?label=Maven)](https://bintray.com/slim-gears/slimrepo/slimrepo-android/_latestVersion) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Slim%20Repo-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/1778) [![Join the chat at https://gitter.im/slim-gears/slimrepo](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/slim-gears/slimrepo?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+---
 ### Light-weight modular ORM for Java and Android
-
-##### The library is still under development. Stay tuned for updates.
-
-## Background
 
 The library was inspired by [GreenDAO](http://greendao-orm.com/ "GreenDAO") and [Microsoft Entity Framework Code First](https://msdn.microsoft.com/en-us/data/ee712907) 
 
-#### Terminology
+**Slim Repo** is intended to completely decouple data persistence logic in your application from the underlying storage. CRUD operations performed using simple, readable, intuitive and type safe syntax. Because of Slim Repo's modular design, it's possible to add any other SQL, NoSQL or In-memory storage support, without changing the user code.
 
-`Entity` - Data object, POJO 
- 
-`Repository` - represents abstract working session, *unit-of-work* against ORM
+#### Features (design goals)
 
-`RepositoryService` - factory, allowing to create `Repository` instances 
-
-#### Features
-
-* **Intuitive syntax** - intuitive, type-safe and highly readable syntax
-* **Annotation processing based** - no reflection usage in run-time, *proguard-friendly*
+* **Ease of use** - intuitive, type-safe and highly readable syntax
+* **Performance** - annotation processing based, fast, no reflection usage in run-time, *proguard*-friendly
 * **Bulk operations support** - *Bulk update* and *bulk delete* are supported
 * **Light-weight** - simple and has a low package footprint
+* **Modularity** - Underlying storage providers (e.g. *SQLite*) are extensions. Other *SQL* or *NoSQL* storage providers can be used without changing the user code
 
 ## Gradle configuration for Android project
 
@@ -65,3 +54,8 @@ dependencies {
 * [Quick getting started](https://github.com/slim-gears/slimrepo/wiki/Getting-started)
 * [Slim Repo Wikipedia (not complete yet)](https://github.com/slim-gears/slimrepo/wiki)
 * [Sample android project](https://github.com/slim-gears/slimrepo/tree/master/slimrepo-example)
+
+## Architecture
+#### Layer diagram
+![](https://raw.githubusercontent.com/slim-gears/slimrepo/master/doc/slimrepo-layers.png)
+
