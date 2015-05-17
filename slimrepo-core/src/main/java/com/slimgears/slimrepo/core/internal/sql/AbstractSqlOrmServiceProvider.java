@@ -45,9 +45,9 @@ public abstract class AbstractSqlOrmServiceProvider extends AbstractOrmServicePr
 
     @Override
     protected void onMapFieldTypes(FieldTypeMappingRegistrar registrar) {
-        super.onMapFieldTypes(registrar);
         SqlRelationalTypeMapper typeMapper = new SqlRelationalTypeMapper();
         registrar.registerConverter(typeMapper, typeMapper);
+        super.onMapFieldTypes(registrar);
     }
 
     protected abstract SqlStatementBuilder.SyntaxProvider createSyntaxProvider();

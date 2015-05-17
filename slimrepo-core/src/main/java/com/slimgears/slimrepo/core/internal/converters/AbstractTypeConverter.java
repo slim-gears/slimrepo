@@ -1,27 +1,20 @@
-// Copyright 2015 Denis Itskovich
-// Refer to LICENSE.txt for license details
-package com.slimgears.slimrepo.core.internal;
+package com.slimgears.slimrepo.core.internal.converters;
 
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
-import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMappingInstaller;
-import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMappingRegistrar;
 import com.slimgears.slimrepo.core.internal.interfaces.TypeConverter;
 
 /**
-* Created by Denis on 30-Apr-15
-* <File Description>
-*/
-public abstract class AbstractTypeConverter<TSource, TDestination> implements TypeConverter<TSource>, FieldTypeMappingInstaller {
-    protected final Class<TSource> sourceType;
+ * Created by Denis on 13-May-15.
+ */
+public abstract class AbstractTypeConverter<TSource, TDestination> implements TypeConverter<TSource> {
     protected final Class<TDestination> destinationType;
-
-    protected AbstractTypeConverter(Class<TSource> sourceType, Class<TDestination> destinationType) {
-        this.sourceType = sourceType;
-        this.destinationType = destinationType;
-    }
 
     protected abstract TSource fromInbound(TDestination value);
     protected abstract TDestination toOutbound(TSource value);
+
+    protected AbstractTypeConverter(Class<TDestination> destinationType) {
+        this.destinationType = destinationType;
+    }
 
     @Override
     public TSource toEntityType(Field<?, TSource> field, Object value) {
@@ -42,10 +35,5 @@ public abstract class AbstractTypeConverter<TSource, TDestination> implements Ty
     @Override
     public Class getInboundType(Field<?, TSource> field) {
         return getOutboundType(field);
-    }
-
-    @Override
-    public void install(FieldTypeMappingRegistrar registrar) {
-        registrar.registerConverter(sourceType, this);
     }
 }

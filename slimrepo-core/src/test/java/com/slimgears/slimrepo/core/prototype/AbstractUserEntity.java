@@ -4,6 +4,7 @@ package com.slimgears.slimrepo.core.prototype;
 
 import com.slimgears.slimrepo.core.prototype.generated.AccountStatus;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -17,4 +18,5 @@ public class AbstractUserEntity {
     protected Date lastVisitDate;
     protected AbstractRoleEntity role;
     protected AccountStatus accountStatus;
+    protected ArrayList comments;
 }

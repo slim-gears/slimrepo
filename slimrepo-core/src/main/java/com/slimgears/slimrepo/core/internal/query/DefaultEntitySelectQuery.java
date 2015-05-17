@@ -195,7 +195,9 @@ public class DefaultEntitySelectQuery<TKey, TEntity extends Entity<TKey>>
     @Override
     public TEntity firstOrDefault() throws IOException {
         SelectQueryParams<TKey, TEntity> queryParams = this.queryParams.fork();
+        if (queryParams.pagination == null) queryParams.pagination = new QueryPagination();
         queryParams.pagination.limit = 1;
+
         try (CloseableIterator<TEntity> iterator = toEntityIterator(queryProvider.prepareSelect(queryParams).execute())) {
             return (iterator.hasNext()) ? iterator.next() : null;
         } catch (RuntimeException e) {

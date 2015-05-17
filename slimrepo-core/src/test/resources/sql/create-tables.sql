@@ -8,5 +8,6 @@ CREATE TABLE IF NOT EXISTS `UserEntity` (
     `userLastName` TEXT,
     `lastVisitDate` INTEGER,
     `role` INTEGER REFERENCES `RoleEntity` (`roleId`),
-    `accountStatus` INTEGER)
+    `accountStatus` INTEGER,
+    `comments` BLOB)
 {Params: []}

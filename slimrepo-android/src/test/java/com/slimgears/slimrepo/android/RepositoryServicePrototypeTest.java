@@ -22,6 +22,7 @@ import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 
@@ -250,6 +251,20 @@ public class RepositoryServicePrototypeTest {
         Assert.assertEquals(4, firstNameToLastName.size());
         Assert.assertEquals("Doe", firstNameToLastName.get("John"));
         Assert.assertEquals("Smith", firstNameToLastName.get("Jake"));
+    }
+
+    @Test
+    public void serializableStoredAndRestored() throws IOException {
+        ArrayList<String> comments = new ArrayList<>();
+        comments.add("one");
+        comments.add("two");
+        comments.add("three");
+        repositoryService.users().add(UserEntity.builder().comments(comments).build());
+
+        UserEntity user = repositoryService.users().query().prepare().firstOrDefault();
+        Assert.assertEquals("one", user.getComments().get(0));
+        Assert.assertEquals("two", user.getComments().get(1));
+        Assert.assertEquals("three", user.getComments().get(2));
     }
 
     private UserEntity[] addUsers(final UserEntity... users) throws IOException {

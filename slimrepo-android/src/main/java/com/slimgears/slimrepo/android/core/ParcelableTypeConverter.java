@@ -3,14 +3,14 @@ package com.slimgears.slimrepo.android.core;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.slimgears.slimrepo.core.internal.AbstractTypeConverter;
+import com.slimgears.slimrepo.core.internal.converters.AbstractSpecificTypeConverter;
 import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMappingRegistrar;
 import com.slimgears.slimrepo.core.internal.interfaces.TypeConverter;
 
 /**
  * Created by Denis on 05-May-15.
  */
-public class ParcelableTypeConverter<T extends Parcelable> extends AbstractTypeConverter<T, byte[]> {
+public class ParcelableTypeConverter<T extends Parcelable> extends AbstractSpecificTypeConverter<T, byte[]> {
     private final Parcelable.Creator<T> creator;
 
     public ParcelableTypeConverter(Class<T> sourceType, Parcelable.Creator<T> creator) {

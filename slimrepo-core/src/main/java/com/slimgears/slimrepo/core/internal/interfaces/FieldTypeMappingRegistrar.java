@@ -15,4 +15,5 @@ public interface FieldTypeMappingRegistrar extends FieldTypeMapper {
 
     <T> void registerConverter(Class<? extends T> valueType, TypeConverter<T> converter);
     void registerConverter(Matcher matcher, TypeConverter converter);
+    void registerNotConvertibleTypes(Iterable<Class> types);
 }

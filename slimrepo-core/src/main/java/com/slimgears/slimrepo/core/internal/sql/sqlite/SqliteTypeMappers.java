@@ -2,7 +2,8 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal.sql.sqlite;
 
-import com.slimgears.slimrepo.core.internal.AbstractTypeConverter;
+import com.slimgears.slimrepo.core.internal.converters.AbstractSpecificTypeConverter;
+import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMappingInstaller;
 import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMappingRegistrar;
 
 import java.util.Date;
@@ -10,9 +11,11 @@ import java.util.Date;
 /**
  * Created by ditskovi on 4/28/2015.
  */
-public class SqliteTypeMappers {
-    private final static AbstractTypeConverter<Date, Long> DATE_TYPE_MAPPER =
-            new AbstractTypeConverter<Date, Long>(Date.class, Long.class) {
+public class SqliteTypeMappers implements FieldTypeMappingInstaller {
+    public static final FieldTypeMappingInstaller INSTANCE = new SqliteTypeMappers();
+
+    private final static AbstractSpecificTypeConverter<Date, Long> DATE_TYPE_MAPPER =
+            new AbstractSpecificTypeConverter<Date, Long>(Date.class, Long.class) {
                 @Override
                 protected Long toOutbound(Date value) {
                     return value != null ? value.getTime() : null;
@@ -24,8 +27,8 @@ public class SqliteTypeMappers {
                 }
             };
 
-    private final static AbstractTypeConverter<Boolean, Integer> BOOLEAN_TYPE_MAPPER =
-            new AbstractTypeConverter<Boolean, Integer>(Boolean.class, Integer.class) {
+    private final static AbstractSpecificTypeConverter<Boolean, Integer> BOOLEAN_TYPE_MAPPER =
+            new AbstractSpecificTypeConverter<Boolean, Integer>(Boolean.class, Integer.class) {
                 @Override
                 protected Integer toOutbound(Boolean value) {
                     return value ? 1 : 0;
@@ -37,8 +40,8 @@ public class SqliteTypeMappers {
                 }
             };
 
-    private final static AbstractTypeConverter<Byte, Short> BYTE_TYPE_MAPPER =
-            new AbstractTypeConverter<Byte, Short>(Byte.class, Short.class) {
+    private final static AbstractSpecificTypeConverter<Byte, Short> BYTE_TYPE_MAPPER =
+            new AbstractSpecificTypeConverter<Byte, Short>(Byte.class, Short.class) {
                 @Override
                 protected Short toOutbound(Byte value) {
                     return (short)value;
@@ -50,7 +53,8 @@ public class SqliteTypeMappers {
                 }
             };
 
-    public static void install(FieldTypeMappingRegistrar registrar) {
+    @Override
+    public void install(FieldTypeMappingRegistrar registrar) {
         DATE_TYPE_MAPPER.install(registrar);
         BYTE_TYPE_MAPPER.install(registrar);
         BOOLEAN_TYPE_MAPPER.install(registrar);

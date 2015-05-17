@@ -1,6 +1,5 @@
 package com.slimgears.slimrepo.example;
 
-import android.graphics.Rect;
 import android.os.Bundle;
 
 import com.slimgears.slimrepo.core.interfaces.RepositoryService;
@@ -68,8 +67,7 @@ public class ApplicationTest {
                                 .setLastName("Twain")
                                 .setAge(40)
                                 .setCountry(countryFrance)
-                                .setStatus(status)
-                                .setRect(new Rect(-10, -20, 10, 20)));
+                                .setStatus(status));
             }
         });
 
@@ -87,7 +85,5 @@ public class ApplicationTest {
         Assert.assertEquals("France", users[0].getCountry().getName());
         Assert.assertEquals(1, users[0].getStatus().getInt("Integer"));
         Assert.assertEquals("test", users[0].getStatus().getString("String"));
-        Assert.assertEquals(-10, users[0].getRect().left);
-        Assert.assertEquals(10, users[0].getRect().right);
     }
 }

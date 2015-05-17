@@ -78,7 +78,7 @@ public class SqliteOrmServiceProvider extends AbstractSqliteOrmServiceProvider {
 
     @Override
     protected void onMapFieldTypes(FieldTypeMappingRegistrar registrar) {
-        super.onMapFieldTypes(registrar);
         installTypeMappings(registrar, new ParcelableTypeMappingInstaller());
+        super.onMapFieldTypes(registrar);
     }
 }

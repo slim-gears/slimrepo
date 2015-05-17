@@ -13,7 +13,7 @@ import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
  * <File Description>
  */
 @GenerateRepository(version = 1, name = "UserDatabase")
-@OrmProvider(value = SqliteOrmServiceProvider.class, typeMappings = {TypeMappings.class})
+@OrmProvider(SqliteOrmServiceProvider.class)
 public interface UserRepository extends Repository {
     EntitySet<UserEntity> users();
     EntitySet<CountryEntity> countries();

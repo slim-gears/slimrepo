@@ -2,6 +2,7 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal;
 
+import com.slimgears.slimrepo.core.internal.converters.TypeMappers;
 import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMapper;
 import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMappingInstaller;
 import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMappingRegistrar;
@@ -28,7 +29,7 @@ public abstract class AbstractOrmServiceProvider implements OrmServiceProvider {
     }
 
     protected FieldTypeMappingRegistrar createTypeMappingRegistrar() {
-        return new DefaultFieldTypeMapper();
+        return new com.slimgears.slimrepo.core.internal.converters.DefaultFieldTypeMapper();
     }
 
     protected void onMapFieldTypes(FieldTypeMappingRegistrar registrar) {

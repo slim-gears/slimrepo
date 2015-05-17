@@ -1,6 +1,6 @@
 // Copyright 2015 Denis Itskovich
 // Refer to LICENSE.txt for license details
-package com.slimgears.slimrepo.core.internal;
+package com.slimgears.slimrepo.core.internal.converters;
 
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMapper;
@@ -56,28 +56,6 @@ public class DefaultFieldTypeMapper implements FieldTypeMapper, FieldTypeMapping
         }
     }
 
-    private static final TypeConverter DEFAULT_CONVERTER = new TypeConverter() {
-        @Override
-        public Object toEntityType(Field field, Object value) {
-            return value;
-        }
-
-        @Override
-        public Object fromEntityType(Field field, Object value) {
-            return value;
-        }
-
-        @Override
-        public Class getOutboundType(Field field) {
-            return field.metaInfo().getValueType();
-        }
-
-        @Override
-        public Class getInboundType(Field field) {
-            return getOutboundType(field);
-        }
-    };
-
     class MatcherConverterEntry {
         public final Matcher matcher;
         public final TypeConverter converter;
@@ -125,12 +103,22 @@ public class DefaultFieldTypeMapper implements FieldTypeMapper, FieldTypeMapping
         matcherConverterEntries.add(new MatcherConverterEntry(matcher, converter));
     }
 
+    @Override
+    public void registerNotConvertibleTypes(Iterable<Class> types) {
+        for (Class c : types) {
+            registerConverter(c, EmptyTypeConverter.INSTANCE);
+        }
+    }
+
     @SuppressWarnings("unchecked")
     private <T> TypeConverter<T> getConverter(Field<?, T> field) {
         for (MatcherConverterEntry entry : matcherConverterEntries) {
             if (entry.matcher.match(field)) return entry.converter;
         }
 
-        return DEFAULT_CONVERTER;
+        throw new RuntimeException(
+                "Type converter for type " +
+                field.metaInfo().getValueType().getSimpleName() +
+                " is not registered");
     }
 }

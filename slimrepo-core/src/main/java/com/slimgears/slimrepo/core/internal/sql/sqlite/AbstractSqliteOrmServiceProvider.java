@@ -13,12 +13,12 @@ import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlStatementBuilder;
 public abstract class AbstractSqliteOrmServiceProvider extends AbstractSqlOrmServiceProvider {
     @Override
     protected SqlStatementBuilder.SyntaxProvider createSyntaxProvider() {
-        return new SqliteSyntaxProvider(this);
+        return new SqliteSyntaxProvider(getFieldTypeMapperRegistrar());
     }
 
     @Override
     protected void onMapFieldTypes(FieldTypeMappingRegistrar registrar) {
+        SqliteTypeMappers.INSTANCE.install(registrar);
         super.onMapFieldTypes(registrar);
-        SqliteTypeMappers.install(registrar);
     }
 }

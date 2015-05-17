@@ -2,6 +2,7 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.prototype.generated;
 
+import com.slimgears.slimrepo.core.interfaces.fields.BlobField;
 import com.slimgears.slimrepo.core.interfaces.fields.RelationalField;
 import com.slimgears.slimrepo.core.prototype.AbstractUserEntity;
 import com.slimgears.slimrepo.core.interfaces.entities.Entity;
@@ -13,12 +14,13 @@ import com.slimgears.slimrepo.core.interfaces.fields.ComparableField;
 import com.slimgears.slimrepo.core.interfaces.fields.StringField;
 import com.slimgears.slimrepo.core.internal.AbstractEntityType;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
     static class MetaType extends AbstractEntityType<Integer, UserEntity> {
         public MetaType() {
-            super("UserEntity", UserEntity.class, UserId, UserFirstName, UserLastName, LastVisitDate, Role, AccountStatus);
+            super("UserEntity", UserEntity.class, UserId, UserFirstName, UserLastName, LastVisitDate, Role, AccountStatus, Comments);
         }
 
         @Override
@@ -34,7 +36,8 @@ public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
                     lookup.getValue(UserLastName),
                     lookup.getValue(LastVisitDate),
                     lookup.getValue(Role),
-                    lookup.getValue(AccountStatus));
+                    lookup.getValue(AccountStatus),
+                    lookup.getValue(Comments));
         }
 
         @Override
@@ -45,7 +48,8 @@ public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
                     .putValue(UserLastName, entity.getUserLastName())
                     .putValue(LastVisitDate, entity.getLastVisitDate())
                     .putValue(Role, entity.getRole())
-                    .putValue(AccountStatus, entity.getAccountStatus());
+                    .putValue(AccountStatus, entity.getAccountStatus())
+                    .putValue(Comments, entity.getComments());
         }
 
         @Override
@@ -60,19 +64,21 @@ public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
     public static final ComparableField<UserEntity, Date> LastVisitDate = Fields.comparableField("lastVisitDate", Date.class, true);
     public static final RelationalField<UserEntity, RoleEntity> Role = Fields.relationalField("role", RoleEntity.EntityMetaType, true);
     public static final ComparableField<UserEntity, AccountStatus> AccountStatus = Fields.comparableField("accountStatus", AccountStatus.class, true);
+    public static final BlobField<UserEntity, ArrayList> Comments = Fields.blobField("comments", ArrayList.class, true);
     public static final EntityType<Integer, UserEntity> EntityMetaType = new MetaType();
 
     private UserEntity() {
 
     }
 
-    public UserEntity(int userId, String userFirstName, String userLastName, Date lastVisitDate, RoleEntity role, AccountStatus accountStatus) {
+    public UserEntity(int userId, String userFirstName, String userLastName, Date lastVisitDate, RoleEntity role, AccountStatus accountStatus, ArrayList comments) {
         this.userId = userId;
         this.userFirstName = userFirstName;
         this.userLastName = userLastName;
         this.lastVisitDate = lastVisitDate;
         this.accountStatus = accountStatus;
         this.role = role;
+        this.comments = comments;
     }
 
     @Override
@@ -110,6 +116,11 @@ public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
 
         public Builder accountStatus(AccountStatus accountStatus) {
             model.setAccountStatus(accountStatus);
+            return this;
+        }
+
+        public Builder comments(ArrayList<String> comments) {
+            model.setComments(comments);
             return this;
         }
 
@@ -177,6 +188,15 @@ public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
 
     public UserEntity setAccountStatus(AccountStatus accountStatus) {
         this.accountStatus = accountStatus;
+        return this;
+    }
+
+    public ArrayList getComments() {
+        return this.comments;
+    }
+
+    public UserEntity setComments(ArrayList<String> comments) {
+        this.comments = comments;
         return this;
     }
 }
