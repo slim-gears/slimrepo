@@ -1,0 +1,33 @@
+apply plugin: 'com.jfrog.bintray'
+
+if (project.hasProperty('bintrayUser') && project.hasProperty('bintrayKey')) {
+    bintray {
+        user = bintrayUser
+        key = bintrayKey
+        publications = ['maven'] //When uploading Maven-based publication files
+        dryRun = false //Whether to run this as dry-run, without deploying
+        publish = true //If version should be auto published after an upload
+
+        pkg {
+            repo = rootProject.name
+            name = project.name
+            userOrg = bintrayOrg //An optional organization name when the repo belongs to one of the user's orgs
+            websiteUrl = bintrayWebsiteUrl
+            issueTrackerUrl = bintrayIssueTrackerUrl
+            vcsUrl = bintrayVcsUrl
+            licenses = ['Apache-2.0']
+            publicDownloadNumbers = bintrayPublicDownloadNumbers
+            desc = project.ext.pkg_desc
+            labels = project.ext.pkg_labels
+            version {
+                name = project.version //Bintray logical version name
+//                mavenCentralSync {
+//                    sync = true //Optional (true by default). Determines whether to sync the version to Maven Central.
+//                    user = sonatypeUser //OSS user token
+//                    password = sonatypePassword //OSS user password
+//                    close = '1' //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
+//                }
+            }
+        }
+    }
+}

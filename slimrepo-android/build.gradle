@@ -15,7 +15,6 @@ apply plugin: 'com.android.library'
 apply plugin: 'org.robolectric'
 apply plugin: 'maven-publish'
 apply plugin: 'idea'
-apply plugin: 'com.jfrog.bintray'
 
 android {
     compileSdkVersion 22
@@ -84,27 +83,7 @@ robolectric {
     }
 }
 
-if (hasProperty('bintrayUser') && hasProperty('bintrayKey')) {
-    bintray {
-        user = bintrayUser
-        key = bintrayKey
-        publications = ['maven'] //When uploading Maven-based publication files
-        dryRun = false //Whether to run this as dry-run, without deploying
-        publish = true //If version should be auto published after an upload
-        pkg {
-            repo = bintrayRepo
-            name = 'slimrepo-android'
-            userOrg = bintrayOrg //An optional organization name when the repo belongs to one of the user's orgs
-            desc = 'Slim Repository Android Core Library'
-            websiteUrl = bintrayWebsiteUrl
-            issueTrackerUrl = bintrayIssueTrackerUrl
-            vcsUrl = bintrayVcsUrl
-            licenses = ['Apache-2.0']
-            labels = ['android','java','orm','sqlite']
-            publicDownloadNumbers = bintrayPublicDownloadNumbers
-            version {
-                name = project.version //Bintray logical version name
-            }
-        }
-    }
-}
+ext.pkg_desc = 'Slim Repository Android Core Library'
+ext.pkg_labels = ['android','java','orm','sqlite']
+
+apply from: '../bintray-publish.gradle'

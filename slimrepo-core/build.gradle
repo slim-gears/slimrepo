@@ -1,7 +1,6 @@
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 apply plugin: 'idea'
-apply plugin: 'com.jfrog.bintray'
 
 configurations {
     testOutput.extendsFrom (testCompile)
@@ -48,30 +47,10 @@ publishing {
     }
 }
 
-if (hasProperty('bintrayUser') && hasProperty('bintrayKey')) {
-    bintray {
-        user = bintrayUser
-        key = bintrayKey
-        publications = ['maven'] //When uploading Maven-based publication files
-        dryRun = false //Whether to run this as dry-run, without deploying
-        publish = true //If version should be auto published after an upload
-        pkg {
-            repo = bintrayRepo
-            name = 'slimrepo-core'
-            userOrg = bintrayOrg //An optional organization name when the repo belongs to one of the user's orgs
-            desc = 'Slim Repository Core Library'
-            websiteUrl = bintrayWebsiteUrl
-            issueTrackerUrl = bintrayIssueTrackerUrl
-            vcsUrl = bintrayVcsUrl
-            licenses = ['Apache-2.0']
-            labels = ['java','orm','sqlite']
-            publicDownloadNumbers = bintrayPublicDownloadNumbers
-            version {
-                name = project.version //Bintray logical version name
-            }
-        }
-    }
-}
+ext.pkg_desc = 'Slim Repository Core Library'
+ext.pkg_labels = ['java','orm','sqlite']
+
+apply from: '../bintray-publish.gradle'
 
 artifacts {
     testOutput testJar
