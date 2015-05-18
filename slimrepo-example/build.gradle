@@ -45,11 +45,8 @@ robolectric {
 }
 
 dependencies {
-//    compile 'com.slimgears.slimrepo:slimrepo-android:0.7.0'
-//    apt 'com.slimgears.slimrepo:slimrepo-apt:0.7.0'
-
-    compile project(':slimrepo-android')
-    apt project(':slimrepo-apt')
+    compile 'com.slimgears.slimrepo:slimrepo-android:0.8.0'
+    apt 'com.slimgears.slimrepo:slimrepo-apt:0.8.0'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.0.5-beta'
