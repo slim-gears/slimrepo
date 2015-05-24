@@ -35,9 +35,7 @@ public abstract class AbstractSqlOrmServiceProvider extends AbstractOrmServicePr
         return createStatementBuilder(syntaxProvider, predicateBuilder);
     }
 
-    protected SqlStatementBuilder createStatementBuilder(SqlStatementBuilder.SyntaxProvider syntaxProvider, SqlStatementBuilder.PredicateBuilder predicateBuilder) {
-        return new DefaultSqlStatementBuilder(predicateBuilder, syntaxProvider);
-    }
+    protected abstract SqlStatementBuilder createStatementBuilder(SqlStatementBuilder.SyntaxProvider syntaxProvider, SqlStatementBuilder.PredicateBuilder predicateBuilder);
 
     protected SqlStatementBuilder.PredicateBuilder createPredicateBuilder(SqlStatementBuilder.SyntaxProvider syntaxProvider) {
         return new SqlPredicateBuilder(syntaxProvider);

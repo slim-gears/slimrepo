@@ -4,7 +4,6 @@ import com.google.common.base.Joiner;
 import com.slimgears.slimrepo.android.core.SqliteOrmServiceProvider;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.internal.interfaces.RepositoryModel;
-import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommand;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlSessionServiceProvider;
 import com.slimgears.slimrepo.core.prototype.UserRepository;
 import com.slimgears.slimrepo.core.prototype.generated.GeneratedUserRepository;
@@ -24,8 +23,6 @@ import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.any;
 
@@ -52,53 +49,7 @@ public class MigrationsTest {
         }
     };
 
-    private static final SqlCommand.Parameters EMPTY_PARAMETERS = new SqlCommand.Parameters() {
-        private final Map<String, String> map = new HashMap<>();
-        private final String[] values = {};
-
-        @Override
-        public String add(String parameter) {
-            throw new RuntimeException("Not implemented");
-        }
-
-        @Override
-        public int getCount() {
-            return 0;
-        }
-
-        @Override
-        public Map<String, String> getMap() {
-            return map;
-        }
-
-        @Override
-        public String[] getValues() {
-            return values;
-        }
-    };
     private SqliteOrmServiceProvider ormServiceProvider;
-
-    static class ResourceCommand implements SqlCommand {
-        private final String statement;
-
-        ResourceCommand(String name) {
-            try {
-                statement = Joiner.on("\n").join(IOUtils.readLines(ResourceCommand.class.getResourceAsStream(name)));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        @Override
-        public String getStatement() {
-            return statement;
-        }
-
-        @Override
-        public Parameters getParameters() {
-            return EMPTY_PARAMETERS;
-        }
-    }
 
     @Before
     public void initTest() {
@@ -144,8 +95,13 @@ public class MigrationsTest {
             @Override
             public boolean matches(Object item) {
                 UserRepositoryService repoService = (UserRepositoryService)item;
-                try (UserRepository repo = repoService.open()) {
-                    return matcher.matches(repo);
+                UserRepository repo = repoService.open();
+                try {
+                    try {
+                        return matcher.matches(repo);
+                    } finally {
+                        repo.close();
+                    }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -160,6 +116,10 @@ public class MigrationsTest {
 
     private void createTestDb(String scriptName) throws IOException {
         SqlSessionServiceProvider sessionServiceProvider = (SqlSessionServiceProvider)ormServiceProvider.createSessionServiceProvider(EMPTY_MODEL);
-        sessionServiceProvider.getExecutor().execute(new ResourceCommand(scriptName));
+        sessionServiceProvider.getExecutor().execute(loadScriptFromResource(scriptName));
+    }
+
+    private String loadScriptFromResource(String scriptName) throws IOException {
+        return Joiner.on("\n").join(IOUtils.readLines(MigrationsTest.class.getResourceAsStream(scriptName)));
     }
 }

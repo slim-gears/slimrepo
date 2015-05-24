@@ -2,11 +2,10 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal.sql.interfaces;
 
+import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
 import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
-import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
-import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMappingRegistrar;
 import com.slimgears.slimrepo.core.internal.interfaces.RepositoryModel;
 import com.slimgears.slimrepo.core.internal.query.DeleteQueryParams;
 import com.slimgears.slimrepo.core.internal.query.InsertQueryParams;
@@ -21,8 +20,10 @@ public interface SqlStatementBuilder {
     interface SyntaxProvider {
         String qualifiedFieldName(Field<?, ?> field);
         String simpleFieldName(Field<?, ?> field);
+        String simpleFieldName(String name);
         String typeName(Field<?, ?> field);
         String tableName(EntityType<?, ?> entityType);
+        String tableName(String name);
         String databaseName(RepositoryModel repositoryModel);
         String parameterReference(int index, String name);
         <T> String valueToString(Field<?, T> field, T value);
@@ -40,6 +41,9 @@ public interface SqlStatementBuilder {
     <TKey, TEntity extends Entity<TKey>> String updateStatement(UpdateQueryParams<TKey, TEntity> params, SqlCommand.Parameters sqlParams);
     <TKey, TEntity extends Entity<TKey>> String deleteStatement(DeleteQueryParams<TKey, TEntity> params, SqlCommand.Parameters sqlParams);
     <TKey, TEntity extends Entity<TKey>> String insertStatement(InsertQueryParams<TKey, TEntity> params, SqlCommand.Parameters sqlParams);
-    <TKey, TEntity extends Entity<TKey>> String createTableStatement(EntityType<TKey, TEntity> entityType);
-    <TKey, TEntity extends Entity<TKey>> String dropTableStatement(EntityType<TKey, TEntity> entityType);
+
+    String copyData(String fromTable, SqlDatabaseScheme.TableScheme toTable, Iterable<String> fieldNames);
+    String cloneTableStatement(String existingTableName, String newTableName);
+    String createTableStatement(SqlDatabaseScheme.TableScheme tableScheme);
+    String dropTableStatement(String tableName);
 }

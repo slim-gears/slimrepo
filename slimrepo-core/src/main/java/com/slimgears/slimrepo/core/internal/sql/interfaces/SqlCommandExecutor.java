@@ -12,7 +12,7 @@ import java.io.IOException;
  * <File Description>
  */
 public interface SqlCommandExecutor {
-    long count(SqlCommand command) throws IOException;
-    <T> CloseableIterator<FieldValueLookup<T>> select(SqlCommand command) throws IOException;
-    void execute(SqlCommand command) throws IOException;
+    long count(String statement, String... parameters) throws IOException;
+    <T> CloseableIterator<FieldValueLookup<T>> select(String statement, String... parameters) throws IOException;
+    void execute(String statement, String... parameters) throws IOException;
 }

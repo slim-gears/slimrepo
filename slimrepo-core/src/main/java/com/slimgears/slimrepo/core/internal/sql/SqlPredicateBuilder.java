@@ -26,7 +26,7 @@ import java.util.Map;
  * Created by Denis on 11-Apr-15
  * <File Description>
  */
-public class SqlPredicateBuilder implements SqlStatementBuilder.PredicateBuilder {
+class SqlPredicateBuilder implements SqlStatementBuilder.PredicateBuilder {
     private static final Map<PredicateType, String> OPERATOR_FORMATS = new HashMap<>();
     private static final Map<PredicateType, String> ARGUMENT_FORMATS = new HashMap<>();
 

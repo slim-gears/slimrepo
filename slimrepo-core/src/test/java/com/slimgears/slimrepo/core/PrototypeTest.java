@@ -14,10 +14,12 @@ import com.slimgears.slimrepo.core.internal.interfaces.RepositoryCreator;
 import com.slimgears.slimrepo.core.internal.interfaces.RepositoryModel;
 import com.slimgears.slimrepo.core.internal.interfaces.SessionServiceProvider;
 import com.slimgears.slimrepo.core.internal.interfaces.TransactionProvider;
+import com.slimgears.slimrepo.core.internal.sql.AbstractSqlSchemeProvider;
 import com.slimgears.slimrepo.core.internal.sql.AbstractSqlSessionServiceProvider;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommand;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommandExecutor;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlOrmServiceProvider;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlSchemeProvider;
 import com.slimgears.slimrepo.core.internal.sql.sqlite.AbstractSqliteOrmServiceProvider;
 import com.slimgears.slimrepo.core.prototype.UserRepository;
 import com.slimgears.slimrepo.core.prototype.generated.AccountStatus;
@@ -33,6 +35,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.mockito.Answers;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -64,6 +67,7 @@ public class PrototypeTest {
 
     private SessionServiceProvider sessionServiceProviderMock;
     private SqlOrmServiceProvider ormServiceProviderMock;
+    private SqlSchemeProvider schemeProviderMock;
     private List<String> sqlStatements;
 
     class TracingAnswer<T> implements Answer<T> {
@@ -102,6 +106,8 @@ public class PrototypeTest {
             }
         };
 
+        schemeProviderMock = Mockito.mock(AbstractSqlSchemeProvider.class, Answers.CALLS_REAL_METHODS);
+
         sessionServiceProviderMock = new AbstractSqlSessionServiceProvider(ormServiceProviderMock) {
             @Override
             protected SqlCommandExecutor createCommandExecutor() {
@@ -112,13 +118,18 @@ public class PrototypeTest {
             protected TransactionProvider createTransactionProvider() {
                 return transactionProviderMock;
             }
+
+            @Override
+            protected SqlSchemeProvider createSchemeProvider() {
+                return schemeProviderMock;
+            }
         };
 
-        Mockito.when(executorMock.select(Matchers.any(SqlCommand.class)))
+        Mockito.when(executorMock.select(Matchers.any(String.class), Matchers.any(String[].class)))
                 .thenAnswer(answer(rowsMock(10)));
-        Mockito.when(executorMock.count(Matchers.any(SqlCommand.class)))
+        Mockito.when(executorMock.count(Matchers.any(String.class), Matchers.any(String[].class)))
                 .thenAnswer(answer(0));
-        Mockito.doAnswer(answer(null)).when(executorMock).execute(Matchers.any(SqlCommand.class));
+        Mockito.doAnswer(answer(null)).when(executorMock).execute(Matchers.any(String.class), Matchers.any(String[].class));
     }
 
     @Test
@@ -134,7 +145,7 @@ public class PrototypeTest {
                         .count();
             }
         });
-        Mockito.verify(executorMock).count(Matchers.any(SqlCommand.class));
+        Mockito.verify(executorMock).count(Matchers.any(String.class), Matchers.any(String[].class));
         assertSqlEquals("query-count-users.sql");
     }
 
@@ -159,7 +170,7 @@ public class PrototypeTest {
                         .toArray();
             }
         });
-        Mockito.verify(executorMock).select(Matchers.any(SqlCommand.class));
+        Mockito.verify(executorMock).select(Matchers.any(String.class), Matchers.any(String[].class));
         assertSqlEquals("query-users.sql");
     }
 
@@ -174,7 +185,7 @@ public class PrototypeTest {
                         .count();
             }
         });
-        Mockito.verify(executorMock).count(Matchers.any(SqlCommand.class));
+        Mockito.verify(executorMock).count(Matchers.any(String.class), Matchers.any(String[].class));
         assertSqlEquals("query-count-related-field.sql");
     }
 
@@ -198,7 +209,7 @@ public class PrototypeTest {
                         .toArray();
             }
         });
-        Mockito.verify(executorMock).select(Matchers.any(SqlCommand.class));
+        Mockito.verify(executorMock).select(Matchers.any(String.class), Matchers.any(String[].class));
         assertSqlEquals("query-related-field.sql");
     }
 
@@ -212,7 +223,7 @@ public class PrototypeTest {
                         .selectToMap(UserEntity.UserFirstName, UserEntity.UserLastName);
             }
         });
-        Mockito.verify(executorMock).select(Matchers.any(SqlCommand.class));
+        Mockito.verify(executorMock).select(Matchers.any(String.class), Matchers.any(String[].class));
         assertSqlEquals("query-selected-to-map.sql");
     }
 
@@ -228,8 +239,28 @@ public class PrototypeTest {
                         .execute();
             }
         });
-        Mockito.verify(executorMock).execute(Matchers.any(SqlCommand.class));
+        Mockito.verify(executorMock).execute(Matchers.any(String.class), Matchers.any(String[].class));
         assertSqlEquals("update-fields.sql");
+    }
+
+    @Test
+    public void upgradeWhenFieldAdded() throws IOException {
+        Assert.fail("Test not implemented");
+    }
+
+    @Test
+    public void upgradeWhenFieldDeleted() throws IOException {
+        Assert.fail("Test not implemented");
+    }
+
+    @Test
+    public void upgradeWhenTableAdded() throws IOException {
+        Assert.fail("Test not implemented");
+    }
+
+    @Test
+    public void upgradeWhenTableDeleted() throws IOException {
+        Assert.fail("Test not implemented");
     }
 
     @Test
@@ -262,7 +293,7 @@ public class PrototypeTest {
                 return users;
             }
         });
-        Mockito.verify(executorMock, times(19)).select(Matchers.any(SqlCommand.class));
+        Mockito.verify(executorMock, times(19)).select(Matchers.any(String.class), Matchers.any(String[].class));
         assertSqlEquals("query-predicates.sql");
     }
 
