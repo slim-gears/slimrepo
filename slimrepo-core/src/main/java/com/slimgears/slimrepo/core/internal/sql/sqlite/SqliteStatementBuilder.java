@@ -337,14 +337,16 @@ class SqliteStatementBuilder implements SqlStatementBuilder {
     private String columnConstraints(SqlDatabaseScheme.FieldScheme field) {
         if (field.isAutoIncremented()) return "PRIMARY KEY ASC";
         if (field.isPrimaryKey()) return "PRIMARY KEY";
-        if (field.isForeignKey()) return foreignKeyConstraint((RelationalField)field);
+        if (field.isForeignKey()) return foreignKeyConstraint(field);
         if (field.isNotNull()) return "NOT NULL";
         return "";
     }
 
-    private String foreignKeyConstraint(RelationalField field) {
-        EntityType relatedEntityType = field.metaInfo().getRelatedEntityType();
-        return "REFERENCES " + syntaxProvider.tableName(relatedEntityType) + " (" + syntaxProvider.simpleFieldName(relatedEntityType.getKeyField()) + ")";
+    private String foreignKeyConstraint(SqlDatabaseScheme.FieldScheme field) {
+        SqlDatabaseScheme.TableScheme relatedTable = field.getRelatedForeignField().getTable();
+        String relatedTableName = relatedTable.getName();
+        String relatedKeyFieldName = relatedTable.getKeyField().getName();
+        return "REFERENCES " + syntaxProvider.tableName(relatedTableName) + " (" + syntaxProvider.simpleFieldName(relatedKeyFieldName) + ")";
     }
 
     private boolean isAutoIncremented(EntityType entityType, Field field) {

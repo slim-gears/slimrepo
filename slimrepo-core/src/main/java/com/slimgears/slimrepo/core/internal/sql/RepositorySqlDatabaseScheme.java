@@ -119,8 +119,7 @@ class RepositorySqlDatabaseScheme implements SqlDatabaseScheme {
         this.syntaxProvider = syntaxProvider;
         this.repositoryModel = repositoryModel;
         for (EntityType<?, ?> entityType : repositoryModel.getEntityTypes()) {
-            TableScheme tableScheme = new EntityTypeTableScheme<>(entityType);
-            tableSchemeMap.put(entityType, tableScheme);
+            addTable(entityType);
         }
     }
 
@@ -140,14 +139,18 @@ class RepositorySqlDatabaseScheme implements SqlDatabaseScheme {
     }
 
     private <TKey, TEntity extends Entity<TKey>> TableScheme getTableScheme(EntityType<TKey, TEntity> entityType) {
-        if (tableSchemeMap.containsKey(entityType)) {
-            return tableSchemeMap.get(entityType);
+        return tableSchemeMap.get(entityType);
+    }
+
+    private void addTable(EntityType<?, ?> entityType) {
+        if (tableSchemeMap.containsKey(entityType)) return;
+
+        for (RelationalField<?, ?> relatedEntityType : entityType.getRelationalFields()) {
+            addTable(relatedEntityType.metaInfo().getRelatedEntityType());
         }
 
         TableScheme tableScheme = new EntityTypeTableScheme<>(entityType);
         tableSchemeMap.put(entityType, tableScheme);
         nameToTableSchemeMap.put(tableScheme.getName(), tableScheme);
-
-        return tableScheme;
     }
 }

@@ -23,6 +23,7 @@ import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import static org.hamcrest.CoreMatchers.any;
 
@@ -40,7 +41,7 @@ public class MigrationsTest {
 
         @Override
         public int getVersion() {
-            return 0;
+            return 1;
         }
 
         @Override
@@ -120,6 +121,11 @@ public class MigrationsTest {
     }
 
     private String loadScriptFromResource(String scriptName) throws IOException {
-        return Joiner.on("\n").join(IOUtils.readLines(MigrationsTest.class.getResourceAsStream(scriptName)));
+        InputStream stream = ClassLoader.getSystemResourceAsStream(scriptName);
+        try {
+            return Joiner.on("\n").join(IOUtils.readLines(stream));
+        } finally {
+            stream.close();
+        }
     }
 }

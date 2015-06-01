@@ -1,9 +1,10 @@
 // Copyright 2015 Denis Itskovich
 // Refer to LICENSE.txt for license details
-package com.slimgears.slimrepo.core;
+package com.slimgears.slimrepo.core.internal.sql;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.slimgears.slimrepo.core.interfaces.RepositoryService;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
@@ -14,10 +15,8 @@ import com.slimgears.slimrepo.core.internal.interfaces.RepositoryCreator;
 import com.slimgears.slimrepo.core.internal.interfaces.RepositoryModel;
 import com.slimgears.slimrepo.core.internal.interfaces.SessionServiceProvider;
 import com.slimgears.slimrepo.core.internal.interfaces.TransactionProvider;
-import com.slimgears.slimrepo.core.internal.sql.AbstractSqlSchemeProvider;
-import com.slimgears.slimrepo.core.internal.sql.AbstractSqlSessionServiceProvider;
-import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommand;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommandExecutor;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlDatabaseScheme;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlOrmServiceProvider;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlSchemeProvider;
 import com.slimgears.slimrepo.core.internal.sql.sqlite.AbstractSqliteOrmServiceProvider;
@@ -35,7 +34,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.mockito.Answers;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -54,6 +52,8 @@ import java.util.List;
 import static com.slimgears.slimrepo.core.interfaces.conditions.Conditions.and;
 import static com.slimgears.slimrepo.core.interfaces.conditions.Conditions.or;
 import static com.slimgears.slimrepo.core.utilities.Dates.addDays;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 /**
@@ -70,6 +70,11 @@ public class PrototypeTest {
     private SqlSchemeProvider schemeProviderMock;
     private List<String> sqlStatements;
 
+    private SqlDatabaseSchemeProxy databaseSchemeMock;
+    private SqlDatabaseSchemeProxy repositorySchemeMock;
+
+    private final RepositoryModel repositoryModel = GeneratedUserRepository.Model.Instance;
+
     class TracingAnswer<T> implements Answer<T> {
         private final T answer;
 
@@ -79,9 +84,8 @@ public class PrototypeTest {
 
         @Override
         public T answer(InvocationOnMock invocation) throws Throwable {
-            SqlCommand command = (SqlCommand)invocation.getArguments()[0];
-            String sql = command.getStatement();
-            Object[] params = command.getParameters().getValues();
+            String sql = (String)invocation.getArguments()[0];
+            Iterable<Object> params = Iterables.skip(Arrays.asList(invocation.getArguments()), 1);
             String sqlWithParams = sql + "\n{Params: [" + Joiner.on(", ").join(params) + "]}";
             sqlStatements.add(sqlWithParams);
             System.out.println(sqlWithParams);
@@ -106,7 +110,13 @@ public class PrototypeTest {
             }
         };
 
-        schemeProviderMock = Mockito.mock(AbstractSqlSchemeProvider.class, Answers.CALLS_REAL_METHODS);
+        repositorySchemeMock = new SqlDatabaseSchemeProxy(getDatabaseScheme(repositoryModel));
+        databaseSchemeMock = new SqlDatabaseSchemeProxy(getDatabaseScheme(repositoryModel));
+
+        schemeProviderMock = Mockito.mock(SqlSchemeProvider.class);
+
+        when(schemeProviderMock.getModelScheme(repositoryModel)).thenReturn(repositorySchemeMock);
+        when(schemeProviderMock.getDatabaseScheme()).thenReturn(databaseSchemeMock);
 
         sessionServiceProviderMock = new AbstractSqlSessionServiceProvider(ormServiceProviderMock) {
             @Override
@@ -125,11 +135,14 @@ public class PrototypeTest {
             }
         };
 
-        Mockito.when(executorMock.select(Matchers.any(String.class), Matchers.any(String[].class)))
+        when(executorMock.select(Matchers.any(String.class), Matchers.<String>anyVararg()))
                 .thenAnswer(answer(rowsMock(10)));
-        Mockito.when(executorMock.count(Matchers.any(String.class), Matchers.any(String[].class)))
+        when(executorMock.count(Matchers.any(String.class), Matchers.<String>anyVararg()))
                 .thenAnswer(answer(0));
-        Mockito.doAnswer(answer(null)).when(executorMock).execute(Matchers.any(String.class), Matchers.any(String[].class));
+
+        doAnswer(answer(null))
+                .when(executorMock)
+                .execute(Matchers.any(String.class), Matchers.<String>anyVararg());
     }
 
     @Test
@@ -145,7 +158,7 @@ public class PrototypeTest {
                         .count();
             }
         });
-        Mockito.verify(executorMock).count(Matchers.any(String.class), Matchers.any(String[].class));
+        Mockito.verify(executorMock).count(Matchers.any(String.class), Matchers.<String>anyVararg());
         assertSqlEquals("query-count-users.sql");
     }
 
@@ -170,7 +183,7 @@ public class PrototypeTest {
                         .toArray();
             }
         });
-        Mockito.verify(executorMock).select(Matchers.any(String.class), Matchers.any(String[].class));
+        Mockito.verify(executorMock).select(Matchers.any(String.class), Matchers.<String>anyVararg());
         assertSqlEquals("query-users.sql");
     }
 
@@ -185,16 +198,16 @@ public class PrototypeTest {
                         .count();
             }
         });
-        Mockito.verify(executorMock).count(Matchers.any(String.class), Matchers.any(String[].class));
+        Mockito.verify(executorMock).count(Matchers.any(String.class), Matchers.<String>anyVararg());
         assertSqlEquals("query-count-related-field.sql");
     }
 
     @Test
     public void repositoryCreation() throws IOException {
         RepositoryCreator creator = ormServiceProviderMock
-                .createSessionServiceProvider(GeneratedUserRepository.Model.Instance)
+                .createSessionServiceProvider(repositoryModel)
                 .getRepositoryCreator();
-        creator.createRepository(GeneratedUserRepository.Model.Instance);
+        creator.createRepository(repositoryModel);
         assertSqlEquals("create-tables.sql");
     }
 
@@ -209,7 +222,7 @@ public class PrototypeTest {
                         .toArray();
             }
         });
-        Mockito.verify(executorMock).select(Matchers.any(String.class), Matchers.any(String[].class));
+        Mockito.verify(executorMock).select(Matchers.any(String.class), Matchers.<String>anyVararg());
         assertSqlEquals("query-related-field.sql");
     }
 
@@ -223,7 +236,7 @@ public class PrototypeTest {
                         .selectToMap(UserEntity.UserFirstName, UserEntity.UserLastName);
             }
         });
-        Mockito.verify(executorMock).select(Matchers.any(String.class), Matchers.any(String[].class));
+        Mockito.verify(executorMock).select(Matchers.any(String.class), Matchers.<String>anyVararg());
         assertSqlEquals("query-selected-to-map.sql");
     }
 
@@ -239,28 +252,40 @@ public class PrototypeTest {
                         .execute();
             }
         });
-        Mockito.verify(executorMock).execute(Matchers.any(String.class), Matchers.any(String[].class));
+        Mockito.verify(executorMock).execute(Matchers.any(String.class), Matchers.<String>anyVararg());
         assertSqlEquals("update-fields.sql");
     }
 
     @Test
-    public void upgradeWhenFieldAdded() throws IOException {
-        Assert.fail("Test not implemented");
+    public void repositoryUpgradeWhenFieldAdded() throws IOException {
+        databaseSchemeMock.hideFields(UserEntity.EntityMetaType, UserEntity.Comments);
+        assertUpgrade("upgrade-field-added.sql");
     }
 
     @Test
-    public void upgradeWhenFieldDeleted() throws IOException {
-        Assert.fail("Test not implemented");
+    public void repositoryUpgradeWhenFieldDeleted() throws IOException {
+        repositorySchemeMock.hideFields(UserEntity.EntityMetaType, UserEntity.Comments);
+        assertUpgrade("upgrade-field-deleted.sql");
     }
 
     @Test
-    public void upgradeWhenTableAdded() throws IOException {
-        Assert.fail("Test not implemented");
+    public void repositoryUpgradeWhenTableAdded() throws IOException {
+        databaseSchemeMock.hideTables(UserEntity.EntityMetaType);
+        assertUpgrade("upgrade-table-added.sql");
     }
 
     @Test
-    public void upgradeWhenTableDeleted() throws IOException {
-        Assert.fail("Test not implemented");
+    public void repositoryUpgradeWhenTableDeleted() throws IOException {
+        repositorySchemeMock.hideTables(UserEntity.EntityMetaType);
+        assertUpgrade("upgrade-table-deleted.sql");
+    }
+
+    private void assertUpgrade(String sqlScriptName) throws IOException {
+        RepositoryCreator creator = ormServiceProviderMock
+                .createSessionServiceProvider(repositoryModel)
+                .getRepositoryCreator();
+        creator.upgradeRepository(repositoryModel);
+        assertSqlEquals(sqlScriptName);
     }
 
     @Test
@@ -293,7 +318,7 @@ public class PrototypeTest {
                 return users;
             }
         });
-        Mockito.verify(executorMock, times(19)).select(Matchers.any(String.class), Matchers.any(String[].class));
+        Mockito.verify(executorMock, times(19)).select(Matchers.any(String.class), Matchers.<String>anyVararg());
         assertSqlEquals("query-predicates.sql");
     }
 
@@ -361,5 +386,16 @@ public class PrototypeTest {
                 Assert.assertEquals("Line mismatch", expectedLines.get(i), actualLines.get(i));
             }
         }
+    }
+
+    private SqlDatabaseScheme getDatabaseScheme(RepositoryModel model) {
+        SqlSchemeProvider provider = new AbstractSqlSchemeProvider(ormServiceProviderMock.getSyntaxProvider()) {
+            @Override
+            public SqlDatabaseScheme getDatabaseScheme() {
+                return null;
+            }
+        };
+
+        return provider.getModelScheme(model);
     }
 }
