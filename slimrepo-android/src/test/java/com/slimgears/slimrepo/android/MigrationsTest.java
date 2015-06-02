@@ -4,21 +4,19 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
 import com.slimgears.slimrepo.android.core.SqliteOrmServiceProvider;
 import com.slimgears.slimrepo.android.core.SqliteSchemeProvider;
+import com.slimgears.slimrepo.core.interfaces.Repository;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.internal.interfaces.RepositoryModel;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlDatabaseScheme;
 import com.slimgears.slimrepo.core.prototype.UserRepository;
 import com.slimgears.slimrepo.core.prototype.generated.GeneratedUserRepository;
 import com.slimgears.slimrepo.core.prototype.generated.GeneratedUserRepositoryService;
+import com.slimgears.slimrepo.core.prototype.generated.UserEntity;
 import com.slimgears.slimrepo.core.prototype.generated.UserRepositoryService;
 
 import org.apache.commons.io.IOUtils;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.junit.Assert;
 import org.junit.Before;
@@ -30,10 +28,11 @@ import org.robolectric.annotation.Config;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+
+import static com.slimgears.slimrepo.android.RepositoryMatchers.all;
+import static com.slimgears.slimrepo.android.RepositoryMatchers.isEmpty;
+import static com.slimgears.slimrepo.android.SchemeMatchers.matchTableFieldNames;
+import static com.slimgears.slimrepo.android.SchemeMatchers.matchTableNames;
 
 /**
  * Created by Denis on 18-May-15.
@@ -67,12 +66,26 @@ public class MigrationsTest {
 
     @Test
     public void fieldRemovalMigration() throws IOException {
-        testMigration("field-removal-migration-db.sql");
+        testMigration("field-removal-migration-db.sql",
+//                countEquals(UserEntity.EntityMetaType, 8),
+//                countEquals(RoleEntity.EntityMetaType, 4),
+                isEmpty(UserEntity.EntityMetaType, UserEntity.UserFirstName.isNull()),
+                isEmpty(UserEntity.EntityMetaType, UserEntity.UserLastName.isNull()),
+                isEmpty(UserEntity.EntityMetaType, UserEntity.LastVisitDate.isNull()),
+                isEmpty(UserEntity.EntityMetaType, UserEntity.Role.isNull()),
+                isEmpty(UserEntity.EntityMetaType, UserEntity.AccountStatus.isNull()));
     }
 
     @Test
     public void fieldAdditionMigration() throws IOException {
-        testMigration("field-addition-migration-db.sql");
+        testMigration("field-addition-migration-db.sql",
+//                countEquals(UserEntity.EntityMetaType, 8),
+//                countEquals(RoleEntity.EntityMetaType, 4),
+                isEmpty(UserEntity.EntityMetaType, UserEntity.UserFirstName.isNull()),
+                isEmpty(UserEntity.EntityMetaType, UserEntity.UserLastName.isNotNull()),
+                isEmpty(UserEntity.EntityMetaType, UserEntity.LastVisitDate.isNull()),
+                isEmpty(UserEntity.EntityMetaType, UserEntity.Role.isNull()),
+                isEmpty(UserEntity.EntityMetaType, UserEntity.AccountStatus.isNull()));
     }
 
     @Test
@@ -99,10 +112,15 @@ public class MigrationsTest {
     }
 
     @SafeVarargs
-    private final void testMigration(String dbScriptName, Matcher<SqlDatabaseScheme>... sqlDatabaseSchemeMatchers) throws IOException {
+    private final void testMigration(String dbScriptName, Matcher<Repository>... matchers) throws IOException {
         createTestDatabase(dbScriptName).close();
         UserRepositoryService repositoryService = createRepositoryService();
-        repositoryService.open().close();
+        UserRepository repository = repositoryService.open();
+        try {
+            Assert.assertThat(repository, all(matchers));
+        } finally {
+            repository.close();
+        }
     }
 
     @SafeVarargs
@@ -116,13 +134,11 @@ public class MigrationsTest {
         }
     }
 
+    @SafeVarargs
     private final void assertScheme(SQLiteDatabase database, Matcher<SqlDatabaseScheme>... sqlDatabaseSchemeMatchers) {
         SqliteSchemeProvider schemeProvider = new SqliteSchemeProvider(ormServiceProvider.getSyntaxProvider(), database);
         SqlDatabaseScheme scheme = schemeProvider.getDatabaseScheme();
-
-        for (Matcher<SqlDatabaseScheme> matcher : sqlDatabaseSchemeMatchers) {
-            Assert.assertThat(scheme, matcher);
-        }
+        Assert.assertThat(scheme, all(sqlDatabaseSchemeMatchers));
     }
 
     private SQLiteDatabase createTestDatabase(final String dbScriptName) {
@@ -147,107 +163,9 @@ public class MigrationsTest {
             }
         };
 
-        SQLiteDatabase database = helper.getReadableDatabase();
-        return database;
+        return helper.getReadableDatabase();
     }
 
-    private Matcher<SqlDatabaseScheme> matchTableFieldNames(final String tableName, final String... fieldNames) {
-        return new BaseMatcher<SqlDatabaseScheme>() {
-            private Collection<String> actualFieldNames;
-            private Collection<String> expectedFieldNames;
-
-            @Override
-            public boolean matches(Object item) {
-                SqlDatabaseScheme scheme = (SqlDatabaseScheme)item;
-                SqlDatabaseScheme.TableScheme table = scheme.getTable(tableName);
-                if (table == null) {
-                    return false;
-                }
-                actualFieldNames = table.getFields().keySet();
-                expectedFieldNames = Arrays.asList(fieldNames);
-                return Iterables.elementsEqual(actualFieldNames, expectedFieldNames);
-            }
-
-            @Override
-            public void describeTo(Description description) {
-                if (actualFieldNames == null) {
-                    description.appendText(String.format("table '%s' not found", tableName));
-                    return;
-                }
-                description.appendValueList("fields [", ", ", "]\n", expectedFieldNames);
-                description.appendValueList("Actual: fields [", ", ", "]\n", actualFieldNames);
-            }
-        };
-    }
-
-    private Matcher<SqlDatabaseScheme> matchTableNames(final String... tableNames) {
-        return new BaseMatcher<SqlDatabaseScheme>() {
-            private Set<String> notExistingTables;
-            private Set<String> notExpectedTables;
-
-            @Override
-            public boolean matches(Object item) {
-                Set<String> actualTableNames = ((SqlDatabaseScheme)item).getTables().keySet();
-                Set<String> expectedTableNames = new HashSet<>(Arrays.asList(tableNames));
-                notExistingTables = Sets.difference(expectedTableNames, actualTableNames);
-                notExpectedTables = Sets.difference(actualTableNames, expectedTableNames);
-
-                return notExpectedTables.isEmpty() && notExistingTables.isEmpty();
-            }
-
-            @Override
-            public void describeTo(Description description) {
-                description.appendValueList("Tables [", ", ", "]\n", Arrays.asList(tableNames));
-                description.appendText("Actual:\n");
-
-                if (!notExistingTables.isEmpty()) {
-                    description.appendValueList("Tables [", ", ", "] were not found\n", notExistingTables);
-                }
-
-                if (!notExpectedTables.isEmpty()) {
-                    description.appendValueList("Tables [", ", ", "] were not expected\n", notExpectedTables);
-                }
-            }
-        };
-    }
-
-    private Matcher<UserRepositoryService> matchModel(EntityType<?, ?> entityType) {
-        return new BaseMatcher<UserRepositoryService>() {
-            @Override
-            public boolean matches(Object item) {
-                return false;
-            }
-
-            @Override
-            public void describeTo(Description description) {
-
-            }
-        };
-    }
-
-    private Matcher<UserRepositoryService> matchRepository(final Matcher<UserRepository> matcher) {
-        return new BaseMatcher<UserRepositoryService>() {
-            @Override
-            public boolean matches(Object item) {
-                UserRepositoryService repoService = (UserRepositoryService)item;
-                UserRepository repo = repoService.open();
-                try {
-                    try {
-                        return matcher.matches(repo);
-                    } finally {
-                        repo.close();
-                    }
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            @Override
-            public void describeTo(Description description) {
-                matcher.describeTo(description);
-            }
-        };
-    }
 
     private String loadScriptFromResource(String scriptName) throws IOException {
         InputStream stream = ClassLoader.getSystemResourceAsStream(scriptName);
