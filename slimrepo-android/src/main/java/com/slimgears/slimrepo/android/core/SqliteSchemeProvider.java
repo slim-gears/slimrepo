@@ -8,16 +8,21 @@ import com.slimgears.slimrepo.core.internal.sql.SimpleSqlDatabaseScheme;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlDatabaseScheme;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlStatementBuilder;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by Denis on 21-May-15.
  */
 public class SqliteSchemeProvider extends AbstractSqlSchemeProvider {
+    private final static Set<String> IGNORED_TABLES = new HashSet<>(Arrays.asList("android_metadata"));
+
     private final static String SQL_GET_TABLE_NAMES = "SELECT `name` FROM `sqlite_master`";
-    private final static String SQL_GET_FOREIGN_KEY_LIST = "PRAGMA foreign_key_list(?)";
-    private final static String SQL_GET_TABLE_SCHEME = "PRAGMA table_info(?)";
+    private final static String SQL_GET_FOREIGN_KEY_LIST = "PRAGMA foreign_key_list(`%s`)";
+    private final static String SQL_GET_TABLE_SCHEME = "PRAGMA table_info(`%s`)";
 
     private final static int TABLE_SCHEME_FIELD_NAME = 1;
     private final static int TABLE_SCHEME_FIELD_TYPE = 2;
@@ -46,7 +51,10 @@ public class SqliteSchemeProvider extends AbstractSqlSchemeProvider {
 
             while (!cursor.isAfterLast()) {
                 String tableName = cursor.getString(0);
-                getTableScheme(tableSchemeMap, tableName);
+                if (!IGNORED_TABLES.contains(tableName)) {
+                    getTableScheme(tableSchemeMap, tableName);
+                }
+                cursor.moveToNext();
             }
 
             return tableSchemeMap.values().toArray(new SqlDatabaseScheme.TableScheme[tableSchemeMap.size()]);
@@ -61,7 +69,7 @@ public class SqliteSchemeProvider extends AbstractSqlSchemeProvider {
         }
 
         SimpleSqlDatabaseScheme.SimpleTableScheme tableScheme = new SimpleSqlDatabaseScheme.SimpleTableScheme(tableName);
-        Cursor cursor = database.rawQuery(SQL_GET_TABLE_SCHEME, new String[]{tableName});
+        Cursor cursor = database.rawQuery(String.format(SQL_GET_TABLE_SCHEME, tableName), null);
 
         try {
             cursor.moveToFirst();
@@ -86,7 +94,7 @@ public class SqliteSchemeProvider extends AbstractSqlSchemeProvider {
     }
 
     private Map<String, SqlDatabaseScheme.FieldScheme> getForeignFields(Map<String, SqlDatabaseScheme.TableScheme> tableSchemeMap, String tableName) {
-        Cursor cursor = database.rawQuery(SQL_GET_FOREIGN_KEY_LIST, new String[]{tableName});
+        Cursor cursor = database.rawQuery(String.format(SQL_GET_FOREIGN_KEY_LIST, tableName), null);
 
         try {
             cursor.moveToFirst();
