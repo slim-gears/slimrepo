@@ -92,6 +92,7 @@ class SqlRepositoryCreator implements RepositoryCreator {
         String backupTableName = targetTableName + "_Backup";
         dropTable(backupTableName);
         cloneTable(targetTableName, backupTableName);
+        dropTable(targetTableName);
         createTable(tableDiff.getNewTableScheme());
 
         Set<String> oldFieldNames = tableDiff.getOldTableScheme().getFields().keySet();

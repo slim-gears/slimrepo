@@ -225,7 +225,7 @@ class SqliteStatementBuilder implements SqlStatementBuilder {
     }
 
     private String selectFromClause(Iterable<String> fieldNames, String fromTable) {
-        return "SELECT " + Joiner.on(", ").join(transform(fieldNames, FUNC_SIMPLE_FIELD_NAME)) +
+        return "SELECT " + Joiner.on(", ").join(transform(fieldNames, FUNC_SIMPLE_FIELD_NAME)) + " " +
                 "FROM " + syntaxProvider.tableName(fromTable);
     }
 

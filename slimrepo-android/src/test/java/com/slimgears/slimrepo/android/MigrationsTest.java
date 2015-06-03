@@ -13,6 +13,7 @@ import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlDatabaseScheme;
 import com.slimgears.slimrepo.core.prototype.UserRepository;
 import com.slimgears.slimrepo.core.prototype.generated.GeneratedUserRepository;
 import com.slimgears.slimrepo.core.prototype.generated.GeneratedUserRepositoryService;
+import com.slimgears.slimrepo.core.prototype.generated.RoleEntity;
 import com.slimgears.slimrepo.core.prototype.generated.UserEntity;
 import com.slimgears.slimrepo.core.prototype.generated.UserRepositoryService;
 
@@ -25,11 +26,13 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowLog;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 import static com.slimgears.slimrepo.android.RepositoryMatchers.all;
+import static com.slimgears.slimrepo.android.RepositoryMatchers.countEquals;
 import static com.slimgears.slimrepo.android.RepositoryMatchers.isEmpty;
 import static com.slimgears.slimrepo.android.SchemeMatchers.matchTableFieldNames;
 import static com.slimgears.slimrepo.android.SchemeMatchers.matchTableNames;
@@ -61,14 +64,17 @@ public class MigrationsTest {
 
     @Before
     public void initTest() {
+//        ShadowLog.setupLogging();
+        ShadowLog.stream = System.out;
+//        ShadowLog.setLoggable(SqliteOrmServiceProvider.class.getSimpleName(), Log.INFO);
         ormServiceProvider = new SqliteOrmServiceProvider(RuntimeEnvironment.application);
     }
 
     @Test
     public void fieldRemovalMigration() throws IOException {
         testMigration("field-removal-migration-db.sql",
-//                countEquals(UserEntity.EntityMetaType, 8),
-//                countEquals(RoleEntity.EntityMetaType, 4),
+                countEquals(UserEntity.EntityMetaType, 8),
+                countEquals(RoleEntity.EntityMetaType, 5),
                 isEmpty(UserEntity.EntityMetaType, UserEntity.UserFirstName.isNull()),
                 isEmpty(UserEntity.EntityMetaType, UserEntity.UserLastName.isNull()),
                 isEmpty(UserEntity.EntityMetaType, UserEntity.LastVisitDate.isNull()),
@@ -79,8 +85,8 @@ public class MigrationsTest {
     @Test
     public void fieldAdditionMigration() throws IOException {
         testMigration("field-addition-migration-db.sql",
-//                countEquals(UserEntity.EntityMetaType, 8),
-//                countEquals(RoleEntity.EntityMetaType, 4),
+                countEquals(UserEntity.EntityMetaType, 8),
+                countEquals(RoleEntity.EntityMetaType, 4),
                 isEmpty(UserEntity.EntityMetaType, UserEntity.UserFirstName.isNull()),
                 isEmpty(UserEntity.EntityMetaType, UserEntity.UserLastName.isNotNull()),
                 isEmpty(UserEntity.EntityMetaType, UserEntity.LastVisitDate.isNull()),
@@ -142,10 +148,11 @@ public class MigrationsTest {
     }
 
     private SQLiteDatabase createTestDatabase(final String dbScriptName) {
-        SQLiteOpenHelper helper = new SQLiteOpenHelper(RuntimeEnvironment.application, EMPTY_MODEL.getName(), null, EMPTY_MODEL.getVersion()) {
+        SQLiteOpenHelper helper = new SQLiteOpenHelper(RuntimeEnvironment.application, EMPTY_MODEL.getName() + ".db", null, EMPTY_MODEL.getVersion()) {
             @Override
             public void onCreate(SQLiteDatabase db) {
                 try {
+                    System.out.println("Creating database: " + db.getPath());
                     String script = loadScriptFromResource(dbScriptName);
                     String[] statements = script.split(";");
                     for (String sql : statements) {
