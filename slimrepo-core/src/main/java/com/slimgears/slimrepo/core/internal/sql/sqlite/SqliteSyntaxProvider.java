@@ -2,7 +2,6 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal.sql.sqlite;
 
-import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMappingRegistrar;
 import com.slimgears.slimrepo.core.internal.interfaces.RepositoryModel;
@@ -18,13 +17,13 @@ public class SqliteSyntaxProvider extends AbstractSqlSyntaxProvider {
     }
 
     @Override
-    public String simpleFieldName(Field field) {
-        return '`' + field.metaInfo().getName() + '`';
+    public String simpleFieldName(String name) {
+        return '`' + name + '`';
     }
 
     @Override
-    public String tableName(EntityType entityType) {
-        return '`' + entityType.getName() + '`';
+    public String tableName(String name) {
+        return '`' + name + '`';
     }
 
     @Override

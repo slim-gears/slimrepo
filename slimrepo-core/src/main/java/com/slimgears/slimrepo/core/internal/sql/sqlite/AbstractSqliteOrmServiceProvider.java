@@ -17,6 +17,11 @@ public abstract class AbstractSqliteOrmServiceProvider extends AbstractSqlOrmSer
     }
 
     @Override
+    protected SqlStatementBuilder createStatementBuilder(SqlStatementBuilder.SyntaxProvider syntaxProvider, SqlStatementBuilder.PredicateBuilder predicateBuilder) {
+        return new SqliteStatementBuilder(predicateBuilder, syntaxProvider);
+    }
+
+    @Override
     protected void onMapFieldTypes(FieldTypeMappingRegistrar registrar) {
         SqliteTypeMappers.INSTANCE.install(registrar);
         super.onMapFieldTypes(registrar);

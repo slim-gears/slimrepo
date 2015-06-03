@@ -11,6 +11,7 @@ import com.slimgears.slimrepo.core.internal.interfaces.TransactionProvider;
 import com.slimgears.slimrepo.core.internal.sql.AbstractSqlSessionServiceProvider;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommandExecutor;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlOrmServiceProvider;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlSchemeProvider;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -42,6 +43,11 @@ public class SqliteSessionServiceProvider extends AbstractSqlSessionServiceProvi
     @Override
     protected <TKey, TEntity extends Entity<TKey>> SessionEntityServiceProvider<TKey, TEntity> createEntityServiceProvider(EntityType<TKey, TEntity> entityType) {
         return new SqliteSessionEntityServiceProvider<>(database, this, entityType);
+    }
+
+    @Override
+    protected SqlSchemeProvider createSchemeProvider() {
+        return new SqliteSchemeProvider(getOrmServiceProvider().getSyntaxProvider(), database);
     }
 
     @Override

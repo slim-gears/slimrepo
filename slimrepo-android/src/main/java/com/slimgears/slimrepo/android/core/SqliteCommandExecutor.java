@@ -7,11 +7,10 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
+import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.internal.interfaces.CloseableIterator;
 import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMapper;
-import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommand;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommandExecutor;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlOrmServiceProvider;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlSessionServiceProvider;
@@ -30,16 +29,9 @@ public class SqliteCommandExecutor implements SqlCommandExecutor {
     private final FieldTypeMapper fieldTypeMapper;
     private final SqlStatementBuilder.SyntaxProvider syntaxProvider;
 
-    class CursorIteratorAdapter<T> implements CloseableIterator<FieldValueLookup<T>> {
-        private final Cursor cursor;
+    class CursorIteratorAdapter<T> extends CursorCloseableIterator<FieldValueLookup<T>> {
         private Map<Field, Integer> fieldToIndexMap = new HashMap<>();
         private final Lookup lookup = new Lookup();
-        private boolean needsMove;
-
-        @Override
-        public void close() throws IOException {
-            cursor.close();
-        }
 
         class Lookup implements FieldValueLookup<T> {
             @Override
@@ -85,26 +77,12 @@ public class SqliteCommandExecutor implements SqlCommandExecutor {
         }
 
         public CursorIteratorAdapter(Cursor cursor) {
-            cursor.moveToFirst();
-            needsMove = false;
-            this.cursor = cursor;
+            super(cursor);
         }
 
         @Override
-        public boolean hasNext() {
-            return !((needsMove && cursor.isLast()) || cursor.isAfterLast());
-        }
-
-        @Override
-        public FieldValueLookup<T> next() {
-            if (needsMove) cursor.moveToNext();
-            needsMove = true;
+        protected FieldValueLookup<T> getItem(Cursor cursor) {
             return lookup;
-        }
-
-        @Override
-        public void remove() {
-
         }
     }
 
@@ -116,22 +94,18 @@ public class SqliteCommandExecutor implements SqlCommandExecutor {
     }
 
     @Override
-    public long count(SqlCommand command) throws IOException {
-        return DatabaseUtils.longForQuery(database, command.getStatement(), command.getParameters().getValues());
+    public long count(String statement, String... params) throws IOException {
+        return DatabaseUtils.longForQuery(database, statement, params);
     }
 
     @Override
-    public <T> CloseableIterator<FieldValueLookup<T>> select(final SqlCommand command) throws IOException {
-        String sql = command.getStatement();
-        String[] params = command.getParameters().getValues();
-        @SuppressLint("Recycle") Cursor cursor = database.rawQuery(sql, params);
+    public <T> CloseableIterator<FieldValueLookup<T>> select(final String statement, final String... params) throws IOException {
+        @SuppressLint("Recycle") Cursor cursor = database.rawQuery(statement, params);
         return new CursorIteratorAdapter<>(cursor);
     }
 
     @Override
-    public void execute(SqlCommand command) throws IOException {
-        String sql = command.getStatement();
-        String[] params = command.getParameters().getValues();
-        database.execSQL(sql, params);
+    public void execute(String statement, String... params) throws IOException {
+        database.execSQL(statement, params);
     }
 }

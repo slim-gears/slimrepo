@@ -10,6 +10,7 @@ import com.slimgears.slimrepo.core.internal.interfaces.SessionEntityServiceProvi
 import com.slimgears.slimrepo.core.internal.interfaces.TransactionProvider;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommandExecutor;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlOrmServiceProvider;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlSchemeProvider;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlSessionServiceProvider;
 
 import java.io.IOException;
@@ -22,6 +23,7 @@ public abstract class AbstractSqlSessionServiceProvider extends AbstractSessionS
     private SqlCommandExecutor sqlExecutor;
     private TransactionProvider transactionProvider;
     private SqlOrmServiceProvider ormServiceProvider;
+    private SqlSchemeProvider schemeProvider;
 
     public AbstractSqlSessionServiceProvider(SqlOrmServiceProvider serviceProvider) {
         this.ormServiceProvider = serviceProvider;
@@ -35,6 +37,7 @@ public abstract class AbstractSqlSessionServiceProvider extends AbstractSessionS
 
     protected abstract SqlCommandExecutor createCommandExecutor();
     protected abstract TransactionProvider createTransactionProvider();
+    protected abstract SqlSchemeProvider createSchemeProvider();
 
     @Override
     protected <TKey, TEntity extends Entity<TKey>> SessionEntityServiceProvider<TKey, TEntity> createEntityServiceProvider(EntityType<TKey, TEntity> entityType) {
@@ -53,6 +56,13 @@ public abstract class AbstractSqlSessionServiceProvider extends AbstractSessionS
         return transactionProvider != null
                 ? transactionProvider
                 : (transactionProvider = createTransactionProvider());
+    }
+
+    @Override
+    public SqlSchemeProvider getSchemeProvider() {
+        return schemeProvider != null
+                ? schemeProvider
+                : (schemeProvider = createSchemeProvider());
     }
 
     @Override

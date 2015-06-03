@@ -2,6 +2,7 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal.sql;
 
+import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMapper;
 import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMappingRegistrar;
@@ -62,5 +63,15 @@ public abstract class AbstractSqlSyntaxProvider implements SqlStatementBuilder.S
     @Override
     public String fieldAlias(Field<?, ?> field) {
         return '`' + rawFieldAlias(field) + '`';
+    }
+
+    @Override
+    public String simpleFieldName(Field field) {
+        return simpleFieldName(field.metaInfo().getName());
+    }
+
+    @Override
+    public String tableName(EntityType entityType) {
+        return tableName(entityType.getName());
     }
 }

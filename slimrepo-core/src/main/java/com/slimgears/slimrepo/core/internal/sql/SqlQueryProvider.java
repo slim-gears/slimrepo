@@ -46,7 +46,7 @@ public class SqlQueryProvider<TKey, TEntity extends Entity<TKey>> implements Que
         return new PreparedQuery<Void>() {
             @Override
             public Void execute() throws IOException {
-                getExecutor().execute(command);
+                getExecutor().execute(command.getStatement(), command.getParameters().getValues());
                 return null;
             }
         };
@@ -63,7 +63,7 @@ public class SqlQueryProvider<TKey, TEntity extends Entity<TKey>> implements Que
         return new PreparedQuery<CloseableIterator<FieldValueLookup<TEntity>>>() {
             @Override
             public CloseableIterator<FieldValueLookup<TEntity>> execute() throws IOException {
-                return getExecutor().select(command);
+                return getExecutor().select(command.getStatement(), command.getParameters().getValues());
             }
         };
     }
@@ -79,7 +79,7 @@ public class SqlQueryProvider<TKey, TEntity extends Entity<TKey>> implements Que
         return new PreparedQuery<Long>() {
             @Override
             public Long execute() throws IOException {
-                return getExecutor().count(command);
+                return getExecutor().count(command.getStatement(), command.getParameters().getValues());
             }
         };
     }
@@ -95,7 +95,7 @@ public class SqlQueryProvider<TKey, TEntity extends Entity<TKey>> implements Que
         return new PreparedQuery<Void>() {
             @Override
             public Void execute() throws IOException {
-                getExecutor().execute(command);
+                getExecutor().execute(command.getStatement(), command.getParameters().getValues());
                 return null;
             }
         };
@@ -112,7 +112,7 @@ public class SqlQueryProvider<TKey, TEntity extends Entity<TKey>> implements Que
         return new PreparedQuery<Void>() {
             @Override
             public Void execute() throws IOException {
-                getExecutor().execute(command);
+                getExecutor().execute(command.getStatement(), command.getParameters().getValues());
                 return null;
             }
         };
