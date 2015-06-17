@@ -43,8 +43,8 @@ repositories {
 **Step 3.** Add dependencies
 ```gradle
 dependencies {
-    compile 'com.slimgears.slimrepo:slimrepo-android:0.8.0'
-    apt 'com.slimgears.slimrepo:slimrepo-apt:0.8.0'
+    compile 'com.slimgears.slimrepo:slimrepo-android:0.9.0'
+    apt 'com.slimgears.slimrepo:slimrepo-apt:0.9.0'
 }
 
 ```
