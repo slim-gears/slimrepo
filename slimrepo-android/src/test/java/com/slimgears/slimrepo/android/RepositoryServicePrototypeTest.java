@@ -30,7 +30,7 @@ import static com.slimgears.slimrepo.core.utilities.Dates.addDays;
 import static com.slimgears.slimrepo.core.utilities.Dates.fromDate;
 
 @RunWith(RobolectricTestRunner.class)
-@Config(emulateSdk = 18, manifest=Config.NONE)
+@Config(sdk = 18, manifest=Config.NONE)
 public class RepositoryServicePrototypeTest {
     private UserRepositoryService repositoryService;
 
@@ -42,52 +42,46 @@ public class RepositoryServicePrototypeTest {
 
     @Test
     public void addEntitiesThenQuery() throws IOException {
-        repositoryService.update(new RepositoryService.UpdateAction<UserRepository>() {
-            @Override
-            public void execute(UserRepository repository) throws IOException {
-                UserEntity userJohnDoe = repository.users().add(UserEntity.builder()
-                        .userFirstName("John")
-                        .userLastName("Doe")
-                        .build());
-                UserEntity userJakeSmith = repository.users().add(UserEntity.builder()
-                        .userFirstName("Jake")
-                        .userLastName("Smith")
-                        .build());
-                RoleEntity roleUser = repository.roles().add(RoleEntity.builder()
-                        .roleDescription("User")
-                        .build());
-                RoleEntity roleAdmin = repository.roles().add(RoleEntity.builder()
-                        .roleDescription("Administrator")
-                        .build());
+        repositoryService.update(repository -> {
+            UserEntity userJohnDoe = repository.users().add(UserEntity.builder()
+                    .userFirstName("John")
+                    .userLastName("Doe")
+                    .build());
+            UserEntity userJakeSmith = repository.users().add(UserEntity.builder()
+                    .userFirstName("Jake")
+                    .userLastName("Smith")
+                    .build());
+            RoleEntity roleUser = repository.roles().add(RoleEntity.builder()
+                    .roleDescription("User")
+                    .build());
+            RoleEntity roleAdmin = repository.roles().add(RoleEntity.builder()
+                    .roleDescription("Administrator")
+                    .build());
 
-                repository.saveChanges();
+            repository.saveChanges();
 
-                Assert.assertEquals(1, userJohnDoe.getUserId());
-                Assert.assertEquals(2, userJakeSmith.getUserId());
+            Assert.assertEquals(1, userJohnDoe.getUserId());
+            Assert.assertEquals(2, userJakeSmith.getUserId());
 
-                Assert.assertEquals(1, roleUser.getRoleId());
-                Assert.assertEquals(2, roleAdmin.getRoleId());
-            }
+            Assert.assertEquals(1, roleUser.getRoleId());
+            Assert.assertEquals(2, roleAdmin.getRoleId());
         });
 
-        repositoryService.query(new RepositoryService.QueryAction<UserRepository, Object>() {
-            @Override
-            public Object execute(UserRepository repository) throws IOException {
-                UserEntity[] allUsers = repository.users().query().prepare().toArray();
+        repositoryService.query(repository -> {
+            UserEntity[] allUsers = repository.users().query().prepare().toArray();
 
-                Assert.assertNotNull(allUsers);
-                Assert.assertEquals(2, allUsers.length);
-                Assert.assertEquals("John", allUsers[0].getUserFirstName());
-                Assert.assertEquals("Smith", allUsers[1].getUserLastName());
+            Assert.assertNotNull(allUsers);
+            Assert.assertEquals(2, allUsers.length);
+            Assert.assertEquals("John", allUsers[0].getUserFirstName());
+            Assert.assertEquals("Smith", allUsers[1].getUserLastName());
 
-                RoleEntity[] allRoles = repository.roles().query().prepare().toArray();
+            RoleEntity[] allRoles = repository.roles().query().prepare().toArray();
 
-                Assert.assertNotNull(allRoles);
-                Assert.assertEquals(2, allRoles.length);
-                Assert.assertEquals("User", allRoles[0].getRoleDescription());
-                Assert.assertEquals("Administrator", allRoles[1].getRoleDescription());
-                return allUsers;
-            }
+            Assert.assertNotNull(allRoles);
+            Assert.assertEquals(2, allRoles.length);
+            Assert.assertEquals("User", allRoles[0].getRoleDescription());
+            Assert.assertEquals("Administrator", allRoles[1].getRoleDescription());
+            return allUsers;
         });
     }
 
@@ -276,28 +270,18 @@ public class RepositoryServicePrototypeTest {
     }
 
     private long queryUsersCountWhere(final Condition<UserEntity> condition) throws IOException {
-        return repositoryService.query(new RepositoryService.QueryAction<UserRepository, Long>() {
-            @Override
-            public Long execute(UserRepository repository) throws IOException {
-                return repository.users()
-                        .query()
-                        .where(condition)
-                        .prepare()
-                        .count();
-            }
-        });
+        return repositoryService.query(repository -> repository.users()
+                .query()
+                .where(condition)
+                .prepare()
+                .count());
     }
 
     private UserEntity[] queryUsersWhere(final Condition<UserEntity> condition) throws IOException {
-        return repositoryService.query(new RepositoryService.QueryAction<UserRepository, UserEntity[]>() {
-            @Override
-            public UserEntity[] execute(UserRepository repository) throws IOException {
-                return repository.users()
-                        .query()
-                        .where(condition)
-                        .prepare()
-                        .toArray();
-            }
-        });
+        return repositoryService.query(repository -> repository.users()
+                .query()
+                .where(condition)
+                .prepare()
+                .toArray());
     }
 }

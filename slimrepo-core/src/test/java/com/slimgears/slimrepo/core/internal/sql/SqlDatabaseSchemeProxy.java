@@ -31,24 +31,15 @@ class SqlDatabaseSchemeProxy implements SqlDatabaseScheme {
         hiddenTables.addAll(
                 Collections2.transform(
                         Arrays.asList(entityTypes),
-                        new Function<EntityType<?, ?>, String>() {
-                            @Override
-                            public String apply(EntityType<?, ?> entityType) {
-                                return entityType.getName();
-                            }
-                        }));
+                        EntityType::getName));
     }
 
-    public <TKey, TEntity extends Entity<TKey>> void hideFields(final EntityType<TKey, TEntity> entityType, Field<TEntity, ?>... fields) {
+    @SafeVarargs
+    public final <TKey, TEntity extends Entity<TKey>> void hideFields(final EntityType<TKey, TEntity> entityType, Field<TEntity, ?>... fields) {
         hiddenFields.addAll(
                 Collections2.transform(
                         Arrays.asList(fields),
-                        new Function<Field<TEntity, ?>, String>() {
-                            @Override
-                            public String apply(Field<TEntity, ?> field) {
-                                return fullFieldName(entityType.getName(), field.metaInfo().getName());
-                            }
-                        }));
+                        field -> fullFieldName(entityType.getName(), field.metaInfo().getName())));
     }
 
     private String fullFieldName(String tableName, String fieldName) {

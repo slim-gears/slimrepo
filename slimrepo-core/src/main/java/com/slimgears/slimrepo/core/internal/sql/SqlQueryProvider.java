@@ -37,84 +37,44 @@ public class SqlQueryProvider<TKey, TEntity extends Entity<TKey>> implements Que
 
     @Override
     public PreparedQuery<Void> prepareInsert(final Collection<TEntity> entities) {
-        final SqlCommand command = new SqlLazyCommand(getBuilder(), new SqlLazyCommand.CommandBuilder() {
-            @Override
-            public String buildCommand(SqlStatementBuilder sqlBuilder, SqlCommand.Parameters parameters) {
-                return sqlBuilder.insertStatement(new InsertQueryParams<>(entityType, entities), parameters);
-            }
-        });
-        return new PreparedQuery<Void>() {
-            @Override
-            public Void execute() throws IOException {
-                getExecutor().execute(command.getStatement(), command.getParameters().getValues());
-                return null;
-            }
+        final SqlCommand command = new SqlLazyCommand(getBuilder(), (sqlBuilder1, parameters) ->
+                sqlBuilder1.insertStatement(new InsertQueryParams<>(entityType, entities), parameters));
+        return () -> {
+            getExecutor().execute(command.getStatement(), command.getParameters().getValues());
+            return null;
         };
     }
 
     @Override
     public PreparedQuery<CloseableIterator<FieldValueLookup<TEntity>>> prepareSelect(final SelectQueryParams<TKey, TEntity> query) {
-        final SqlCommand command = new SqlLazyCommand(getBuilder(), new SqlLazyCommand.CommandBuilder() {
-            @Override
-            public String buildCommand(SqlStatementBuilder sqlBuilder, SqlCommand.Parameters parameters) {
-                return sqlBuilder.selectStatement(query, parameters);
-            }
-        });
-        return new PreparedQuery<CloseableIterator<FieldValueLookup<TEntity>>>() {
-            @Override
-            public CloseableIterator<FieldValueLookup<TEntity>> execute() throws IOException {
-                return getExecutor().select(command.getStatement(), command.getParameters().getValues());
-            }
-        };
+        final SqlCommand command = new SqlLazyCommand(getBuilder(), (sqlBuilder1, parameters) ->
+                sqlBuilder1.selectStatement(query, parameters));
+        return () -> getExecutor().select(command.getStatement(), command.getParameters().getValues());
     }
 
     @Override
     public PreparedQuery<Long> prepareCount(final SelectQueryParams<TKey, TEntity> query) {
-        final SqlCommand command = new SqlLazyCommand(getBuilder(), new SqlLazyCommand.CommandBuilder() {
-            @Override
-            public String buildCommand(SqlStatementBuilder sqlBuilder, SqlCommand.Parameters parameters) {
-                return sqlBuilder.countStatement(query, parameters);
-            }
-        });
-        return new PreparedQuery<Long>() {
-            @Override
-            public Long execute() throws IOException {
-                return getExecutor().count(command.getStatement(), command.getParameters().getValues());
-            }
-        };
+        final SqlCommand command = new SqlLazyCommand(getBuilder(), (sqlBuilder1, parameters) ->
+                sqlBuilder1.countStatement(query, parameters));
+        return () -> getExecutor().count(command.getStatement(), command.getParameters().getValues());
     }
 
     @Override
     public PreparedQuery<Void> prepareUpdate(final UpdateQueryParams<TKey, TEntity> query) {
-        final SqlCommand command = new SqlLazyCommand(getBuilder(), new SqlLazyCommand.CommandBuilder() {
-            @Override
-            public String buildCommand(SqlStatementBuilder sqlBuilder, SqlCommand.Parameters parameters) {
-                return sqlBuilder.updateStatement(query, parameters);
-            }
-        });
-        return new PreparedQuery<Void>() {
-            @Override
-            public Void execute() throws IOException {
-                getExecutor().execute(command.getStatement(), command.getParameters().getValues());
-                return null;
-            }
+        final SqlCommand command = new SqlLazyCommand(getBuilder(), (sqlBuilder1, parameters) -> sqlBuilder1.updateStatement(query, parameters));
+        return () -> {
+            getExecutor().execute(command.getStatement(), command.getParameters().getValues());
+            return null;
         };
     }
 
     @Override
     public PreparedQuery<Void> prepareDelete(final DeleteQueryParams<TKey, TEntity> query) {
-        final SqlCommand command = new SqlLazyCommand(getBuilder(), new SqlLazyCommand.CommandBuilder() {
-            @Override
-            public String buildCommand(SqlStatementBuilder sqlBuilder, SqlCommand.Parameters parameters) {
-                return sqlBuilder.deleteStatement(query, parameters);
-            }
-        });
-        return new PreparedQuery<Void>() {
-            @Override
-            public Void execute() throws IOException {
-                getExecutor().execute(command.getStatement(), command.getParameters().getValues());
-                return null;
-            }
+        final SqlCommand command = new SqlLazyCommand(getBuilder(), (sqlBuilder1, parameters) ->
+                sqlBuilder1.deleteStatement(query, parameters));
+        return () -> {
+            getExecutor().execute(command.getStatement(), command.getParameters().getValues());
+            return null;
         };
     }
 

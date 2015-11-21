@@ -40,7 +40,7 @@ public abstract class AnnotationProcessorBase extends AbstractProcessor {
 
     @Override
     public SourceVersion getSupportedSourceVersion() {
-        return SourceVersion.RELEASE_7;
+        return processingEnv.getSourceVersion();
     }
 
     protected abstract boolean processType(TypeElement typeElement) throws IOException;

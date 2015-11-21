@@ -123,21 +123,11 @@ public class RepositoryAnnotationProcessor extends AnnotationProcessorBase {
     }
 
     private Collection<TypeName> getTypeMappingsAttribute(OrmProvider provider) {
-        return TypeUtils.getTypesFromAnnotation(provider, new TypeUtils.AnnotationTypesGetter<OrmProvider>() {
-            @Override
-            public Class[] getTypes(OrmProvider annotation) throws MirroredTypesException {
-                return annotation.typeMappings();
-            }
-        });
+        return TypeUtils.getTypesFromAnnotation(provider, OrmProvider::typeMappings);
     }
 
     private TypeName getValueAttribute(OrmProvider annotation) {
-        return TypeUtils.getTypeFromAnnotation(annotation, new TypeUtils.AnnotationTypeGetter<OrmProvider>() {
-            @Override
-            public Class getType(OrmProvider annotation) throws MirroredTypeException {
-                return annotation.value();
-            }
-        });
+        return TypeUtils.getTypeFromAnnotation(annotation, OrmProvider::value);
     }
 
     private void addRepositoryServiceImplementationConstructors(final TypeSpec.Builder implementationBuilder, OrmProvider annotation) {
@@ -145,12 +135,7 @@ public class RepositoryAnnotationProcessor extends AnnotationProcessorBase {
         final TypeElement ormServiceProviderTypeElement = processingEnv.getElementUtils().getTypeElement(ormProviderClass.toString());
         Iterable<? extends Element> constructorElements = filter(
                 ormServiceProviderTypeElement.getEnclosedElements(),
-                new Predicate<Element>() {
-                    @Override
-                    public boolean apply(Element input) {
-                        return input.getKind() == ElementKind.CONSTRUCTOR;
-                    }
-                });
+                input -> input.getKind() == ElementKind.CONSTRUCTOR);
 
         for (Element element : constructorElements) {
             implementationBuilder.addMethod(createRepositoryServiceImplementationConstructor(ormServiceProviderTypeElement, (ExecutableElement)element));
@@ -180,20 +165,9 @@ public class RepositoryAnnotationProcessor extends AnnotationProcessorBase {
 
     private Iterable<ExecutableElement> getEntityGetterMethods(TypeElement element) {
         List<? extends Element> elements = element.getEnclosedElements();
-        Collection<ExecutableElement> methods = transform(
-                filter(elements, new Predicate<Element>() {
-                    @Override
-                    public boolean apply(Element input) {
-                        return (input instanceof ExecutableElement) &&
-                                RepositoryGenerator.isEntitySet(processingEnv.getTypeUtils(), ((ExecutableElement) input).getReturnType());
-                    }
-                }),
-                new Function<Element, ExecutableElement>() {
-                    @Override
-                    public ExecutableElement apply(Element input) {
-                        return (ExecutableElement)input;
-                    }
-                });
-        return methods;
+        return transform(
+                filter(elements, input -> (input instanceof ExecutableElement) &&
+                        RepositoryGenerator.isEntitySet(processingEnv.getTypeUtils(), ((ExecutableElement) input).getReturnType())),
+                input -> (ExecutableElement)input);
     }
 }

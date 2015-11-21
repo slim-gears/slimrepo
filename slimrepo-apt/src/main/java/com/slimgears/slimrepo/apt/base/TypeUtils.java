@@ -61,19 +61,9 @@ public class TypeUtils {
 
     public static <TAnnotation extends Annotation> Collection<TypeName> getTypesFromAnnotation(TAnnotation annotation, AnnotationTypesGetter<TAnnotation> getter) {
         try {
-            return Collections2.transform(Arrays.asList(getter.getTypes(annotation)), new Function<Class, TypeName>() {
-                @Override
-                public TypeName apply(Class input) {
-                    return TypeName.get(input);
-                }
-            });
+            return Collections2.transform(Arrays.asList(getter.getTypes(annotation)), TypeName::get);
         } catch (MirroredTypesException e) {
-            return Collections2.transform(e.getTypeMirrors(), new Function<TypeMirror, TypeName>() {
-                @Override
-                public TypeName apply(TypeMirror input) {
-                    return TypeName.get(input);
-                }
-            });
+            return Collections2.transform(e.getTypeMirrors(), TypeName::get);
         }
     }
 }

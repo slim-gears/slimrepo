@@ -127,23 +127,13 @@ public abstract class ClassGenerator<T extends ClassGenerator<T>> {
 
     protected TypeName[] toTypeNames(Type[] classes) {
         return Collections2
-                .transform(Arrays.asList(classes), new Function<Type, TypeName>() {
-                    @Override
-                    public TypeName apply(Type input) {
-                        return TypeName.get(input);
-                    }
-                })
+                .transform(Arrays.asList(classes), TypeName::get)
                 .toArray(new TypeName[classes.length]);
     }
 
     protected TypeName[] toTypeNames(TypeElement[] typeElements) {
         return Collections2
-                .transform(Arrays.asList(typeElements), new Function<TypeElement, TypeName>() {
-                    @Override
-                    public TypeName apply(TypeElement input) {
-                        return TypeName.get(input.asType());
-                    }
-                })
+                .transform(Arrays.asList(typeElements), input -> TypeName.get(input.asType()))
                 .toArray(new TypeName[typeElements.length]);
     }
 

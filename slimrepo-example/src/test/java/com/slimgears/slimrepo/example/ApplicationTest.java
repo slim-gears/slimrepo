@@ -20,7 +20,7 @@ import org.robolectric.annotation.Config;
 import java.io.IOException;
 
 @RunWith(RobolectricTestRunner.class)
-@Config(emulateSdk = 18, manifest=Config.NONE)
+@Config(sdk = 18, manifest=Config.NONE)
 public class ApplicationTest {
     @Test
     public void repositorySanityCheck() throws IOException {

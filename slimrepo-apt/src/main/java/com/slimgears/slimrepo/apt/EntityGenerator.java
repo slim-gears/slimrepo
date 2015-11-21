@@ -68,26 +68,9 @@ public class EntityGenerator extends DataModelGenerator {
         META_FIELD_BUILDER_MAP.put(TypeName.get(String.class), StringMetaFieldBuilder.INSTANCE);
     }
 
-    private static TypeUtils.AnnotationTypesGetter<ComparableSemantics> TYPES_FROM_COMPARABLE_SEMANTICS = new TypeUtils.AnnotationTypesGetter<ComparableSemantics>() {
-        @Override
-        public Class[] getTypes(ComparableSemantics annotation) throws MirroredTypesException {
-            return annotation.value();
-        }
-    };
-
-    private static TypeUtils.AnnotationTypesGetter<ValueSemantics> TYPES_FROM_VALUE_SEMANTICS = new TypeUtils.AnnotationTypesGetter<ValueSemantics>() {
-        @Override
-        public Class[] getTypes(ValueSemantics annotation) throws MirroredTypesException {
-            return annotation.value();
-        }
-    };
-
-    private static TypeUtils.AnnotationTypesGetter<BlobSemantics> TYPES_FROM_BLOB_SEMANTICS = new TypeUtils.AnnotationTypesGetter<BlobSemantics>() {
-        @Override
-        public Class[] getTypes(BlobSemantics annotation) throws MirroredTypesException {
-            return annotation.value();
-        }
-    };
+    private static TypeUtils.AnnotationTypesGetter<ComparableSemantics> TYPES_FROM_COMPARABLE_SEMANTICS = ComparableSemantics::value;
+    private static TypeUtils.AnnotationTypesGetter<ValueSemantics> TYPES_FROM_VALUE_SEMANTICS = ValueSemantics::value;
+    private static TypeUtils.AnnotationTypesGetter<BlobSemantics> TYPES_FROM_BLOB_SEMANTICS = BlobSemantics::value;
 
     static abstract class AbstractMetaFieldBuilder {
         public FieldSpec build(ClassName entityType, FieldInfo field) {
@@ -251,12 +234,7 @@ public class EntityGenerator extends DataModelGenerator {
                 .addCode("super($S, $T.class, ", getClassName(), getTypeName())
                 .addCode(Joiner
                         .on(", ")
-                        .join(transform(fields, new Function<FieldInfo, String>() {
-                            @Override
-                            public String apply(FieldInfo field) {
-                                return getMetaFieldName(field.name);
-                            }
-                        })))
+                        .join(transform(fields, field -> getMetaFieldName(field.name))))
                 .addCode(");\n")
                 .build())
             .addMethod(MethodSpec.methodBuilder("newInstance")
@@ -279,12 +257,7 @@ public class EntityGenerator extends DataModelGenerator {
                 .returns(entityType)
                 .addParameter(ParameterizedTypeName.get(ClassName.get(FieldValueLookup.class), entityType), "lookup")
                 .addCode("return new $T(\n", entityType)
-                .addCode(Joiner.on(",\n").join(transform(fields, new Function<FieldInfo, String>() {
-                    @Override
-                    public String apply(FieldInfo field) {
-                        return "    lookup.getValue(" + getMetaFieldName(field.name) + ")";
-                    }
-                })))
+                .addCode(Joiner.on(",\n").join(transform(fields, field -> "    lookup.getValue(" + getMetaFieldName(field.name) + ")")))
                 .addCode(");\n")
                 .build())
             .addMethod(MethodSpec.methodBuilder("entityToMap")
@@ -293,12 +266,7 @@ public class EntityGenerator extends DataModelGenerator {
                 .addParameter(entityType, "entity")
                 .addParameter(ParameterizedTypeName.get(ClassName.get(FieldValueMap.class), entityType), "map")
                 .addCode("map\n")
-                .addCode(Joiner.on("\n").join(transform(fields, new Function<FieldInfo, String>() {
-                    @Override
-                    public String apply(FieldInfo field) {
-                        return "    .putValue(" + getMetaFieldName(field.name) + ", entity." + getModelGetterName(field.name) + "())";
-                    }
-                })))
+                .addCode(Joiner.on("\n").join(transform(fields, field -> "    .putValue(" + getMetaFieldName(field.name) + ", entity." + getModelGetterName(field.name) + "())")))
                 .addCode(";\n")
                 .build())
             .build();
@@ -319,21 +287,11 @@ public class EntityGenerator extends DataModelGenerator {
 
     private FieldInfo findFieldByName(Iterable<FieldInfo> fields, String... names) {
         final Set<String> nameSet = new HashSet<>(Arrays.asList(names));
-        return find(fields, new Predicate<FieldInfo>() {
-            @Override
-            public boolean apply(FieldInfo field) {
-                return nameSet.contains(field.name);
-            }
-        });
+        return find(fields, field -> nameSet.contains(field.name));
     }
 
     private FieldInfo findAnnotatedField(Iterable<FieldInfo> fields, final Class annotationClass) {
-        return find(fields, new Predicate<FieldInfo>() {
-            @Override
-            public boolean apply(FieldInfo input) {
-                return input.element.getAnnotation(annotationClass) != null;
-            }
-        }, null);
+        return find(fields, input -> input.element.getAnnotation(annotationClass) != null, null);
     }
 
     private static TypeName box(TypeName type) {
