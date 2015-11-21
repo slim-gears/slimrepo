@@ -1,14 +1,12 @@
 buildscript {
     repositories {
         jcenter()
-        //mavenLocal()
         maven { url "https://plugins.gradle.org/m2/" }
         maven { url "https://jitpack.io" }
     }
 
     dependencies {
-        classpath 'com.github.slim-gears:gradle-aio:0.4.2'
-        //classpath 'com.slimgears.gradle-aio:gradle-aio:0.4-SNAPSHOT'
+        classpath 'com.github.slim-gears:gradle-aio:0.4.3'
     }
 }
 
