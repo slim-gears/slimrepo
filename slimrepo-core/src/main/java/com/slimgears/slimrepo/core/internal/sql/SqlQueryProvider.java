@@ -2,7 +2,6 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal.sql;
 
-import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimrepo.core.internal.interfaces.CloseableIterator;
@@ -17,14 +16,13 @@ import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommandExecutor;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlSessionServiceProvider;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlStatementBuilder;
 
-import java.io.IOException;
 import java.util.Collection;
 
 /**
  * Created by Denis on 13-Apr-15
  * <File Description>
  */
-public class SqlQueryProvider<TKey, TEntity extends Entity<TKey>> implements QueryProvider<TKey, TEntity> {
+public class SqlQueryProvider<TKey, TEntity> implements QueryProvider<TKey, TEntity> {
     protected final EntityType<TKey, TEntity> entityType;
     protected final SqlSessionServiceProvider serviceProvider;
     private SqlStatementBuilder sqlBuilder;

@@ -1,6 +1,5 @@
 package com.slimgears.slimrepo.core.internal;
 
-import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimrepo.core.internal.interfaces.CloseableIterator;
@@ -19,7 +18,7 @@ import java.util.Collection;
 /**
  * Created by Denis on 01-May-15.
  */
-public class AutoSessionEntityServiceProvider<TKey, TEntity extends Entity<TKey>>
+public class AutoSessionEntityServiceProvider<TKey, TEntity>
         extends AbstractSessionEntityServiceProvider<TKey, TEntity>
         implements QueryProvider<TKey, TEntity> {
     private final OrmServiceProvider ormServiceProvider;
@@ -27,6 +26,7 @@ public class AutoSessionEntityServiceProvider<TKey, TEntity extends Entity<TKey>
     private final EntityType<TKey, TEntity> entityType;
 
     public AutoSessionEntityServiceProvider(OrmServiceProvider ormServiceProvider, RepositoryModel repositoryModel, EntityType<TKey, TEntity> entityType) {
+        super(entityType);
         this.ormServiceProvider = ormServiceProvider;
         this.repositoryModel = repositoryModel;
         this.entityType = entityType;

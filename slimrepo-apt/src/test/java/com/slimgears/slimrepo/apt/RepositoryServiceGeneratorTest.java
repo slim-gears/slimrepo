@@ -35,12 +35,7 @@ public class RepositoryServiceGeneratorTest {
     }
 
     private static Iterable<JavaFileObject> fromResources(final String path, String[] files) {
-        return transform(asList(files), new Function<String, JavaFileObject>() {
-            @Override
-            public JavaFileObject apply(String input) {
-                return JavaFileObjects.forResource(path + '/' + input);
-            }
-        });
+        return transform(asList(files), input -> JavaFileObjects.forResource(path + '/' + input));
     }
 
     private void testAnnotationProcessing(AbstractProcessor processor, Iterable<JavaFileObject> inputs, Iterable<JavaFileObject> expectedOutputs) {
@@ -53,7 +48,7 @@ public class RepositoryServiceGeneratorTest {
     }
 
     @Test
-    public void entityGenerationTest() {
+    public void forAbstractEntities_shouldGenerate_concreteEntities() {
         testAnnotationProcessing(
                 new EntityAnnotationProcessor(),
                 inputFiles("AbstractRelatedEntity.java", "AbstractTestEntity.java"),
@@ -61,7 +56,15 @@ public class RepositoryServiceGeneratorTest {
     }
 
     @Test
-    public void repositoryGenerationTest() {
+    public void forExistingEntities_shouldGenerate_metaModel() {
+        testAnnotationProcessing(
+                new EntityAnnotationProcessor(),
+                inputFiles("ExistingEntity.java"),
+                expectedFiles("ExistingEntityMeta.java"));
+    }
+
+    @Test
+    public void forRepositoryInterface_shouldGenerate_implementationAndRepositoryService() {
         testAnnotationProcessing(
                 new RepositoryAnnotationProcessor(),
                 inputFiles("TestRepository.java"),
@@ -69,7 +72,7 @@ public class RepositoryServiceGeneratorTest {
     }
 
     @Test
-    public void repositoryWithCustomOrmServiceGeneration() {
+    public void forCustomOrmRepository_shouldGenerate_customRepositoryImplementationAndService() {
         testAnnotationProcessing(
                 new RepositoryAnnotationProcessor(),
                 inputFiles("CustomOrmRepository.java"),

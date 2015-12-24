@@ -7,7 +7,6 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.slimgears.slimrepo.core.interfaces.Repository;
 import com.slimgears.slimrepo.core.interfaces.RepositoryService;
-import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMappingInstaller;
@@ -74,7 +73,7 @@ public abstract class AbstractRepositoryService<TRepository extends Repository> 
 
     protected abstract TRepository createRepository(SessionServiceProvider sessionServiceProvider);
 
-    protected <TKey, TEntity extends Entity<TKey>> EntitySet<TEntity> getEntitySet(EntityType<TKey, TEntity> entityType) {
+    protected <TKey, TEntity> EntitySet<TEntity> getEntitySet(EntityType<TKey, TEntity> entityType) {
         try {
             //noinspection unchecked
             return sessionEntityServiceProviderCache.get(entityType);

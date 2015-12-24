@@ -2,7 +2,6 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal.query;
 
-import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
 import com.slimgears.slimrepo.core.interfaces.conditions.Conditions;
 import com.slimgears.slimrepo.core.interfaces.queries.QueryBuilder;
@@ -13,7 +12,7 @@ import com.slimgears.slimrepo.core.interfaces.queries.QueryBuilder;
  */
 public abstract class AbstractEntityQuery<
         TKey,
-        TEntity extends Entity<TKey>,
+        TEntity,
         TQuery,
         TBuilder extends QueryBuilder<TEntity, TQuery, TBuilder>,
         TQueryParams extends ConditionalQueryParams<TKey, TEntity, TQueryParams>>

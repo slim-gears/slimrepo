@@ -3,7 +3,6 @@
 package com.slimgears.slimrepo.core.internal.query;
 
 import com.google.common.base.Predicate;
-import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueMap;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
@@ -19,7 +18,7 @@ import static com.google.common.collect.Collections2.filter;
  * Created by Denis on 07-Apr-15
  * <File Description>
  */
-public class DefaultEntityUpdateQuery<TKey, TEntity extends Entity<TKey>>
+public class DefaultEntityUpdateQuery<TKey, TEntity>
         extends AbstractEntityQuery<TKey, TEntity, EntityUpdateQuery, EntityUpdateQuery.Builder<TEntity>, UpdateQueryParams<TKey, TEntity>>
         implements EntityUpdateQuery, EntityUpdateQuery.Builder<TEntity> {
 

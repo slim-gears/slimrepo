@@ -1,8 +1,6 @@
 package com.slimgears.slimrepo.core.internal.sql;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
-import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlDatabaseScheme;
@@ -35,7 +33,7 @@ class SqlDatabaseSchemeProxy implements SqlDatabaseScheme {
     }
 
     @SafeVarargs
-    public final <TKey, TEntity extends Entity<TKey>> void hideFields(final EntityType<TKey, TEntity> entityType, Field<TEntity, ?>... fields) {
+    public final <TKey, TEntity> void hideFields(final EntityType<TKey, TEntity> entityType, Field<TEntity, ?>... fields) {
         hiddenFields.addAll(
                 Collections2.transform(
                         Arrays.asList(fields),

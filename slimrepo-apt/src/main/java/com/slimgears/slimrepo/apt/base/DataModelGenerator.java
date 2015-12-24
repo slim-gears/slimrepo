@@ -24,38 +24,6 @@ public class DataModelGenerator extends ClassGenerator<DataModelGenerator> {
     private TypeSpec.Builder builderClassBuilder;
     private TypeName builderTypeName;
 
-    protected class FieldInfo {
-        public final VariableElement element;
-        public final String name;
-        public final TypeName type;
-
-        public FieldInfo(VariableElement element) {
-            this(element, element.getSimpleName().toString(), getTypeName(element.asType()));
-        }
-
-        private FieldInfo(VariableElement element, String name, TypeName type) {
-            this.element = element;
-            this.name = name;
-            this.type = type;
-        }
-
-        public FieldInfo replaceType(TypeName type) {
-            return new FieldInfo(element, name, type);
-        }
-
-        public boolean requiredTypeCasting() {
-            return !element.asType().toString().equals(type.toString());
-        }
-    }
-
-    private TypeName getTypeName(final TypeMirror typeMirror) {
-        try {
-            return TypeName.get(typeMirror);
-        } catch (Throwable e) {
-            return ClassName.get(getPackageName(), TypeUtils.simpleName(typeMirror.toString()));
-        }
-    }
-
     public DataModelGenerator(ProcessingEnvironment processingEnvironment) {
         super(processingEnvironment);
     }
@@ -156,7 +124,7 @@ public class DataModelGenerator extends ClassGenerator<DataModelGenerator> {
                 .addModifiers(Modifier.PUBLIC)
                 .returns(field.type);
 
-        return (field.requiredTypeCasting())
+        return (field.requiresTypeCasting())
                 ? builder.addCode("return ($T)this.$L;\n", field.type, field.name).build()
                 : builder.addCode("return this.$L;\n", field.name).build();
     }

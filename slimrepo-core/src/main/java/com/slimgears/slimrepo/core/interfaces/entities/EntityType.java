@@ -12,7 +12,7 @@ import java.util.Collection;
  * Created by Denis on 07-Apr-15
  * <File Description>
  */
-public interface EntityType<TKey, TEntity extends Entity<TKey>> {
+public interface EntityType<TKey, TEntity> {
     Class<TEntity> getEntityClass();
     String getName();
     ValueField<TEntity, TKey> getKeyField();

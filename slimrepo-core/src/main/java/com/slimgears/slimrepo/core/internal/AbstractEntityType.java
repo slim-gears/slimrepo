@@ -2,8 +2,9 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal;
 
-import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
+import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
+import com.slimgears.slimrepo.core.interfaces.entities.FieldValueMap;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.interfaces.fields.RelationalField;
 import com.slimgears.slimrepo.core.interfaces.fields.ValueField;
@@ -16,18 +17,18 @@ import java.util.List;
  * Created by Denis on 09-Apr-15
  * <File Description>
  */
-public abstract class AbstractEntityType<TKey, TEntity extends Entity<TKey>> implements EntityType<TKey, TEntity> {
+public abstract class AbstractEntityType<TKey, TEntity> implements EntityType<TKey, TEntity> {
     private final String name;
     private final Class<TEntity> entityClass;
     private final ValueField<TEntity, TKey> keyField;
     private final List<Field<TEntity, ?>> fields = new ArrayList<>();
     private final List<RelationalField<TEntity, ?>> relationalFields = new ArrayList<>();
 
+    @SuppressWarnings("unchecked")
     protected AbstractEntityType(
-            String name,
             Class<TEntity> entityClass,
             ValueField<TEntity, TKey> keyField, Field<TEntity, ?>... otherFields) {
-        this.name = name;
+        this.name = entityClass.getSimpleName();
         this.entityClass = entityClass;
         this.keyField = keyField;
         addFields(keyField);
@@ -55,15 +56,40 @@ public abstract class AbstractEntityType<TKey, TEntity extends Entity<TKey>> imp
     }
 
     @Override
+    public TEntity newInstance(FieldValueLookup<TEntity> lookup) {
+
+        TEntity entity = newInstance();
+        for (Field field : fields) {
+            //noinspection unchecked
+            field.setValue(entity, lookup.getValue(field));
+        }
+        return entity;
+    }
+
+    @Override
+    public void entityToMap(TEntity entity, FieldValueMap<TEntity> map) {
+        for (Field field : fields) {
+            //noinspection unchecked
+            map.putValue(field, field.getValue(entity));
+        }
+    }
+
+    @Override
     public ValueField<TEntity, TKey> getKeyField() {
         return keyField;
     }
 
     @Override
     public TKey getKey(TEntity entity) {
-        return entity.getEntityId();
+        return getKeyField().getValue(entity);
     }
 
+    @Override
+    public void setKey(TEntity entity, TKey key) {
+        getKeyField().setValue(entity, key);
+    }
+
+    @SuppressWarnings("unchecked")
     private AbstractEntityType<TKey, TEntity> addFields(Field<TEntity, ?>... fields) {
         for (Field<TEntity, ?> field : fields) {
             if (field instanceof Bindable) {

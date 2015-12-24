@@ -2,7 +2,6 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal.query;
 
-import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
 
@@ -10,7 +9,7 @@ import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
 * Created by Denis on 13-Apr-15
 * <File Description>
 */
-public abstract class ConditionalQueryParams<TKey, TEntity extends Entity<TKey>, TQueryParams extends ConditionalQueryParams<TKey, TEntity, TQueryParams>>
+public abstract class ConditionalQueryParams<TKey, TEntity, TQueryParams extends ConditionalQueryParams<TKey, TEntity, TQueryParams>>
         extends AbstractQueryParams<TKey, TEntity, TQueryParams> {
     public Condition<TEntity> condition;
     public QueryPagination pagination;

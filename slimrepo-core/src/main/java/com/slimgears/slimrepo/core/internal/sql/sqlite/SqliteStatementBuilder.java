@@ -7,7 +7,6 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
 import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
 import com.slimgears.slimrepo.core.interfaces.conditions.RelationalCondition;
-import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimrepo.core.interfaces.fields.ComparableField;
@@ -57,7 +56,7 @@ class SqliteStatementBuilder implements SqlStatementBuilder {
     }
 
     @Override
-    public <TKey, TEntity extends Entity<TKey>> String countStatement(SelectQueryParams<TKey, TEntity> params, SqlCommand.Parameters sqlParams) {
+    public <TKey, TEntity> String countStatement(SelectQueryParams<TKey, TEntity> params, SqlCommand.Parameters sqlParams) {
         Iterable<RelationalField> relationalFields = findRelationalFieldsInCondition(params.condition);
         return
                 selectCountClause() +
@@ -68,7 +67,7 @@ class SqliteStatementBuilder implements SqlStatementBuilder {
     }
 
     @Override
-    public <TKey, TEntity extends Entity<TKey>> String selectStatement(SelectQueryParams<TKey, TEntity> params, SqlCommand.Parameters sqlParams) {
+    public <TKey, TEntity> String selectStatement(SelectQueryParams<TKey, TEntity> params, SqlCommand.Parameters sqlParams) {
         Iterable<RelationalField> relationalFields = (params.fields != null)
                 ? findRelationalFields(params.fields)
                 : getAllRelationalFields(params.entityType);
@@ -86,7 +85,7 @@ class SqliteStatementBuilder implements SqlStatementBuilder {
     }
 
     @Override
-    public <TKey, TEntity extends Entity<TKey>> String updateStatement(UpdateQueryParams<TKey, TEntity> params, SqlCommand.Parameters sqlParams) {
+    public <TKey, TEntity> String updateStatement(UpdateQueryParams<TKey, TEntity> params, SqlCommand.Parameters sqlParams) {
         return
                 updateClause(params.entityType) +
                 setClause(params.updates, sqlParams) +
@@ -95,14 +94,14 @@ class SqliteStatementBuilder implements SqlStatementBuilder {
     }
 
     @Override
-    public <TKey, TEntity extends Entity<TKey>> String deleteStatement(DeleteQueryParams<TKey, TEntity> params, SqlCommand.Parameters sqlParams) {
+    public <TKey, TEntity> String deleteStatement(DeleteQueryParams<TKey, TEntity> params, SqlCommand.Parameters sqlParams) {
         return "DELETE " + fromClause(params.entityType) +
                 whereClause(params.condition, sqlParams) +
                 limitClause(params.pagination);
     }
 
     @Override
-    public <TKey, TEntity extends Entity<TKey>> String insertStatement(InsertQueryParams<TKey, TEntity> params, SqlCommand.Parameters sqlParams) {
+    public <TKey, TEntity> String insertStatement(InsertQueryParams<TKey, TEntity> params, SqlCommand.Parameters sqlParams) {
         Iterable<Field> fields = fieldsToInsert(params.entityType);
         return
                 insertClause(params.entityType, fields) +
@@ -314,7 +313,7 @@ class SqliteStatementBuilder implements SqlStatementBuilder {
         return syntaxProvider.simpleFieldName(field);
     }
 
-    private <TKey, TEntity extends Entity<TKey>> Collection<FieldValueLookup> entitiesToRows(final EntityType<TKey, TEntity> entityType, Collection<TEntity> entities) {
+    private <TKey, TEntity> Collection<FieldValueLookup> entitiesToRows(final EntityType<TKey, TEntity> entityType, Collection<TEntity> entities) {
         return Collections2.transform(entities, new Function<TEntity, FieldValueLookup>() {
             @Override
             public FieldValueLookup apply(TEntity entity) {

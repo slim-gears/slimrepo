@@ -2,7 +2,6 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal.sql;
 
-import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
@@ -23,7 +22,6 @@ class SqlRelationalTypeMapper implements FieldTypeMappingRegistrar.Matcher, Type
     public Object toEntityType(Field field, Object value) {
         if (value == null) return null;
 
-
         RelationalField relationalField = (RelationalField)field;
         EntityType relatedEntityType = relationalField.metaInfo().getRelatedEntityType();
         //noinspection unchecked
@@ -32,7 +30,8 @@ class SqlRelationalTypeMapper implements FieldTypeMappingRegistrar.Matcher, Type
 
     @Override
     public Object fromEntityType(Field field, Object value) {
-        return value != null ? ((Entity)value).getEntityId() : null;
+        //noinspection unchecked
+        return value != null ? field.metaInfo().getEntityType().getKey(value) : null;
     }
 
     @Override

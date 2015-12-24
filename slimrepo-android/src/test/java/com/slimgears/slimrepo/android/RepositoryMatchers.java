@@ -3,7 +3,6 @@ package com.slimgears.slimrepo.android;
 import com.slimgears.slimrepo.android.core.SqliteOrmServiceProvider;
 import com.slimgears.slimrepo.core.interfaces.Repository;
 import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
-import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.queries.EntitySelectQuery;
 import com.slimgears.slimrepo.core.internal.sql.SqlPredicateBuilder;
@@ -71,7 +70,7 @@ public class RepositoryMatchers {
         protected abstract boolean matches(EntitySelectQuery.Builder<TEntity> queryBuilder) throws IOException;
     }
 
-    static class EntityQueryRepositoryMatcherAdapter<TKey, TEntity extends Entity<TKey>> extends BaseMatcher<Repository> {
+    static class EntityQueryRepositoryMatcherAdapter<TKey, TEntity> extends BaseMatcher<Repository> {
         private final EntityType<TKey, TEntity> entityType;
         private final Matcher<EntitySelectQuery.Builder<TEntity>> matcher;
 
@@ -137,19 +136,19 @@ public class RepositoryMatchers {
         }
     }
 
-    public static <TKey, TEntity extends Entity<TKey>> Matcher<Repository> matchQuery(EntityType<TKey, TEntity> entityType, Matcher<EntitySelectQuery.Builder<TEntity>> matcher) {
+    public static <TKey, TEntity> Matcher<Repository> matchQuery(EntityType<TKey, TEntity> entityType, Matcher<EntitySelectQuery.Builder<TEntity>> matcher) {
         return new EntityQueryRepositoryMatcherAdapter<>(entityType, matcher);
     }
 
-    public static <TKey, TEntity extends Entity<TKey>> Matcher<Repository> countEquals(EntityType<TKey, TEntity> entityType, final long expectedCount) {
+    public static <TKey, TEntity> Matcher<Repository> countEquals(EntityType<TKey, TEntity> entityType, final long expectedCount) {
         return countEquals(entityType, null, expectedCount);
     }
 
-    public static <TKey, TEntity extends Entity<TKey>> Matcher<Repository> countNotEquals(EntityType<TKey, TEntity> entityType, final long expectedCount) {
+    public static <TKey, TEntity> Matcher<Repository> countNotEquals(EntityType<TKey, TEntity> entityType, final long expectedCount) {
         return countNotEquals(entityType, null, expectedCount);
     }
 
-    public static <TKey, TEntity extends Entity<TKey>> Matcher<Repository> countEquals(final EntityType<TKey, TEntity> entityType, final Condition<TEntity> condition, final long expectedCount) {
+    public static <TKey, TEntity> Matcher<Repository> countEquals(final EntityType<TKey, TEntity> entityType, final Condition<TEntity> condition, final long expectedCount) {
         return matchQuery(entityType, new EntityQueryMatcherBase<TEntity>() {
             private long actualCount;
 
@@ -171,15 +170,15 @@ public class RepositoryMatchers {
         });
     }
 
-    public static <TKey, TEntity extends Entity<TKey>> Matcher<Repository> countNotEquals(EntityType<TKey, TEntity> entityType, final Condition<TEntity> condition, final long expectedCount) {
+    public static <TKey, TEntity> Matcher<Repository> countNotEquals(EntityType<TKey, TEntity> entityType, final Condition<TEntity> condition, final long expectedCount) {
         return not(countEquals(entityType, condition, expectedCount));
     }
 
-    public static <TKey, TEntity extends Entity<TKey>> Matcher<Repository> isEmpty(EntityType<TKey, TEntity> entityType, Condition<TEntity> condition) {
+    public static <TKey, TEntity> Matcher<Repository> isEmpty(EntityType<TKey, TEntity> entityType, Condition<TEntity> condition) {
         return countEquals(entityType, condition, 0);
     }
 
-    public static <TKey, TEntity extends Entity<TKey>> Matcher<Repository> isNotEmpty(EntityType<TKey, TEntity> entityType, Condition<TEntity> condition) {
+    public static <TKey, TEntity> Matcher<Repository> isNotEmpty(EntityType<TKey, TEntity> entityType, Condition<TEntity> condition) {
         return countNotEquals(entityType, condition, 0);
     }
 

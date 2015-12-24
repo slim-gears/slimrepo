@@ -1,29 +1,51 @@
-import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityBuilder;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
-import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
-import com.slimgears.slimrepo.core.interfaces.entities.FieldValueMap;
+import com.slimgears.slimrepo.core.interfaces.fields.BlobField;
 import com.slimgears.slimrepo.core.interfaces.fields.ComparableField;
-import com.slimgears.slimrepo.core.interfaces.fields.RelationalField;
 import com.slimgears.slimrepo.core.interfaces.fields.StringField;
 import com.slimgears.slimrepo.core.interfaces.fields.ValueField;
+import com.slimgears.slimrepo.core.interfaces.fields.ValueGetter;
+import com.slimgears.slimrepo.core.interfaces.fields.ValueSetter;
 import com.slimgears.slimrepo.core.internal.AbstractEntityType;
 import com.slimgears.slimrepo.core.internal.Fields;
 import java.lang.Integer;
 import java.lang.Override;
 import java.lang.String;
 
+class TestEntity extends AbstractTestEntity {
+    public static final ComparableField<TestEntity, Integer> Id = Fields.comparableField(
+            "id",
+            Integer.class,
+            new ValueGetter<TestEntity, Integer>() { @Override public Integer getValue(TestEntity entity) { return entity.getId(); } },
+            new ValueSetter<TestEntity, Integer>() { @Override public void setValue(TestEntity entity, Integer value) { entity.setId(value); } },
+            false);
 
-class TestEntity extends AbstractTestEntity implements Entity<Integer> {
-    public static final ComparableField<TestEntity, Integer> Id = Fields.comparableField("id", Integer.class, false);
+    public static final StringField<TestEntity> Name = Fields.stringField(
+            "name",
+            new ValueGetter<TestEntity, String>() { @Override public String getValue(TestEntity entity) { return entity.getName(); } },
+            new ValueSetter<TestEntity, String>() { @Override public void setValue(TestEntity entity, String value) { entity.setName(value); } },
+            true);
 
-    public static final StringField<TestEntity> Name = Fields.stringField("name", true);
+    public static final BlobField<TestEntity, RelatedEntity> Related = Fields.blobField(
+            "related",
+            RelatedEntity.class,
+            new ValueGetter<TestEntity, RelatedEntity>() { @Override public RelatedEntity getValue(TestEntity entity) { return entity.getRelated(); } },
+            new ValueSetter<TestEntity, RelatedEntity>() { @Override public void setValue(TestEntity entity, RelatedEntity value) { entity.setRelated(value); } },
+            true);
 
-    public static final RelationalField<TestEntity, RelatedEntity> Related = Fields.relationalField("related", RelatedEntity.EntityMetaType, true);
+    public static final ComparableField<TestEntity, TestEnum> EnumValue = Fields.comparableField(
+            "enumValue",
+            TestEnum.class,
+            new ValueGetter<TestEntity, TestEnum>() { @Override public TestEnum getValue(TestEntity entity) { return entity.getEnumValue(); } },
+            new ValueSetter<TestEntity, TestEnum>() { @Override public void setValue(TestEntity entity, TestEnum value) { entity.setEnumValue(value); } },
+            true);
 
-    public static final ComparableField<TestEntity, TestEnum> EnumValue = Fields.comparableField("enumValue", TestEnum.class, true);
-
-    public static final ValueField<TestEntity, CustomType> CustomTypeValue = Fields.valueField("customTypeValue", CustomType.class, true);
+    public static final ValueField<TestEntity, CustomType> CustomTypeValue = Fields.valueField(
+            "customTypeValue",
+            CustomType.class,
+            new ValueGetter<TestEntity, CustomType>() { @Override public CustomType getValue(TestEntity entity) { return entity.getCustomTypeValue(); } },
+            new ValueSetter<TestEntity, CustomType>() { @Override public void setValue(TestEntity entity, CustomType value) { entity.setCustomTypeValue(value); } },
+            true);
 
     public static final EntityType<Integer, TestEntity> EntityMetaType = new MetaType();
 
@@ -36,11 +58,6 @@ class TestEntity extends AbstractTestEntity implements Entity<Integer> {
         this.related = related;
         this.enumValue = enumValue;
         this.customTypeValue = customTypeValue;
-    }
-
-    @Override
-    public Integer getEntityId() {
-        return this.id;
     }
 
     public static Builder builder() {
@@ -98,37 +115,12 @@ class TestEntity extends AbstractTestEntity implements Entity<Integer> {
 
     private static class MetaType extends AbstractEntityType<Integer, TestEntity> {
         MetaType() {
-            super("TestEntity", TestEntity.class, Id, Name, Related, EnumValue, CustomTypeValue);
+            super(TestEntity.class, Id, Name, Related, EnumValue, CustomTypeValue);
         }
 
         @Override
         public TestEntity newInstance() {
             return new TestEntity();
-        }
-
-        @Override
-        public void setKey(TestEntity entity, Integer key) {
-            entity.setId(key);
-        }
-
-        @Override
-        public TestEntity newInstance(FieldValueLookup<TestEntity> lookup) {
-            return new TestEntity(
-                    lookup.getValue(Id),
-                    lookup.getValue(Name),
-                    lookup.getValue(Related),
-                    lookup.getValue(EnumValue),
-                    lookup.getValue(CustomTypeValue));
-        }
-
-        @Override
-        public void entityToMap(TestEntity entity, FieldValueMap<TestEntity> map) {
-            map
-                    .putValue(Id, entity.getId())
-                    .putValue(Name, entity.getName())
-                    .putValue(Related, entity.getRelated())
-                    .putValue(EnumValue, entity.getEnumValue())
-                    .putValue(CustomTypeValue, entity.getCustomTypeValue());
         }
     }
 

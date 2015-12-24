@@ -4,7 +4,6 @@ package com.slimgears.slimrepo.android.core;
 
 import android.database.sqlite.SQLiteDatabase;
 
-import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.internal.interfaces.SessionEntityServiceProvider;
 import com.slimgears.slimrepo.core.internal.interfaces.TransactionProvider;
@@ -41,7 +40,7 @@ public class SqliteSessionServiceProvider extends AbstractSqlSessionServiceProvi
     }
 
     @Override
-    protected <TKey, TEntity extends Entity<TKey>> SessionEntityServiceProvider<TKey, TEntity> createEntityServiceProvider(EntityType<TKey, TEntity> entityType) {
+    protected <TKey, TEntity> SessionEntityServiceProvider<TKey, TEntity> createEntityServiceProvider(EntityType<TKey, TEntity> entityType) {
         return new SqliteSessionEntityServiceProvider<>(database, this, entityType);
     }
 

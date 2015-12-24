@@ -2,7 +2,6 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal.sql;
 
-import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.internal.AbstractSessionServiceProvider;
 import com.slimgears.slimrepo.core.internal.interfaces.RepositoryCreator;
@@ -40,7 +39,7 @@ public abstract class AbstractSqlSessionServiceProvider extends AbstractSessionS
     protected abstract SqlSchemeProvider createSchemeProvider();
 
     @Override
-    protected <TKey, TEntity extends Entity<TKey>> SessionEntityServiceProvider<TKey, TEntity> createEntityServiceProvider(EntityType<TKey, TEntity> entityType) {
+    protected <TKey, TEntity> SessionEntityServiceProvider<TKey, TEntity> createEntityServiceProvider(EntityType<TKey, TEntity> entityType) {
         return new SqlSessionEntityServiceProvider<>(this, entityType);
     }
 
