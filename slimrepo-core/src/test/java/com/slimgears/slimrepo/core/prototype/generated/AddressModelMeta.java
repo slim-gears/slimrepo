@@ -16,8 +16,9 @@ public class AddressModelMeta {
     public static final StringField<AddressModel> City = Fields.stringField("city", AddressModel::getCity, AddressModel::setCity, true);
     public static final StringField<AddressModel> Country = Fields.stringField("country", AddressModel::getCountry, AddressModel::setCountry, true);
     public static final StringField<AddressModel> StreetAddress = Fields.stringField("streetAddress", AddressModel::getStreetAddress, AddressModel::setStreetAddress, true);
+    public static final MetaType EntityMetaType = new MetaType();
 
-    class MetaType extends AbstractEntityType<Integer, AddressModel> {
+    static class MetaType extends AbstractEntityType<Integer, AddressModel> {
         protected MetaType() { super(AddressModel.class, Id, City, Country, StreetAddress); }
 
         @Override

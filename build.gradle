@@ -6,7 +6,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.github.slim-gears:gradle-aio:0.4.3'
+        classpath 'com.github.slim-gears:gradle-aio:0.4.8'
     }
 }
 

@@ -6,6 +6,7 @@ apply plugin: 'publishing-aio'
 dependencies {
     compile "com.squareup:javapoet:$javaPoetVersion"
     compile "com.google.guava:guava:$guavaVersion"
+    compile "com.annimon:stream:$annimonStreamVersion"
     compile project(':slimrepo-core')
     
     testCompile project(path: ':slimrepo-core', configuration: 'testOutput')

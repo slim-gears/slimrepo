@@ -2,7 +2,6 @@ package com.slimgears.slimrepo.apt;// Copyright 2015 Denis Itskovich
 // Refer to LICENSE.txt for license details
 
 
-import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.testing.compile.JavaFileObjects;
 
@@ -50,7 +49,7 @@ public class RepositoryServiceGeneratorTest {
     @Test
     public void forAbstractEntities_shouldGenerate_concreteEntities() {
         testAnnotationProcessing(
-                new EntityAnnotationProcessor(),
+                new GenerateEntityAnnotationProcessor(),
                 inputFiles("AbstractRelatedEntity.java", "AbstractTestEntity.java"),
                 expectedFiles("TestEntity.java", "RelatedEntity.java"));
     }

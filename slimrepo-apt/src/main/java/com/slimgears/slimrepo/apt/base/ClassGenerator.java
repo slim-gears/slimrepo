@@ -30,7 +30,7 @@ public abstract class ClassGenerator<T extends ClassGenerator<T>> {
     private Types typeUtils;
     private String className;
     private String packageName;
-    private TypeName superClass;
+    private TypeName superClass = TypeName.get(Object.class);
     private Collection<TypeName> superInterfaces = new ArrayList<>();
     private ClassName typeName;
 

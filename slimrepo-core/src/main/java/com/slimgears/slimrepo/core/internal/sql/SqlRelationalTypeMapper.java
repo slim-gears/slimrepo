@@ -30,8 +30,14 @@ class SqlRelationalTypeMapper implements FieldTypeMappingRegistrar.Matcher, Type
 
     @Override
     public Object fromEntityType(Field field, Object value) {
+        if (value == null) return null;
         //noinspection unchecked
-        return value != null ? field.metaInfo().getEntityType().getKey(value) : null;
+
+        RelationalField relationalField = (RelationalField)field;
+        EntityType relatedEntityType = relationalField.metaInfo().getRelatedEntityType();
+
+        //noinspection unchecked
+        return relatedEntityType.getKey(value);
     }
 
     @Override
