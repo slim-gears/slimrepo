@@ -13,7 +13,7 @@ import com.slimgears.slimrepo.core.internal.interfaces.TypeConverter;
 /**
  * Created by ditskovi on 4/27/2015.
  */
-public class SqlRelationalTypeMapper implements FieldTypeMappingRegistrar.Matcher, TypeConverter {
+class SqlRelationalTypeMapper implements FieldTypeMappingRegistrar.Matcher, TypeConverter {
     @Override
     public boolean match(Field field) {
         return field instanceof RelationalField;

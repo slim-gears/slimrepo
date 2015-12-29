@@ -107,30 +107,30 @@ public class SqlPredicateBuilder implements SqlStatementBuilder.PredicateBuilder
             return fieldOperator(predicate, substituteArgs(predicate, predicate.getFirst()        , predicate.getSecond()));
     }
 
-    @Override
-    protected <V> String visitCollection(CollectionCondition<T, V> predicate) {
-        return fieldOperator(predicate, joinStrings(substituteArgs(predicate, predicate.getValues())));
-    }
+        @Override
+        protected <V> String visitCollection(CollectionCondition<T, V> predicate) {
+            return fieldOperator(predicate, joinStrings(substituteArgs(predicate, predicate.getValues())));
+        }
 
-    @Override
-    protected <V> String visitUnary(UnaryCondition<T, V> predicate) {
-        return fieldOperator(predicate);
-    }
+        @Override
+        protected <V> String visitUnary(UnaryCondition<T, V> predicate) {
+            return fieldOperator(predicate);
+        }
 
-    @Override
-    protected String visitComposite(CompositeCondition<T> predicate) {
-        return combine(predicate.getType(), Iterators.forArray(predicate.getArguments()));
-    }
+        @Override
+        protected String visitComposite(CompositeCondition<T> predicate) {
+            return combine(predicate.getType(), Iterators.forArray(predicate.getArguments()));
+        }
 
-    @Override
-    protected String visitUnknown(Condition<T> condition) {
-        throw new RuntimeException("Not supported predicate class: " + condition.getClass().getName());
-    }
+        @Override
+        protected String visitUnknown(Condition<T> condition) {
+            throw new RuntimeException("Not supported predicate class: " + condition.getClass().getName());
+        }
 
-    @Override
-    protected <V> String visitRelational(RelationalCondition<T, V> condition) {
-        return build(condition.getCondition(), parameters);
-    }
+        @Override
+        protected <V> String visitRelational(RelationalCondition<T, V> condition) {
+            return build(condition.getCondition(), parameters);
+        }
 
         private String combine(PredicateType type, Iterator<Condition<T>> predicateIterator) {
             String first = visit(predicateIterator.next());

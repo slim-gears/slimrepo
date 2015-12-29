@@ -5,6 +5,7 @@ package com.slimgears.slimrepo.android.core;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMappingRegistrar;
 import com.slimgears.slimrepo.core.internal.interfaces.RepositoryModel;
@@ -20,6 +21,7 @@ import java.io.IOException;
  */
 public class SqliteOrmServiceProvider extends AbstractSqliteOrmServiceProvider {
     private final Context context;
+    private final static String TAG = SqliteOrmServiceProvider.class.getSimpleName();
 
     public SqliteOrmServiceProvider(Context mContext) {
         this.context = mContext;
@@ -35,6 +37,7 @@ public class SqliteOrmServiceProvider extends AbstractSqliteOrmServiceProvider {
 
         @Override
         public void onCreate(SQLiteDatabase db) {
+            Log.i(TAG, String.format("Creating database [version %d]: %s", model.getVersion(), db.getPath()));
             SessionServiceProvider serviceProvider = createSessionServiceProvider(db, null);
             try {
                 serviceProvider
@@ -48,6 +51,7 @@ public class SqliteOrmServiceProvider extends AbstractSqliteOrmServiceProvider {
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            Log.i(TAG, String.format("Upgrading database [version %d --> %d]: %s", oldVersion, newVersion, db.getPath()));
             SessionServiceProvider serviceProvider = createSessionServiceProvider(db, null);
             try {
                 serviceProvider

@@ -1,6 +1,6 @@
 // Copyright 2015 Denis Itskovich
 // Refer to LICENSE.txt for license details
-package com.slimgears.slimrepo.core.internal.sql;
+package com.slimgears.slimrepo.core.internal.sql.sqlite;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -23,6 +23,7 @@ import com.slimgears.slimrepo.core.internal.query.QueryPagination;
 import com.slimgears.slimrepo.core.internal.query.SelectQueryParams;
 import com.slimgears.slimrepo.core.internal.query.UpdateQueryParams;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommand;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlDatabaseScheme;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlStatementBuilder;
 
 import java.util.ArrayList;
@@ -39,11 +40,18 @@ import static com.google.common.collect.Iterables.transform;
  * Created by Denis on 08-Apr-15
  * <File Description>
  */
-public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
+class SqliteStatementBuilder implements SqlStatementBuilder {
     private final PredicateBuilder predicateBuilder;
     private final SyntaxProvider syntaxProvider;
 
-    public DefaultSqlStatementBuilder(PredicateBuilder predicateBuilder, SyntaxProvider syntaxProvider) {
+    private final Function<String, String> FUNC_SIMPLE_FIELD_NAME = new Function<String, String>() {
+        @Override
+        public String apply(String input) {
+            return syntaxProvider.simpleFieldName(input);
+        }
+    };
+
+    public SqliteStatementBuilder(PredicateBuilder predicateBuilder, SyntaxProvider syntaxProvider) {
         this.predicateBuilder = predicateBuilder;
         this.syntaxProvider = syntaxProvider;
     }
@@ -102,21 +110,39 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
     }
 
     @Override
-    public <TKey, TEntity extends Entity<TKey>> String createTableStatement(EntityType<TKey, TEntity> entityType) {
+    public String copyData(String fromTable, SqlDatabaseScheme.TableScheme toTable, Iterable<String> fieldNames) {
         return
-                "CREATE TABLE IF NOT EXISTS " + tableName(entityType) + " (\n    " +
-                        columnDefinitions(entityType) + ")";
+                insertClause(toTable.getName(), fieldNames) +
+                selectFromClause(fieldNames, fromTable);
     }
 
     @Override
-    public <TKey, TEntity extends Entity<TKey>> String dropTableStatement(EntityType<TKey, TEntity> entityType) {
-        return "DROP TABLE IF EXISTS " + tableName(entityType);
+    public String cloneTableStatement(String existingTableName, String newTableName) {
+        return "CREATE TABLE " + syntaxProvider.tableName(newTableName) + " AS SELECT * FROM " + syntaxProvider.tableName(existingTableName);
+    }
+
+    @Override
+    public String createTableStatement(SqlDatabaseScheme.TableScheme tableScheme) {
+        return
+                "CREATE TABLE IF NOT EXISTS " + syntaxProvider.tableName(tableScheme.getName()) + " (\n    " +
+                        columnDefinitions(tableScheme) + ")";
+    }
+
+    @Override
+    public String dropTableStatement(String name) {
+        return "DROP TABLE IF EXISTS " + syntaxProvider.tableName(name);
     }
 
     protected String insertClause(EntityType entityType, Iterable<Field> fields) {
         return "INSERT INTO " +
-                tableName(entityType) +
+                syntaxProvider.tableName(entityType) +
                 " (" + Joiner.on(", ").join(fieldNames(fields)) + ")\n";
+    }
+
+    protected String insertClause(String tableName, Iterable<String> fieldNames) {
+        return "INSERT INTO " +
+                syntaxProvider.tableName(tableName) +
+                " (" + Joiner.on(", ").join(transform(fieldNames, FUNC_SIMPLE_FIELD_NAME)) + ")\n";
     }
 
     protected String valuesClause(final Iterable<Field> fields, final SqlCommand.Parameters parameters, Iterable<FieldValueLookup> rows) {
@@ -186,7 +212,7 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
     private String joinClause(RelationalField<?, ?> relationalField) {
         RelationalField.MetaInfo<?> relationalFieldMeta = relationalField.metaInfo();
         return "LEFT JOIN " +
-                tableName(relationalFieldMeta.getRelatedEntityType()) +
+                syntaxProvider.tableName(relationalFieldMeta.getRelatedEntityType()) +
                 " ON " +  qualifiedFieldName(relationalField) + " = " + qualifiedFieldName(relationalFieldMeta.getRelatedEntityType().getKeyField());
     }
 
@@ -196,6 +222,11 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
 
     private <TEntity> String selectClause(EntityType entityType, Iterable<Field<TEntity, ?>> fields) {
         return "SELECT\n    " + Joiner.on(",\n    ").join(fieldsAsAliases(allRelatedFields(entityType, fields))) + "\n";
+    }
+
+    private String selectFromClause(Iterable<String> fieldNames, String fromTable) {
+        return "SELECT " + Joiner.on(", ").join(transform(fieldNames, FUNC_SIMPLE_FIELD_NAME)) + " " +
+                "FROM " + syntaxProvider.tableName(fromTable);
     }
 
     private Iterable<String> fieldsAsAliases(Iterable<Field> fields) {
@@ -237,15 +268,11 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
     }
 
     private String updateClause(EntityType entityType) {
-        return "UPDATE " + tableName(entityType) + "\n";
+        return "UPDATE " + syntaxProvider.tableName(entityType) + "\n";
     }
 
     private String fromClause(EntityType entityType) {
-        return "FROM " + tableName(entityType) + "\n";
-    }
-
-    private String tableName(EntityType entityType) {
-        return syntaxProvider.tableName(entityType);
+        return "FROM " + syntaxProvider.tableName(entityType) + "\n";
     }
 
     private Iterable<String> fieldNames(EntityType entityType) {
@@ -275,9 +302,9 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
         });
     }
 
-    private String columnDefinition(EntityType entityType, Field field) {
-        String columnDef = columnName(field) + " " + columnType(field);
-        String constraints = columnConstraints(entityType, field);
+    private String columnDefinition(SqlDatabaseScheme.FieldScheme field) {
+        String columnDef = syntaxProvider.simpleFieldName(field.getName()) + " " + field.getType();
+        String constraints = columnConstraints(field);
         return  constraints.isEmpty()
                 ? columnDef
                 : columnDef + " " + constraints;
@@ -296,48 +323,34 @@ public class DefaultSqlStatementBuilder implements SqlStatementBuilder {
         });
     }
 
-    private String columnDefinitions(final EntityType entityType) {
+    private String columnDefinitions(final SqlDatabaseScheme.TableScheme tableScheme) {
         return Joiner
                 .on(",\n    ")
-                .join(transform(entityType.getFields(), new Function<Field, String>() {
+                .join(transform(tableScheme.getFields().values(), new Function<SqlDatabaseScheme.FieldScheme, String>() {
                     @Override
-                    public String apply(Field field) {
-                        return columnDefinition(entityType, field);
+                    public String apply(SqlDatabaseScheme.FieldScheme field) {
+                        return columnDefinition(field);
                     }
                 }));
     }
 
-    private String columnConstraints(EntityType entityType, Field field) {
-        if (isAutoIncremented(entityType, field)) return "PRIMARY KEY ASC";
-        if (isPrimaryKey(entityType, field)) return "PRIMARY KEY";
-        if (isForeignKey(field)) return foreignKeyConstraint((RelationalField)field);
-        if (!field.metaInfo().isNullable()) return "NOT NULL";
+    private String columnConstraints(SqlDatabaseScheme.FieldScheme field) {
+        if (field.isAutoIncremented()) return "PRIMARY KEY ASC";
+        if (field.isPrimaryKey()) return "PRIMARY KEY";
+        if (field.isForeignKey()) return foreignKeyConstraint(field);
+        if (field.isNotNull()) return "NOT NULL";
         return "";
     }
 
-    private String foreignKeyConstraint(RelationalField field) {
-        EntityType relatedEntityType = field.metaInfo().getRelatedEntityType();
-        return "REFERENCES " + syntaxProvider.tableName(relatedEntityType) + " (" + syntaxProvider.simpleFieldName(relatedEntityType.getKeyField()) + ")";
-    }
-
-    private boolean isForeignKey(Field field) {
-        return field instanceof RelationalField;
-    }
-
-    private boolean isPrimaryKey(EntityType entityType, Field field) {
-        return entityType.getKeyField() == field;
+    private String foreignKeyConstraint(SqlDatabaseScheme.FieldScheme field) {
+        SqlDatabaseScheme.TableScheme relatedTable = field.getRelatedForeignField().getTable();
+        String relatedTableName = relatedTable.getName();
+        String relatedKeyFieldName = relatedTable.getKeyField().getName();
+        return "REFERENCES " + syntaxProvider.tableName(relatedTableName) + " (" + syntaxProvider.simpleFieldName(relatedKeyFieldName) + ")";
     }
 
     private boolean isAutoIncremented(EntityType entityType, Field field) {
-        return isPrimaryKey(entityType, field) && field instanceof ComparableField;
-    }
-
-    private String columnName(Field field) {
-        return fieldName(field);
-    }
-
-    private String columnType(Field field) {
-        return syntaxProvider.typeName(field);
+        return entityType.getKeyField() == field && field instanceof ComparableField;
     }
 
     private <T> String substituteParameter(SqlCommand.Parameters parameters, Field<?, T> field, T value) {

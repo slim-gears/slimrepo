@@ -1,5 +1,5 @@
-# Slim Repo
-[![Build Status](https://travis-ci.org/slim-gears/slimrepo.svg?branch=master)](https://travis-ci.org/slim-gears/slimrepo) [![Maven Repository](https://img.shields.io/github/release/slim-gears/slimrepo.svg?label=Maven)](https://bintray.com/slim-gears/slimrepo/slimrepo-android/_latestVersion) [![License](https://img.shields.io/badge/License-Apache_2.0-green.svg)](http://opensource.org/licenses/apache2.0.php) [![Android Arsenal](https://img.shields.io/badge/Android_Arsenal-Slim_Repo-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/1778) [![Join the chat at https://gitter.im/slim-gears/slimrepo](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/slim-gears/slimrepo?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+# Slim Repo <img src="doc/slimrepo128.png" width="48px"/>
+[![Build Status](https://travis-ci.org/slim-gears/slimrepo.svg?branch=master)](https://travis-ci.org/slim-gears/slimrepo) [![Maven Repository](https://img.shields.io/github/release/slim-gears/slimrepo.svg?label=Maven)](https://bintray.com/slim-gears/slimrepo/slimrepo-android/_latestVersion) [![License](https://img.shields.io/badge/License-Apache_2.0-green.svg)](http://opensource.org/licenses/apache2.0.php) [![Android Arsenal](https://img.shields.io/badge/Android_Arsenal-Slim_Repo-brightgreen.svg)](http://android-arsenal.com/details/1/1778) [![Join the chat at https://gitter.im/slim-gears/slimrepo](https://img.shields.io/badge/Gitter-Join_Chat-orange.svg)](https://gitter.im/slim-gears/slimrepo?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 ---
 ### Light-weight modular ORM for Java and Android
 
@@ -24,7 +24,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
     }
 }
 
@@ -43,8 +43,8 @@ repositories {
 **Step 3.** Add dependencies
 ```gradle
 dependencies {
-    compile 'com.slimgears.slimrepo:slimrepo-android:0.8.0'
-    apt 'com.slimgears.slimrepo:slimrepo-apt:0.8.0'
+    compile 'com.slimgears.slimrepo:slimrepo-android:0.9.0'
+    apt 'com.slimgears.slimrepo:slimrepo-apt:0.9.0'
 }
 
 ```

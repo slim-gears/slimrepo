@@ -5,7 +5,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:1.2.3'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
-        classpath 'org.robolectric:robolectric-gradle-plugin:1.0.1'
+        classpath 'org.robolectric:robolectric-gradle-plugin:1.1.0'
         classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.0'
     }
 }
@@ -37,16 +37,15 @@ android {
     }
 }
 
-robolectric {
-    ignoreVersionCheck true
+android.testOptions.unitTests.all {
     afterTest { descriptor, result ->
         println "TEST ${result.resultType} - ${descriptor.name}"
     }
 }
 
 dependencies {
-    compile 'com.slimgears.slimrepo:slimrepo-android:0.8.0'
-    apt 'com.slimgears.slimrepo:slimrepo-apt:0.8.0'
+    compile 'com.slimgears.slimrepo:slimrepo-android:0.9.0'
+    apt 'com.slimgears.slimrepo:slimrepo-apt:0.9.0'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.0.5-beta'
