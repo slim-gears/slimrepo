@@ -5,8 +5,9 @@ import com.slimgears.slimrepo.core.internal.interfaces.SessionServiceProvider;
 import com.slimgears.slimrepo.core.prototype.generated.RoleEntity;
 import com.slimgears.slimrepo.core.prototype.generated.UserEntity;
 import java.lang.Override;
+import javax.annotation.Generated;
 
-
+@Generated(value = "TestRepository", comments = "Repository service implementation generated from TestRepository")
 public class GeneratedTestRepositoryService extends AbstractRepositoryService<TestRepository> implements TestRepositoryService {
     public GeneratedTestRepositoryService(OrmServiceProvider ormServiceProvider) {
         super(ormServiceProvider, GeneratedTestRepository.Model.Instance);

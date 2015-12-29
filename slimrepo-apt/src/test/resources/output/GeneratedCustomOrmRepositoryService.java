@@ -8,7 +8,9 @@ import com.slimgears.slimrepo.core.prototype.generated.RoleEntity;
 import com.slimgears.slimrepo.core.prototype.generated.UserEntity;
 import java.lang.Override;
 import java.lang.String;
+import javax.annotation.Generated;
 
+@Generated(value = "CustomOrmRepository", comments = "Repository service implementation generated from CustomOrmRepository")
 public class GeneratedCustomOrmRepositoryService extends AbstractRepositoryService<CustomOrmRepository> implements CustomOrmRepositoryService {
     public GeneratedCustomOrmRepositoryService(String customStringParameter, int customIntParameter) {
         this(new CustomOrmServiceProvider(customStringParameter, customIntParameter));

@@ -9,6 +9,7 @@ import com.slimgears.slimrepo.core.annotations.GenerateRepository;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.core.internal.DefaultRepositoryModel;
 import com.slimgears.slimrepo.core.internal.interfaces.SessionServiceProvider;
+import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
@@ -19,6 +20,7 @@ import com.squareup.javapoet.TypeSpec;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Generated;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
@@ -154,6 +156,11 @@ public class RepositoryGenerator extends ClassGenerator<RepositoryGenerator> {
                 .build();
 
         builder
+                .addAnnotation(AnnotationSpec
+                        .builder(Generated.class)
+                        .addMember("value", "\"" + repositoryInterface.toString() + "\"")
+                        .addMember("comments", "\"Repository generated from " + repositoryInterface.toString() + "\"")
+                        .build())
                 .addModifiers(Modifier.PUBLIC)
                 .addType(modelTypeSpec)
                 .addMethod(ctorBuilder.build());

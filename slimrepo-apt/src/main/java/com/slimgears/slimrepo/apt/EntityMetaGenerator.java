@@ -10,6 +10,7 @@ import com.slimgears.slimrepo.apt.base.GetterSetterPropertyInfo;
 import com.slimgears.slimrepo.apt.base.PropertyInfo;
 import com.slimgears.slimrepo.apt.base.TypeUtils;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
+import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
@@ -21,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Generated;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
@@ -120,6 +122,11 @@ public class EntityMetaGenerator extends ClassGenerator<EntityMetaGenerator> {
 
 
         builder
+                .addAnnotation(AnnotationSpec
+                        .builder(Generated.class)
+                        .addMember("value", "\"" + entityTypeName.toString() + "\"")
+                        .addMember("comments", "\"Entity meta data generated from " + entityTypeName.toString() + "\"")
+                        .build())
                 .addModifiers(Modifier.PUBLIC)
                 .addField(FieldSpec
                         .builder(ParameterizedTypeName.get(

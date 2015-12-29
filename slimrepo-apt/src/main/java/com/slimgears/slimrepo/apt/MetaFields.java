@@ -104,7 +104,18 @@ public class MetaFields {
 
     public static <P extends PropertyInfo> P getKeyField(TypeName entityTypeName, Iterable<? extends P> fields) {
         P field = findAnnotatedField(fields, Key.class);
-        return field != null ? field : findFieldByName(fields, "id", getEntityIdFieldName(entityTypeName));
+        if (field == null) {
+            field = findFieldByName(fields, "id", getEntityIdFieldName(entityTypeName));
+        }
+
+        if (field == null) {
+            throw new RuntimeException(String.format(
+                    "Cannot find key field for entity type: %s. " +
+                    "Expected field with name %s or field annotated with @Key",
+                    entityTypeName,
+                    getEntityIdFieldName(entityTypeName)));
+        }
+        return field;
     }
 
     private static String getEntityIdFieldName(TypeName entityTypeName) {
@@ -113,7 +124,7 @@ public class MetaFields {
 
     private static <P extends PropertyInfo> P findFieldByName(Iterable<? extends P> fields, String... names) {
         final Set<String> nameSet = new HashSet<>(Arrays.asList(names));
-        return Iterables.find(fields, field -> nameSet.contains(field.getName()));
+        return Iterables.find(fields, field -> nameSet.contains(field.getName()), null);
     }
 
     private static <P extends PropertyInfo> P findAnnotatedField(Iterable<? extends P> fields, final Class annotationClass) {

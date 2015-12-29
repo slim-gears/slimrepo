@@ -8,6 +8,7 @@ import com.slimgears.slimrepo.apt.base.TypeUtils;
 import com.slimgears.slimrepo.core.annotations.GenerateEntity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityBuilder;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
+import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
@@ -64,14 +65,19 @@ public class EntityGenerator extends DataModelGenerator {
         }
 
         builder
-            .addField(FieldSpec
-                .builder(ParameterizedTypeName.get(
-                        ClassName.get(EntityType.class), keyType, entityType),
-                        "EntityMetaType",
-                        Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-                .initializer("new MetaType()")
-                .build())
-            .addType(MetaFields.createMetaType(getTypeName(), keyType, fields));
+                .addAnnotation(AnnotationSpec
+                        .builder(Generated.class)
+                        .addMember("value", "\"" + type.asType().toString() + "\"")
+                        .addMember("comments", "\"Entity generated from " + type.asType().toString() + "\"")
+                        .build())
+                .addField(FieldSpec
+                        .builder(ParameterizedTypeName.get(
+                                ClassName.get(EntityType.class), keyType, entityType),
+                                "EntityMetaType",
+                                Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
+                        .initializer("new MetaType()")
+                        .build())
+                .addType(MetaFields.createMetaType(getTypeName(), keyType, fields));
 
         super.build(builder, type, fields);
     }

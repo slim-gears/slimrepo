@@ -13,6 +13,7 @@ import com.slimgears.slimrepo.core.internal.AbstractRepository;
 import com.slimgears.slimrepo.core.internal.AbstractRepositoryService;
 import com.slimgears.slimrepo.core.internal.interfaces.OrmServiceProvider;
 import com.slimgears.slimrepo.core.internal.interfaces.SessionServiceProvider;
+import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.annotation.Generated;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -59,6 +61,11 @@ public class RepositoryAnnotationProcessor extends AnnotationProcessorBase {
         String repositoryServiceInterfaceName = repositoryTypeElement.getSimpleName().toString() + "Service";
 
         TypeSpec.Builder repositoryServiceInterfaceBuilder = TypeSpec.interfaceBuilder(repositoryServiceInterfaceName)
+                .addAnnotation(AnnotationSpec
+                        .builder(Generated.class)
+                        .addMember("value", "\"" + repositoryTypeElement.asType().toString() + "\"")
+                        .addMember("comments", "\"Repository service interface generated from " + repositoryTypeElement.asType().toString() + "\"")
+                        .build())
                 .addSuperinterface(ParameterizedTypeName.get(ClassName.get(RepositoryService.class), TypeName.get(repositoryTypeElement.asType())))
                 .addModifiers(Modifier.PUBLIC);
 
@@ -67,6 +74,11 @@ public class RepositoryAnnotationProcessor extends AnnotationProcessorBase {
 
         TypeSpec.Builder repositoryServiceImplementationBuilder = TypeSpec.classBuilder(repositoryServiceImplementationName)
                 .superclass(ParameterizedTypeName.get(ClassName.get(AbstractRepositoryService.class), TypeName.get(repositoryTypeElement.asType())))
+                .addAnnotation(AnnotationSpec
+                        .builder(Generated.class)
+                        .addMember("value", "\"" + repositoryTypeElement.asType().toString() + "\"")
+                        .addMember("comments", "\"Repository service implementation generated from " + repositoryTypeElement.asType().toString() + "\"")
+                        .build())
                 .addModifiers(Modifier.PUBLIC)
                 .addSuperinterface(ClassName.get(packageName, repositoryServiceInterfaceName))
                 .addMethod(MethodSpec.methodBuilder("createRepository")

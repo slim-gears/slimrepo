@@ -6,7 +6,9 @@ import com.slimgears.slimrepo.core.prototype.generated.RoleEntity;
 import com.slimgears.slimrepo.core.prototype.generated.UserEntity;
 import java.lang.Override;
 import java.lang.String;
+import javax.annotation.Generated;
 
+@Generated(value = "CustomOrmRepository", comments = "Repository generated from CustomOrmRepository")
 public class GeneratedCustomOrmRepository extends AbstractRepository implements CustomOrmRepository {
     private final EntitySet.Provider<RoleEntity> rolesEntitySet;
 

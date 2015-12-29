@@ -9,7 +9,9 @@ import com.slimgears.slimrepo.core.internal.Fields;
 import java.lang.Integer;
 import java.lang.Override;
 import java.lang.String;
+import javax.annotation.Generated;
 
+@Generated(value = "AbstractRelatedEntity", comments = "Entity generated from AbstractRelatedEntity")
 class RelatedEntity extends AbstractRelatedEntity {
     public static final ComparableField<RelatedEntity, Integer> Id = Fields.comparableField(
             "id",

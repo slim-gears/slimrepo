@@ -6,7 +6,9 @@ import com.slimgears.slimrepo.core.prototype.generated.RoleEntity;
 import com.slimgears.slimrepo.core.prototype.generated.UserEntity;
 import java.lang.Override;
 import java.lang.String;
+import javax.annotation.Generated;
 
+@Generated(value = "TestRepository", comments = "Repository generated from TestRepository")
 public class GeneratedTestRepository extends AbstractRepository implements TestRepository {
     private final EntitySet.Provider<RoleEntity> rolesEntitySet;
 

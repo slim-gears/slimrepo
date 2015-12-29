@@ -9,7 +9,9 @@ import com.slimgears.slimrepo.core.internal.Fields;
 import java.lang.Integer;
 import java.lang.Override;
 import java.lang.String;
+import javax.annotation.Generated;
 
+@Generated(value = "ExistingEntity", comments = "Entity meta data generated from ExistingEntity")
 public class ExistingEntityMeta {
     public static final ComparableField<ExistingEntity, Integer> Id = Fields.comparableField(
             "id",
