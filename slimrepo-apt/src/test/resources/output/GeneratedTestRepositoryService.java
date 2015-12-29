@@ -4,8 +4,8 @@ import com.slimgears.slimrepo.core.internal.interfaces.OrmServiceProvider;
 import com.slimgears.slimrepo.core.internal.interfaces.SessionServiceProvider;
 import com.slimgears.slimrepo.core.prototype.generated.RoleEntity;
 import com.slimgears.slimrepo.core.prototype.generated.UserEntity;
-
 import java.lang.Override;
+
 
 public class GeneratedTestRepositoryService extends AbstractRepositoryService<TestRepository> implements TestRepositoryService {
     public GeneratedTestRepositoryService(OrmServiceProvider ormServiceProvider) {
@@ -25,5 +25,10 @@ public class GeneratedTestRepositoryService extends AbstractRepositoryService<Te
     @Override
     public final EntitySet<UserEntity> users() {
         return getEntitySet(UserEntity.EntityMetaType)
+    }
+
+    @Override
+    public final EntitySet<ExistingEntity> existingEntities() {
+        return getEntitySet(ExistingEntityMeta.EntityMetaType);
     }
 }

@@ -3,7 +3,6 @@
 package com.slimgears.slimrepo.core.internal;
 
 import com.slimgears.slimrepo.core.interfaces.Repository;
-import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.internal.interfaces.SessionServiceProvider;
@@ -25,7 +24,7 @@ public class AbstractRepository implements Repository {
     }
 
     @Override
-    public <TKey, TEntity extends Entity<TKey>> EntitySet<TEntity> entities(EntityType<TKey, TEntity> entityType) {
+    public <TKey, TEntity> EntitySet<TEntity> entities(EntityType<TKey, TEntity> entityType) {
         return sessionServiceProvider.getEntitySetProvider(entityType).get();
     }
 

@@ -1,28 +1,8 @@
-apply plugin: 'java'
-apply plugin: 'maven-publish'
-apply plugin: 'idea'
+apply plugin: 'java-lib-aio'
+apply plugin: 'publishing-aio'
 
 configurations {
     testOutput.extendsFrom (testCompile)
-}
-
-task copyTestResources(type: Copy) {
-    from "${projectDir}/src/test/resources"
-    into "${buildDir}/classes/test"
-}
-
-task copyResources(type: Copy) {
-    from "${projectDir}/src/main/resources"
-    into "${buildDir}/classes/main"
-}
-
-processTestResources.dependsOn copyTestResources
-processResources.dependsOn copyResources
-
-test {
-    afterTest { descriptor, result ->
-        println "TEST ${result.resultType} - ${descriptor.name}"
-    }
 }
 
 task testJar(type: Jar, dependsOn: testClasses) {
@@ -30,36 +10,11 @@ task testJar(type: Jar, dependsOn: testClasses) {
     from sourceSets.test.output
 }
 
-task sourceJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allJava
-}
-
-publishing {
-    repositories {
-        mavenLocal()
-    }
-    publications {
-        maven(MavenPublication) {
-            from components.java
-            artifact (sourceJar)
-        }
-    }
-}
-
-ext.pkg_desc = 'Slim Repository Core Library'
-ext.pkg_labels = ['java','orm','sqlite']
-
-apply from: '../bintray-publish.gradle'
-
 artifacts {
     testOutput testJar
 }
 
 dependencies {
-    compile 'com.google.guava:guava:18.0'
-
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:2.0.5-beta'
-    testCompile 'commons-io:commons-io:2.4'
+    compile "com.google.guava:guava:$guavaVersion"
+    testCompile "commons-io:commons-io:$appacheCommonsIoVersion"
 }

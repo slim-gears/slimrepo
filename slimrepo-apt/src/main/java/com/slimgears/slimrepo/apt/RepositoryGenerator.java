@@ -4,6 +4,7 @@ package com.slimgears.slimrepo.apt;// Copyright 2015 Denis Itskovich
 import com.slimgears.slimrepo.apt.base.ClassGenerator;
 import com.slimgears.slimrepo.apt.base.ElementVisitorBase;
 import com.slimgears.slimrepo.apt.base.TypeUtils;
+import com.slimgears.slimrepo.core.annotations.Entity;
 import com.slimgears.slimrepo.core.annotations.GenerateRepository;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.core.internal.DefaultRepositoryModel;
@@ -24,6 +25,7 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Elements;
 import javax.lang.model.util.SimpleTypeVisitor7;
 import javax.lang.model.util.Types;
 
@@ -39,10 +41,12 @@ public class RepositoryGenerator extends ClassGenerator<RepositoryGenerator> {
     public static class EntitySetType {
         public final TypeName entityType;
         public final TypeName entitySetType;
+        public final TypeName entityMeta;
 
-        public EntitySetType(TypeName entityType) {
+        public EntitySetType(TypeName entityType, TypeName entityMeta) {
             this.entityType = entityType;
             this.entitySetType = ParameterizedTypeName.get(ClassName.get(EntitySet.class), entityType);
+            this.entityMeta = entityMeta;
         }
     }
 
@@ -61,15 +65,15 @@ public class RepositoryGenerator extends ClassGenerator<RepositoryGenerator> {
         public Void visitExecutable(ExecutableElement method, Void param) {
             validateEntitySetGetter(getTypeUtils(), method);
             TypeMirror returnType = method.getReturnType();
-            EntitySetType entitySetType = getEntitySetType(getPackageName(), returnType);
+            EntitySetType entitySetType = getEntitySetType(getElementUtils(), getPackageName(), returnType);
 
             String name = method.getSimpleName().toString();
             String fieldName = (name.startsWith("get") ? TypeUtils.toCamelCase("", name.substring(3)) : name) + "EntitySet";
             TypeName fieldType = ParameterizedTypeName.get(ClassName.get(EntitySet.Provider.class), entitySetType.entityType);
 
             builder.addField(fieldType, fieldName, Modifier.FINAL, Modifier.PRIVATE);
-            ctorBuilder.addCode("this.$L = sessionServiceProvider.getEntitySetProvider($T.EntityMetaType);\n", fieldName, entitySetType.entityType);
-            modelCtorBuilder.addCode(", $T.EntityMetaType", entitySetType.entityType);
+            ctorBuilder.addCode("this.$L = sessionServiceProvider.getEntitySetProvider($T.EntityMetaType);\n", fieldName, entitySetType.entityMeta);
+            modelCtorBuilder.addCode(", $T.EntityMetaType", entitySetType.entityMeta);
 
             builder.addMethod(MethodSpec.methodBuilder(name)
                     .addAnnotation(Override.class)
@@ -82,7 +86,7 @@ public class RepositoryGenerator extends ClassGenerator<RepositoryGenerator> {
         }
     }
 
-    public static EntitySetType getEntitySetType(String packageName, TypeMirror entitySetType) {
+    public static EntitySetType getEntitySetType(Elements elementUtils, String packageName, TypeMirror entitySetType) {
         final List<TypeMirror> returnTypeArguments = new ArrayList<>();
         entitySetType.accept(new SimpleTypeVisitor7<Void, Void>() {
             @Override
@@ -93,12 +97,13 @@ public class RepositoryGenerator extends ClassGenerator<RepositoryGenerator> {
         }, null);
 
         TypeMirror entityTypeMirror = returnTypeArguments.get(0);
-        String entityTypeFullName = entityTypeMirror.toString();
-        String entityTypePackageName = TypeUtils.packageName(entityTypeFullName);
-        if (entityTypePackageName.isEmpty()) entityTypePackageName = packageName;
-        TypeName entityType = ClassName.get(entityTypePackageName, TypeUtils.simpleName(entityTypeMirror.toString()));
+        TypeName entityType = TypeUtils.getTypeName(entityTypeMirror, packageName);
+        TypeElement entityTypeElement = elementUtils.getTypeElement(entityType.toString());
+        TypeName entityMeta = entityTypeElement != null && entityTypeElement.getAnnotation(Entity.class) != null
+                ? MetaFields.generatedMetaEntityClassName(entityType)
+                : entityType;
 
-        return new EntitySetType(entityType);
+        return new EntitySetType(entityType, entityMeta);
     }
 
     public static void validateEntitySetGetter(Types typeUtils, ExecutableElement method) {

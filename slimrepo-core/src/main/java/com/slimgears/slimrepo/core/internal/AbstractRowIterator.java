@@ -1,6 +1,5 @@
 package com.slimgears.slimrepo.core.internal;
 
-import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimrepo.core.internal.interfaces.CloseableIterator;
 
@@ -9,7 +8,7 @@ import java.io.IOException;
 /**
  * Created by Denis on 02-May-15.
  */
-public abstract class AbstractRowIterator<T, TKey, TEntity extends Entity<TKey>> implements CloseableIterator<T> {
+public abstract class AbstractRowIterator<T, TKey, TEntity> implements CloseableIterator<T> {
     private final CloseableIterator<FieldValueLookup<TEntity>> rowIterator;
 
     public AbstractRowIterator(CloseableIterator<FieldValueLookup<TEntity>> rowIterator) {

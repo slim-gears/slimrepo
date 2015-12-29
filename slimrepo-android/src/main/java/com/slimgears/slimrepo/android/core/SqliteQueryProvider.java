@@ -5,7 +5,6 @@ package com.slimgears.slimrepo.android.core;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueMap;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
@@ -23,7 +22,7 @@ import java.util.Collection;
  * Created by Denis on 18-Apr-15
  * <File Description>
  */
-public class SqliteQueryProvider<TKey, TEntity extends Entity<TKey>> extends SqlQueryProvider<TKey, TEntity> {
+public class SqliteQueryProvider<TKey, TEntity> extends SqlQueryProvider<TKey, TEntity> {
     private final SQLiteDatabase database;
     private final Class keyType;
     private final FieldTypeMapper fieldTypeMapper;

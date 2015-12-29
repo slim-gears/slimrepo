@@ -36,7 +36,10 @@ public class TypeUtils {
     }
 
     public static String toCamelCase(String begin, String... parts) {
-        String name = begin;
+        String name = begin.length() > 0
+                ? Character.toLowerCase(begin.charAt(0)) + begin.substring(1)
+                : begin;
+
         for (String part : parts) {
             name += Character.toUpperCase(part.charAt(0)) + part.substring(1);
         }
@@ -61,19 +64,39 @@ public class TypeUtils {
 
     public static <TAnnotation extends Annotation> Collection<TypeName> getTypesFromAnnotation(TAnnotation annotation, AnnotationTypesGetter<TAnnotation> getter) {
         try {
-            return Collections2.transform(Arrays.asList(getter.getTypes(annotation)), new Function<Class, TypeName>() {
-                @Override
-                public TypeName apply(Class input) {
-                    return TypeName.get(input);
-                }
-            });
+            return Collections2.transform(Arrays.asList(getter.getTypes(annotation)), TypeName::get);
         } catch (MirroredTypesException e) {
-            return Collections2.transform(e.getTypeMirrors(), new Function<TypeMirror, TypeName>() {
-                @Override
-                public TypeName apply(TypeMirror input) {
-                    return TypeName.get(input);
-                }
-            });
+            return Collections2.transform(e.getTypeMirrors(), TypeName::get);
         }
+    }
+
+    public static TypeName getTypeName(final TypeMirror typeMirror) {
+        try {
+            return TypeName.get(typeMirror);
+        } catch (Exception e) {
+            return ClassName.get(TypeUtils.packageName(typeMirror.toString()), TypeUtils.simpleName(typeMirror.toString()));
+        }
+    }
+
+    public static TypeName getTypeName(TypeMirror typeMirror, String defaultPackageName) {
+        String typePackage = TypeUtils.packageName(typeMirror.toString());
+        if (typePackage.isEmpty()) typePackage = defaultPackageName;
+
+        try {
+            return TypeName.get(typeMirror);
+        } catch (Exception e) {
+            return ClassName.get(typePackage, TypeUtils.simpleName(typeMirror.toString()));
+        }
+    }
+
+    public static TypeName box(TypeName type) {
+        if (type == TypeName.INT) return TypeName.get(Integer.class);
+        if (type == TypeName.SHORT) return TypeName.get(Short.class);
+        if (type == TypeName.LONG) return TypeName.get(Long.class);
+        if (type == TypeName.BOOLEAN) return TypeName.get(Boolean.class);
+        if (type == TypeName.DOUBLE) return TypeName.get(Double.class);
+        if (type == TypeName.FLOAT) return TypeName.get(Float.class);
+        if (type == TypeName.BYTE) return TypeName.get(Byte.class);
+        return type;
     }
 }

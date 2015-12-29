@@ -2,7 +2,6 @@ package com.slimgears.slimrepo.core.internal;
 
 import com.slimgears.slimrepo.core.interfaces.Repository;
 import com.slimgears.slimrepo.core.interfaces.RepositoryService;
-import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.internal.interfaces.OrmServiceProvider;
 import com.slimgears.slimrepo.core.internal.interfaces.RepositoryModel;
@@ -12,7 +11,7 @@ import java.io.IOException;
 /**
  * Created by Denis on 02-May-15.
  */
-public class AutoEntitySet<TKey, TEntity extends Entity<TKey>, TRepository extends Repository> extends DefaultEntitySet<TKey, TEntity> {
+public class AutoEntitySet<TKey, TEntity, TRepository extends Repository> extends DefaultEntitySet<TKey, TEntity> {
     private final RepositoryService<TRepository> repositoryService;
     private final EntityType<TKey, TEntity> entityType;
 

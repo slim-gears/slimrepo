@@ -18,6 +18,9 @@ public interface Field<TEntity, T> {
         boolean isNullable();
     }
 
+    T getValue(TEntity entity);
+    void setValue(TEntity entity, T value);
+
     MetaInfo<T> metaInfo();
     Condition<TEntity> isNull();
     Condition<TEntity> isNotNull();

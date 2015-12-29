@@ -6,7 +6,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.slimgears.slimrepo.core.interfaces.Repository;
-import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.internal.interfaces.EntitySessionNotifier;
@@ -47,15 +46,15 @@ public abstract class AbstractSessionServiceProvider implements SessionServicePr
                 }
             });
 
-    protected abstract <TKey, TEntity extends Entity<TKey>> SessionEntityServiceProvider<TKey, TEntity> createEntityServiceProvider(EntityType<TKey, TEntity> entityType);
+    protected abstract <TKey, TEntity> SessionEntityServiceProvider<TKey, TEntity> createEntityServiceProvider(EntityType<TKey, TEntity> entityType);
     protected abstract RepositoryCreator createRepositoryCreator();
 
-    protected <TKey, TEntity extends Entity<TKey>> EntitySet.Provider<TEntity> createEntitySetProvider(EntityType<TKey, TEntity> entityType) {
+    protected <TKey, TEntity> EntitySet.Provider<TEntity> createEntitySetProvider(EntityType<TKey, TEntity> entityType) {
         return new DefaultEntitySet.Provider<>(this, entityType);
     }
 
     @Override
-    public <TKey, TEntity extends Entity<TKey>> SessionEntityServiceProvider<TKey, TEntity> getEntityServiceProvider(EntityType<TKey, TEntity> entityType) {
+    public <TKey, TEntity> SessionEntityServiceProvider<TKey, TEntity> getEntityServiceProvider(EntityType<TKey, TEntity> entityType) {
         try {
             //noinspection unchecked
             return entityServiceProviderCache.get(entityType);
@@ -65,7 +64,7 @@ public abstract class AbstractSessionServiceProvider implements SessionServicePr
     }
 
     @Override
-    public <TKey, TEntity extends Entity<TKey>> EntitySet.Provider<TEntity> getEntitySetProvider(EntityType<TKey, TEntity> entityType) {
+    public <TKey, TEntity> EntitySet.Provider<TEntity> getEntitySetProvider(EntityType<TKey, TEntity> entityType) {
         try {
             //noinspection unchecked
             return entitySetProviderCache.get(entityType);

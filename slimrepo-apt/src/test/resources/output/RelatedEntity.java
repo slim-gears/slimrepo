@@ -1,20 +1,28 @@
-import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityBuilder;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
-import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
-import com.slimgears.slimrepo.core.interfaces.entities.FieldValueMap;
 import com.slimgears.slimrepo.core.interfaces.fields.ComparableField;
 import com.slimgears.slimrepo.core.interfaces.fields.StringField;
+import com.slimgears.slimrepo.core.interfaces.fields.ValueGetter;
+import com.slimgears.slimrepo.core.interfaces.fields.ValueSetter;
 import com.slimgears.slimrepo.core.internal.AbstractEntityType;
 import com.slimgears.slimrepo.core.internal.Fields;
 import java.lang.Integer;
 import java.lang.Override;
 import java.lang.String;
 
-class RelatedEntity extends AbstractRelatedEntity implements Entity<Integer> {
-    public static final ComparableField<RelatedEntity, Integer> Id = Fields.comparableField("id", Integer.class, false);
+class RelatedEntity extends AbstractRelatedEntity {
+    public static final ComparableField<RelatedEntity, Integer> Id = Fields.comparableField(
+            "id",
+            Integer.class,
+            new ValueGetter<RelatedEntity, Integer>() { @Override public Integer getValue(RelatedEntity entity) { return entity.getId(); }},
+            new ValueSetter<RelatedEntity, Integer>() { @Override public void setValue(RelatedEntity entity, Integer value) { entity.setId(value); } },
+            false);
 
-    public static final StringField<RelatedEntity> Name = Fields.stringField("name", true);
+    public static final StringField<RelatedEntity> Name = Fields.stringField(
+            "name",
+            new ValueGetter<RelatedEntity, String>() { @Override public String getValue(RelatedEntity entity) { return entity.getName(); }},
+            new ValueSetter<RelatedEntity, String>() { @Override public void setValue(RelatedEntity entity, String value) { entity.setName(value); } },
+            true);
 
     public static final EntityType<Integer, RelatedEntity> EntityMetaType = new MetaType();
 
@@ -24,11 +32,6 @@ class RelatedEntity extends AbstractRelatedEntity implements Entity<Integer> {
     public RelatedEntity(int id, String name) {
         this.id = id;
         this.name = name;
-    }
-
-    @Override
-    public Integer getEntityId() {
-        return this.id;
     }
 
     public static Builder builder() {
@@ -59,31 +62,12 @@ class RelatedEntity extends AbstractRelatedEntity implements Entity<Integer> {
 
     private static class MetaType extends AbstractEntityType<Integer, RelatedEntity> {
         MetaType() {
-            super("RelatedEntity", RelatedEntity.class, Id, Name);
+            super(RelatedEntity.class, Id, Name);
         }
 
         @Override
         public RelatedEntity newInstance() {
             return new RelatedEntity();
-        }
-
-        @Override
-        public void setKey(RelatedEntity entity, Integer key) {
-            entity.setId(key);
-        }
-
-        @Override
-        public RelatedEntity newInstance(FieldValueLookup<RelatedEntity> lookup) {
-            return new RelatedEntity(
-                    lookup.getValue(Id),
-                    lookup.getValue(Name));
-        }
-
-        @Override
-        public void entityToMap(RelatedEntity entity, FieldValueMap<RelatedEntity> map) {
-            map
-                    .putValue(Id, entity.getId())
-                    .putValue(Name, entity.getName());
         }
     }
 

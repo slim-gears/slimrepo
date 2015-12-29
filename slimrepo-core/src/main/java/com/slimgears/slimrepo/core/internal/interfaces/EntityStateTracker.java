@@ -2,15 +2,13 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal.interfaces;
 
-import com.slimgears.slimrepo.core.interfaces.entities.Entity;
-
 import java.util.Collection;
 
 /**
  * Created by Denis on 09-Apr-15
  * <File Description>
  */
-public interface EntityStateTracker<TKey, TEntity extends Entity<TKey>> {
+public interface EntityStateTracker<TEntity> {
     Collection<TEntity> getModifiedEntities();
     Collection<TEntity> getAddedEntities();
     Collection<TEntity> getDeletedEntities();

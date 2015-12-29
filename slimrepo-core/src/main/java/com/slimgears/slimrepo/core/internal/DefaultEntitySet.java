@@ -2,10 +2,8 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.slimgears.slimrepo.core.interfaces.Repository;
-import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.queries.EntityDeleteQuery;
@@ -30,15 +28,15 @@ import static com.google.common.collect.Collections2.transform;
  * Created by Denis on 05-Apr-15
  * <File Description>
  */
-public class DefaultEntitySet<TKey, TEntity extends Entity<TKey>> extends AbstractEntitySet<TKey,TEntity> implements
+public class DefaultEntitySet<TKey, TEntity> extends AbstractEntitySet<TEntity> implements
         RepositorySessionNotifier.Listener {
     protected final SessionEntityServiceProvider<TKey, TEntity> sessionEntityServiceProvider;
     protected final EntityType<TKey, TEntity> entityType;
     private EntityCache<TKey, TEntity> entityCache;
-    private EntityStateTracker<TKey, TEntity> stateTracker;
+    private EntityStateTracker<TEntity> stateTracker;
     private QueryProvider<TKey, TEntity> queryProvider;
 
-    public static class Provider<TKey, TEntity extends Entity<TKey>> implements EntitySet.Provider<TEntity> {
+    public static class Provider<TKey, TEntity> implements EntitySet.Provider<TEntity> {
         private EntitySet<TEntity> entitySet = null;
         private final SessionServiceProvider sessionServiceProvider;
         private final EntityType<TKey, TEntity> entityType;
@@ -90,14 +88,14 @@ public class DefaultEntitySet<TKey, TEntity extends Entity<TKey>> extends Abstra
     @Override
     public void removeAll(Iterable<TEntity> entities) throws IOException {
         for (TEntity entity : entities) {
-            getCache().invalidate(entity.getEntityId());
+            getCache().invalidate(entityType.getKey(entity));
             getStateTracker().entityDeleted(entity);
         }
     }
 
     @Override
     public void onSavingChanges(Repository session) throws IOException {
-        EntityStateTracker<TKey, TEntity> tracker = getStateTracker();
+        EntityStateTracker<TEntity> tracker = getStateTracker();
         insert(tracker.getAddedEntities());
         delete(tracker.getDeletedEntities());
         update(tracker.getModifiedEntities());
@@ -106,13 +104,13 @@ public class DefaultEntitySet<TKey, TEntity extends Entity<TKey>> extends Abstra
 
     @Override
     public void onDiscardingChanges(Repository session) {
-        EntityStateTracker<TKey, TEntity> tracker = getStateTracker();
+        EntityStateTracker<TEntity> tracker = getStateTracker();
         EntityCache<TKey, TEntity> cache = getCache();
         for (TEntity entity : Iterables.concat(
                 tracker.getModifiedEntities(),
                 tracker.getAddedEntities(),
                 tracker.getModifiedEntities())) {
-            cache.invalidate(entity.getEntityId());
+            cache.invalidate(entityType.getKey(entity));
         }
         tracker.clearChanges();
     }
@@ -138,7 +136,7 @@ public class DefaultEntitySet<TKey, TEntity extends Entity<TKey>> extends Abstra
         if (entities.isEmpty()) return;
         for (TEntity entity : entities) {
             updateQuery()
-                    .where(entityType.getKeyField().eq(entity.getEntityId()))
+                    .where(entityType.getKeyField().eq(entityType.getKey(entity)))
                     .setAll(entity)
                     .prepare()
                     .execute();
@@ -146,12 +144,7 @@ public class DefaultEntitySet<TKey, TEntity extends Entity<TKey>> extends Abstra
     }
 
     private Collection<TKey> entitiesToIds(Collection<TEntity> entities) {
-        return transform(entities, new Function<TEntity, TKey>() {
-            @Override
-            public TKey apply(TEntity input) {
-                return input.getEntityId();
-            }
-        });
+        return transform(entities, entityType::getKey);
     }
 
     protected QueryProvider<TKey, TEntity> getQueryProvider() {
@@ -164,7 +157,7 @@ public class DefaultEntitySet<TKey, TEntity extends Entity<TKey>> extends Abstra
         return entityCache = sessionEntityServiceProvider.getEntityCache();
     }
 
-    protected EntityStateTracker<TKey, TEntity> getStateTracker() {
+    protected EntityStateTracker<TEntity> getStateTracker() {
         if (stateTracker != null) return stateTracker;
         return stateTracker = sessionEntityServiceProvider.getEntityStateTracker();
     }

@@ -4,8 +4,9 @@ package com.slimgears.slimrepo.core.prototype.generated;
 
 import com.slimgears.slimrepo.core.interfaces.fields.BlobField;
 import com.slimgears.slimrepo.core.interfaces.fields.RelationalField;
+import com.slimgears.slimrepo.core.interfaces.fields.ValueGetter;
+import com.slimgears.slimrepo.core.interfaces.fields.ValueSetter;
 import com.slimgears.slimrepo.core.prototype.AbstractUserEntity;
-import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueMap;
@@ -17,54 +18,59 @@ import com.slimgears.slimrepo.core.internal.AbstractEntityType;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
+public class UserEntity extends AbstractUserEntity {
     static class MetaType extends AbstractEntityType<Integer, UserEntity> {
         public MetaType() {
-            super("UserEntity", UserEntity.class, UserId, UserFirstName, UserLastName, LastVisitDate, Role, AccountStatus, Comments);
+            //noinspection unchecked
+            super(UserEntity.class, UserId, UserFirstName, UserLastName, LastVisitDate, Role, AccountStatus, Comments);
         }
 
         @Override
         public UserEntity newInstance() {
             return new UserEntity();
         }
-
-        @Override
-        public UserEntity newInstance(FieldValueLookup<UserEntity> lookup) {
-            return new UserEntity(
-                    lookup.getValue(UserId),
-                    lookup.getValue(UserFirstName),
-                    lookup.getValue(UserLastName),
-                    lookup.getValue(LastVisitDate),
-                    lookup.getValue(Role),
-                    lookup.getValue(AccountStatus),
-                    lookup.getValue(Comments));
-        }
-
-        @Override
-        public void entityToMap(UserEntity entity, FieldValueMap<UserEntity> map) {
-            map
-                    .putValue(UserId, entity.getUserId())
-                    .putValue(UserFirstName, entity.getUserFirstName())
-                    .putValue(UserLastName, entity.getUserLastName())
-                    .putValue(LastVisitDate, entity.getLastVisitDate())
-                    .putValue(Role, entity.getRole())
-                    .putValue(AccountStatus, entity.getAccountStatus())
-                    .putValue(Comments, entity.getComments());
-        }
-
-        @Override
-        public void setKey(UserEntity entity, Integer key) {
-            entity.setUserId(key);
-        }
     }
 
-    public static final ComparableField<UserEntity, Integer> UserId = Fields.comparableField("userId", Integer.class, false);
-    public static final StringField<UserEntity> UserFirstName = Fields.stringField("userFirstName", true);
-    public static final StringField<UserEntity> UserLastName = Fields.stringField("userLastName", true);
-    public static final ComparableField<UserEntity, Date> LastVisitDate = Fields.comparableField("lastVisitDate", Date.class, true);
-    public static final RelationalField<UserEntity, RoleEntity> Role = Fields.relationalField("role", RoleEntity.EntityMetaType, true);
-    public static final ComparableField<UserEntity, AccountStatus> AccountStatus = Fields.comparableField("accountStatus", AccountStatus.class, true);
-    public static final BlobField<UserEntity, ArrayList> Comments = Fields.blobField("comments", ArrayList.class, true);
+    public static final ComparableField<UserEntity, Integer> UserId = Fields.comparableField(
+            "userId",
+            Integer.class,
+            UserEntity::getUserId,
+            UserEntity::setUserId,
+            false);
+    public static final StringField<UserEntity> UserFirstName = Fields.stringField(
+            "userFirstName",
+            UserEntity::getUserFirstName,
+            UserEntity::setUserFirstName,
+            true);
+    public static final StringField<UserEntity> UserLastName = Fields.stringField(
+            "userLastName",
+            UserEntity::getUserLastName,
+            UserEntity::setUserLastName,
+            true);
+    public static final ComparableField<UserEntity, Date> LastVisitDate = Fields.comparableField(
+            "lastVisitDate",
+            Date.class,
+            UserEntity::getLastVisitDate,
+            UserEntity::setLastVisitDate,
+            true);
+    public static final RelationalField<UserEntity, RoleEntity> Role = Fields.relationalField(
+            "role",
+            RoleEntity.EntityMetaType,
+            UserEntity::getRole,
+            UserEntity::setRole,
+            true);
+    public static final ComparableField<UserEntity, AccountStatus> AccountStatus = Fields.comparableField(
+            "accountStatus",
+            AccountStatus.class,
+            UserEntity::getAccountStatus,
+            UserEntity::setAccountStatus,
+            true);
+    public static final BlobField<UserEntity, ArrayList> Comments = Fields.blobField(
+            "comments",
+            ArrayList.class,
+            UserEntity::getComments,
+            UserEntity::setComments,
+            true);
     public static final EntityType<Integer, UserEntity> EntityMetaType = new MetaType();
 
     private UserEntity() {
@@ -79,11 +85,6 @@ public class UserEntity extends AbstractUserEntity implements Entity<Integer> {
         this.accountStatus = accountStatus;
         this.role = role;
         this.comments = comments;
-    }
-
-    @Override
-    public Integer getEntityId() {
-        return getUserId();
     }
 
     public static class Builder {

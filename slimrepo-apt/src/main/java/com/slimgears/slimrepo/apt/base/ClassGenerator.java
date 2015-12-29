@@ -30,7 +30,7 @@ public abstract class ClassGenerator<T extends ClassGenerator<T>> {
     private Types typeUtils;
     private String className;
     private String packageName;
-    private TypeName superClass;
+    private TypeName superClass = TypeName.get(Object.class);
     private Collection<TypeName> superInterfaces = new ArrayList<>();
     private ClassName typeName;
 
@@ -84,15 +84,19 @@ public abstract class ClassGenerator<T extends ClassGenerator<T>> {
 
     protected abstract void build(TypeSpec.Builder builder, TypeElement type, TypeElement... interfaces);
 
+    public T className(ClassName className) {
+        this.typeName = className;
+        this.packageName = className.packageName();
+        this.className = className.simpleName();
+        return self();
+    }
+
     public T className(String qualifiedClassName) {
         return className(TypeUtils.packageName(qualifiedClassName), TypeUtils.simpleName(qualifiedClassName));
     }
 
     public T className(String packageName, String className) {
-        this.packageName = packageName;
-        this.className = className;
-        this.typeName = ClassName.get(packageName, className);
-        return self();
+        return className(ClassName.get(packageName, className));
     }
 
     public T addInterfaces(Type... interfaces) {
@@ -127,23 +131,13 @@ public abstract class ClassGenerator<T extends ClassGenerator<T>> {
 
     protected TypeName[] toTypeNames(Type[] classes) {
         return Collections2
-                .transform(Arrays.asList(classes), new Function<Type, TypeName>() {
-                    @Override
-                    public TypeName apply(Type input) {
-                        return TypeName.get(input);
-                    }
-                })
+                .transform(Arrays.asList(classes), TypeName::get)
                 .toArray(new TypeName[classes.length]);
     }
 
     protected TypeName[] toTypeNames(TypeElement[] typeElements) {
         return Collections2
-                .transform(Arrays.asList(typeElements), new Function<TypeElement, TypeName>() {
-                    @Override
-                    public TypeName apply(TypeElement input) {
-                        return TypeName.get(input.asType());
-                    }
-                })
+                .transform(Arrays.asList(typeElements), input -> TypeName.get(input.asType()))
                 .toArray(new TypeName[typeElements.length]);
     }
 

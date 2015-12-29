@@ -1,63 +1,17 @@
 import org.gradle.internal.jvm.Jvm
 
-apply plugin: 'java'
-apply plugin: 'maven-publish'
-apply plugin: 'idea'
-
-sourceCompatibility = JavaVersion.VERSION_1_7
-targetCompatibility = JavaVersion.VERSION_1_7
-
-task copyTestResources(type: Copy) {
-    from "${projectDir}/src/test/resources"
-    into "${buildDir}/classes/test"
-}
-
-task copyResources(type: Copy) {
-    from "${projectDir}/src/main/resources"
-    into "${buildDir}/classes/main"
-}
-
-task sourceJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allJava
-}
-
-processTestResources.dependsOn copyTestResources
-processResources.dependsOn copyResources
-
-publishing {
-    repositories {
-        mavenLocal()
-    }
-    publications {
-        maven(MavenPublication) {
-            from components.java
-            artifact (sourceJar)
-        }
-    }
-}
-
-test {
-    afterTest { descriptor, result ->
-        println "TEST ${result.resultType} - ${descriptor.name}"
-    }
-}
-
-ext.pkg_desc = 'Slim Repository Annotation Processor'
-ext.pkg_labels = ['java','orm','sqlite','apt']
-
-apply from: '../bintray-publish.gradle'
+apply plugin: 'java-lib-aio'
+apply plugin: 'publishing-aio'
 
 dependencies {
-    compile 'com.squareup:javapoet:1.0.0'
-    compile 'com.google.guava:guava:18.0'
+    compile "com.squareup:javapoet:$javaPoetVersion"
+    compile "com.google.guava:guava:$guavaVersion"
+    compile "com.annimon:stream:$annimonStreamVersion"
     compile project(':slimrepo-core')
-
+    
     testCompile project(path: ':slimrepo-core', configuration: 'testOutput')
-    testCompile 'junit:junit:4.12'
-    testCompile 'com.google.testing.compile:compile-testing:0.6'
-    testCompile 'com.google.truth:truth:0.25'
-    testCompile 'org.mockito:mockito-core:2.0.5-beta'
+    testCompile "com.google.testing.compile:compile-testing:$googleCompileTestingVersion"
+    testCompile "com.google.truth:truth:$googleTruthVersion"
 
     testCompile files(Jvm.current().getToolsJar())
 }

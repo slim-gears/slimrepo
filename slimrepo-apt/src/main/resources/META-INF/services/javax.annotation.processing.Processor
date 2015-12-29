@@ -1,2 +1,3 @@
+com.slimgears.slimrepo.apt.GenerateEntityAnnotationProcessor
 com.slimgears.slimrepo.apt.EntityAnnotationProcessor
 com.slimgears.slimrepo.apt.RepositoryAnnotationProcessor

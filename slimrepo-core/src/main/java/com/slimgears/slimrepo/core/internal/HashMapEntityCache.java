@@ -2,7 +2,7 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal;
 
-import com.slimgears.slimrepo.core.interfaces.entities.Entity;
+import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.internal.interfaces.EntityCache;
 
 import java.util.concurrent.Callable;
@@ -13,8 +13,13 @@ import java.util.concurrent.ConcurrentMap;
  * Created by Denis on 07-Apr-15
  * <File Description>
  */
-public class HashMapEntityCache<TKey, TEntity extends Entity<TKey>> implements EntityCache<TKey, TEntity> {
-    protected final ConcurrentMap<TKey, TEntity> entityCache = new ConcurrentHashMap<>();
+public class HashMapEntityCache<TKey, TEntity> implements EntityCache<TKey, TEntity> {
+    private final ConcurrentMap<TKey, TEntity> entityCache = new ConcurrentHashMap<>();
+    private final EntityType<TKey, TEntity> entityType;
+
+    public HashMapEntityCache(EntityType<TKey, TEntity> entityType) {
+        this.entityType = entityType;
+    }
 
     @Override
     public TEntity get(TKey id, Callable<TEntity> valueLoader) {
@@ -38,7 +43,7 @@ public class HashMapEntityCache<TKey, TEntity extends Entity<TKey>> implements E
 
     @Override
     public void put(TEntity entity) {
-        entityCache.putIfAbsent(entity.getEntityId(), entity);
+        entityCache.putIfAbsent(entityType.getKey(entity), entity);
     }
 
     @Override

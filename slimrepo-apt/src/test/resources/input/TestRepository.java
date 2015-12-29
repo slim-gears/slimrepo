@@ -10,4 +10,5 @@ import java.lang.Integer;
 public interface TestRepository extends Repository {
     EntitySet<RoleEntity> roles();
     EntitySet<UserEntity> users();
+    EntitySet<ExistingEntity> existingEntities();
 }

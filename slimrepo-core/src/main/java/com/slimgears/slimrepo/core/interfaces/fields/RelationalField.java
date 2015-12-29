@@ -1,7 +1,6 @@
 package com.slimgears.slimrepo.core.interfaces.fields;
 
 import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
-import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 
 /**

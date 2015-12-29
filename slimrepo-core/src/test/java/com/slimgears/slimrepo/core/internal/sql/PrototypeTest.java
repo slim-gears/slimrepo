@@ -138,7 +138,7 @@ public class PrototypeTest {
         when(executorMock.select(Matchers.any(String.class), Matchers.<String>anyVararg()))
                 .thenAnswer(answer(rowsMock(10)));
         when(executorMock.count(Matchers.any(String.class), Matchers.<String>anyVararg()))
-                .thenAnswer(answer(0));
+                .thenAnswer(answer(0l));
 
         doAnswer(answer(null))
                 .when(executorMock)
@@ -147,57 +147,43 @@ public class PrototypeTest {
 
     @Test
     public void queryCountWhereStringFieldContains() throws IOException {
-        testQuery(new RepositoryService.QueryAction<UserRepository, Long>() {
-            @Override
-            public Long execute(UserRepository repository) throws IOException {
-                return repository.users().query()
-                        .where(UserEntity.UserFirstName.contains("John"))
-                        .skip(2)
-                        .limit(10)
-                        .prepare()
-                        .count();
-            }
-        });
+        testQuery(repository -> repository.users().query()
+                .where(UserEntity.UserFirstName.contains("John"))
+                .skip(2)
+                .limit(10)
+                .prepare()
+                .count());
         Mockito.verify(executorMock).count(Matchers.any(String.class), Matchers.<String>anyVararg());
         assertSqlEquals("query-count-users.sql");
     }
 
     @Test
     public void queryWhereStringFieldContains() throws IOException {
-        testQuery(new RepositoryService.QueryAction<UserRepository, UserEntity[]>() {
-            @Override
-            public UserEntity[] execute(UserRepository repository) throws IOException {
-                return repository.users().query()
-                        .where(
-                                or(
-                                        and(
-                                                UserEntity.UserFirstName.contains("John"),
-                                                UserEntity.UserId.greaterThan(20)
-                                        ),
-                                        UserEntity.UserLastName.startsWith("Smi")
-                                ))
-                        .orderAsc(UserEntity.UserLastName, UserEntity.UserFirstName, UserEntity.UserId)
-                        .skip(3)
-                        .limit(10)
-                        .prepare()
-                        .toArray();
-            }
-        });
+        //noinspection unchecked
+        testQuery(repository -> repository.users().query()
+                .where(
+                        or(
+                                and(
+                                        UserEntity.UserFirstName.contains("John"),
+                                        UserEntity.UserId.greaterThan(20)
+                                ),
+                                UserEntity.UserLastName.startsWith("Smi")
+                        ))
+                .orderAsc(UserEntity.UserLastName, UserEntity.UserFirstName, UserEntity.UserId)
+                .skip(3)
+                .limit(10)
+                .prepare()
+                .toArray());
         Mockito.verify(executorMock).select(Matchers.any(String.class), Matchers.<String>anyVararg());
         assertSqlEquals("query-users.sql");
     }
 
     @Test
     public void queryCountWithRelationalCondition() throws IOException {
-        testQuery(new RepositoryService.QueryAction<UserRepository, Object>() {
-            @Override
-            public Object execute(UserRepository repository) throws IOException {
-                return repository.users().query()
-                        .where(UserEntity.Role.is(RoleEntity.RoleDescription.in("Admin")))
-                        .prepare()
-                        .count();
-            }
-        });
+        testQuery(repository -> repository.users().query()
+                .where(UserEntity.Role.is(RoleEntity.RoleDescription.in("Admin")))
+                .prepare()
+                .count());
         Mockito.verify(executorMock).count(Matchers.any(String.class), Matchers.<String>anyVararg());
         assertSqlEquals("query-count-related-field.sql");
     }
@@ -213,45 +199,30 @@ public class PrototypeTest {
 
     @Test
     public void queryWithRelationalCondition() throws IOException {
-        testQuery(new RepositoryService.QueryAction<UserRepository, Object>() {
-            @Override
-            public Object execute(UserRepository repository) throws IOException {
-                return repository.users().query()
-                        .where(UserEntity.Role.is(RoleEntity.RoleDescription.in("Admin")))
-                        .prepare()
-                        .toArray();
-            }
-        });
+        testQuery(repository -> repository.users().query()
+                .where(UserEntity.Role.is(RoleEntity.RoleDescription.in("Admin")))
+                .prepare()
+                .toArray());
         Mockito.verify(executorMock).select(Matchers.any(String.class), Matchers.<String>anyVararg());
         assertSqlEquals("query-related-field.sql");
     }
 
     @Test
     public void querySelectedFieldsToMap() throws IOException {
-        testQuery(new RepositoryService.QueryAction<UserRepository, Object>() {
-            @Override
-            public Object execute(UserRepository repository) throws IOException {
-                return repository.users().query()
-                        .where(UserEntity.UserFirstName.in("John", "Jake"))
-                        .selectToMap(UserEntity.UserFirstName, UserEntity.UserLastName);
-            }
-        });
+        testQuery(repository -> repository.users().query()
+                .where(UserEntity.UserFirstName.in("John", "Jake"))
+                .selectToMap(UserEntity.UserFirstName, UserEntity.UserLastName));
         Mockito.verify(executorMock).select(Matchers.any(String.class), Matchers.<String>anyVararg());
         assertSqlEquals("query-selected-to-map.sql");
     }
 
     @Test
     public void updateWithWhereTranslatedToSql() throws IOException {
-        testUpdate(new RepositoryService.UpdateAction<UserRepository>() {
-            @Override
-            public void execute(UserRepository repository) throws IOException {
-                repository.users().updateQuery()
-                        .where(UserEntity.UserFirstName.eq("John"))
-                        .set(UserEntity.UserLastName, "Doe")
-                        .prepare()
-                        .execute();
-            }
-        });
+        testUpdate(repository -> repository.users().updateQuery()
+                .where(UserEntity.UserFirstName.eq("John"))
+                .set(UserEntity.UserLastName, "Doe")
+                .prepare()
+                .execute());
         Mockito.verify(executorMock).execute(Matchers.any(String.class), Matchers.<String>anyVararg());
         assertSqlEquals("update-fields.sql");
     }
@@ -292,31 +263,28 @@ public class PrototypeTest {
     public void queryPredicatesTranslatedToSql() throws IOException {
         final Date fromDate = Dates.fromDate(2000, 1, 1);
         final Date toDate = addDays(fromDate, 1);
-        testQuery(new RepositoryService.QueryAction<UserRepository, Object>() {
-            @Override
-            public Object execute(UserRepository repository) throws IOException {
-                EntitySet<UserEntity> users = repository.users();
-                users.findAllWhere(UserEntity.UserLastName.isNull());
-                users.findAllWhere(UserEntity.UserFirstName.isNotNull());
-                users.findAllWhere(UserEntity.AccountStatus.eq(AccountStatus.PAUSED));
-                users.findAllWhere(UserEntity.AccountStatus.notEq(AccountStatus.ACTIVE));
-                users.findAllWhere(UserEntity.AccountStatus.in(AccountStatus.PAUSED, AccountStatus.DISABLED));
-                users.findAllWhere(UserEntity.AccountStatus.in(Arrays.asList(AccountStatus.PAUSED, AccountStatus.DISABLED)));
-                users.findAllWhere(UserEntity.AccountStatus.notIn(AccountStatus.ACTIVE, AccountStatus.DISABLED));
-                users.findAllWhere(UserEntity.AccountStatus.notIn(Arrays.asList(AccountStatus.ACTIVE, AccountStatus.DISABLED)));
-                users.findAllWhere(UserEntity.LastVisitDate.between(fromDate, toDate));
-                users.findAllWhere(UserEntity.LastVisitDate.greaterOrEq(fromDate));
-                users.findAllWhere(UserEntity.LastVisitDate.lessOrEq(toDate));
-                users.findAllWhere(UserEntity.LastVisitDate.greaterThan(fromDate));
-                users.findAllWhere(UserEntity.LastVisitDate.lessThan(toDate));
-                users.findAllWhere(UserEntity.Role.is(RoleEntity.RoleDescription.startsWith("A")));
-                users.findAllWhere(UserEntity.Role.is(RoleEntity.RoleDescription.endsWith("B")));
-                users.findAllWhere(UserEntity.Role.is(RoleEntity.RoleDescription.contains("C")));
-                users.findAllWhere(UserEntity.UserFirstName.notStartsWith("A"));
-                users.findAllWhere(UserEntity.UserFirstName.notEndsWith("B"));
-                users.findAllWhere(UserEntity.UserFirstName.notContains("C"));
-                return users;
-            }
+        testQuery(repository -> {
+            EntitySet<UserEntity> users = repository.users();
+            users.findAllWhere(UserEntity.UserLastName.isNull());
+            users.findAllWhere(UserEntity.UserFirstName.isNotNull());
+            users.findAllWhere(UserEntity.AccountStatus.eq(AccountStatus.PAUSED));
+            users.findAllWhere(UserEntity.AccountStatus.notEq(AccountStatus.ACTIVE));
+            users.findAllWhere(UserEntity.AccountStatus.in(AccountStatus.PAUSED, AccountStatus.DISABLED));
+            users.findAllWhere(UserEntity.AccountStatus.in(Arrays.asList(AccountStatus.PAUSED, AccountStatus.DISABLED)));
+            users.findAllWhere(UserEntity.AccountStatus.notIn(AccountStatus.ACTIVE, AccountStatus.DISABLED));
+            users.findAllWhere(UserEntity.AccountStatus.notIn(Arrays.asList(AccountStatus.ACTIVE, AccountStatus.DISABLED)));
+            users.findAllWhere(UserEntity.LastVisitDate.between(fromDate, toDate));
+            users.findAllWhere(UserEntity.LastVisitDate.greaterOrEq(fromDate));
+            users.findAllWhere(UserEntity.LastVisitDate.lessOrEq(toDate));
+            users.findAllWhere(UserEntity.LastVisitDate.greaterThan(fromDate));
+            users.findAllWhere(UserEntity.LastVisitDate.lessThan(toDate));
+            users.findAllWhere(UserEntity.Role.is(RoleEntity.RoleDescription.startsWith("A")));
+            users.findAllWhere(UserEntity.Role.is(RoleEntity.RoleDescription.endsWith("B")));
+            users.findAllWhere(UserEntity.Role.is(RoleEntity.RoleDescription.contains("C")));
+            users.findAllWhere(UserEntity.UserFirstName.notStartsWith("A"));
+            users.findAllWhere(UserEntity.UserFirstName.notEndsWith("B"));
+            users.findAllWhere(UserEntity.UserFirstName.notContains("C"));
+            return users;
         });
         Mockito.verify(executorMock, times(19)).select(Matchers.any(String.class), Matchers.<String>anyVararg());
         assertSqlEquals("query-predicates.sql");

@@ -1,0 +1,8 @@
+ext {
+    javaPoetVersion = '1.0.0'
+    guavaVersion = '18.0'
+    googleCompileTestingVersion = '0.6'
+    googleTruthVersion = '0.25'
+    appacheCommonsIoVersion = '2.4'
+    annimonStreamVersion = '1.0.3'
+}

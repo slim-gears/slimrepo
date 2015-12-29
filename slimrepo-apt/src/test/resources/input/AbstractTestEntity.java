@@ -19,6 +19,7 @@ class AbstractTestEntity {
     protected int id;
     protected String name;
     protected AbstractRelatedEntity related;
+    protected ExistingEntity relatedExisting;
     protected TestEnum enumValue;
     protected CustomType customTypeValue;
 }

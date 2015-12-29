@@ -4,7 +4,6 @@ package com.slimgears.slimrepo.core.internal.query;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterators;
-import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
@@ -27,7 +26,7 @@ import java.util.concurrent.Callable;
  * Created by Denis on 07-Apr-15
  * <File Description>
  */
-public class DefaultEntitySelectQuery<TKey, TEntity extends Entity<TKey>>
+public class DefaultEntitySelectQuery<TKey, TEntity>
         extends AbstractEntityQuery<TKey, TEntity, EntitySelectQuery<TEntity>, EntitySelectQuery.Builder<TEntity>, SelectQueryParams<TKey, TEntity>>
         implements EntitySelectQuery<TEntity>, EntitySelectQuery.Builder<TEntity> {
 

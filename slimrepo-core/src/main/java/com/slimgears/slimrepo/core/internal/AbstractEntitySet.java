@@ -1,13 +1,14 @@
 package com.slimgears.slimrepo.core.internal;
 
+import com.google.common.collect.Collections2;
 import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
-import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.interfaces.fields.ValueField;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +16,7 @@ import java.util.Map;
 /**
  * Created by Denis on 03-May-15.
  */
-public abstract class AbstractEntitySet<TKey, TEntity extends Entity<TKey>> implements EntitySet<TEntity> {
+public abstract class AbstractEntitySet<TEntity> implements EntitySet<TEntity> {
     @Override
     public final long countAll() throws IOException {
         return query().prepare().count();
@@ -64,6 +65,11 @@ public abstract class AbstractEntitySet<TKey, TEntity extends Entity<TKey>> impl
     @Override
     public final <K, V> Map<K, V> toMap(Field<TEntity, K> keyField, Field<TEntity, V> valueField) throws IOException {
         return query().selectToMap(keyField, valueField);
+    }
+
+    @Override
+    public final <T> Collection<T> map(Transformer<TEntity, T> mapper) throws IOException {
+        return Collections2.transform(query().prepare().toList(), mapper::transform);
     }
 
     @Override

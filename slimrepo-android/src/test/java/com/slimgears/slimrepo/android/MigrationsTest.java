@@ -41,7 +41,7 @@ import static com.slimgears.slimrepo.android.SchemeMatchers.matchTableNames;
  * Created by Denis on 18-May-15.
  */
 @RunWith(RobolectricTestRunner.class)
-@Config(emulateSdk = 18, manifest=Config.NONE)
+@Config(sdk = 18, manifest=Config.NONE)
 public class MigrationsTest {
     private static final RepositoryModel EMPTY_MODEL = new RepositoryModel() {
         @Override

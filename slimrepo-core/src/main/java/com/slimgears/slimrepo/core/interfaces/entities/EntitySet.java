@@ -10,6 +10,7 @@ import com.slimgears.slimrepo.core.interfaces.queries.EntitySelectQuery;
 import com.slimgears.slimrepo.core.interfaces.queries.EntityUpdateQuery;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -17,9 +18,13 @@ import java.util.Map;
  * Created by Denis on 02-Apr-15
  * <File Description>
  */
-public interface EntitySet<TEntity extends Entity<?>> {
-    interface Provider<TEntity extends Entity<?>> {
+public interface EntitySet<TEntity> {
+    interface Provider<TEntity> {
         EntitySet<TEntity> get();
+    }
+
+    interface Transformer<TEntity, T> {
+        T transform(TEntity entity);
     }
 
     EntitySelectQuery.Builder<TEntity> query();
@@ -38,6 +43,7 @@ public interface EntitySet<TEntity extends Entity<?>> {
     List<TEntity> toList() throws IOException;
     <T> Map<T, TEntity> toMap(Field<TEntity, T> keyField) throws IOException;
     <K, V> Map<K, V> toMap(Field<TEntity, K> keyField, Field<TEntity, V> valueField) throws IOException;
+    <T> Collection<T> map(Transformer<TEntity, T> mapper) throws IOException;
 
     @SuppressWarnings("unchecked")
     TEntity[] add(TEntity... entities) throws IOException;

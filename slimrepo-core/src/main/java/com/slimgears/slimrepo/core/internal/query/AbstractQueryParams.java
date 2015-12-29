@@ -2,7 +2,6 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal.query;
 
-import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 
 import java.util.ArrayList;
@@ -12,7 +11,7 @@ import java.util.Collection;
 * Created by Denis on 13-Apr-15
 * <File Description>
 */
-public abstract class AbstractQueryParams<TKey, TEntity extends Entity<TKey>, TQueryParams extends AbstractQueryParams<TKey, TEntity, TQueryParams>> {
+public abstract class AbstractQueryParams<TKey, TEntity, TQueryParams extends AbstractQueryParams<TKey, TEntity, TQueryParams>> {
     public final EntityType<TKey, TEntity> entityType;
 
     public AbstractQueryParams(EntityType<TKey, TEntity> entityType) {

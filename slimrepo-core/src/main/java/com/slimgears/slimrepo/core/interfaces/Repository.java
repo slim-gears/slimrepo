@@ -2,7 +2,6 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.interfaces;
 
-import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 
@@ -14,7 +13,7 @@ import java.io.IOException;
 * <File Description>
 */
 public interface Repository extends Closeable {
-    <TKey, TEntity extends Entity<TKey>> EntitySet<TEntity> entities(EntityType<TKey, TEntity> entityType);
+    <TKey, TEntity> EntitySet<TEntity> entities(EntityType<TKey, TEntity> entityType);
     void saveChanges() throws IOException;
     void discardChanges();
 }

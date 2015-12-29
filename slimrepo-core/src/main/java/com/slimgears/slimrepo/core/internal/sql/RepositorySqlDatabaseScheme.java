@@ -1,6 +1,5 @@
 package com.slimgears.slimrepo.core.internal.sql;
 
-import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.fields.ComparableField;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
@@ -21,7 +20,7 @@ class RepositorySqlDatabaseScheme implements SqlDatabaseScheme {
     private final Map<EntityType, TableScheme> tableSchemeMap = new LinkedHashMap<>();
     private final Map<String, TableScheme> nameToTableSchemeMap = new LinkedHashMap<>();
 
-    class EntityTypeTableScheme<TKey, TEntity extends Entity<TKey>> implements TableScheme {
+    class EntityTypeTableScheme<TKey, TEntity> implements TableScheme {
         private final EntityType<TKey, TEntity> entityType;
         private final Map<Field<TEntity, ?>, FieldScheme> fieldSchemeMap = new LinkedHashMap<>();
         private final Map<String, FieldScheme> nameToFieldSchemeMap = new LinkedHashMap<>();
@@ -138,7 +137,7 @@ class RepositorySqlDatabaseScheme implements SqlDatabaseScheme {
         return nameToTableSchemeMap.get(name);
     }
 
-    private <TKey, TEntity extends Entity<TKey>> TableScheme getTableScheme(EntityType<TKey, TEntity> entityType) {
+    private <TKey, TEntity> TableScheme getTableScheme(EntityType<TKey, TEntity> entityType) {
         return tableSchemeMap.get(entityType);
     }
 

@@ -3,7 +3,6 @@
 package com.slimgears.slimrepo.core.prototype.generated;
 
 import com.slimgears.slimrepo.core.prototype.AbstractRoleEntity;
-import com.slimgears.slimrepo.core.interfaces.entities.Entity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueMap;
 import com.slimgears.slimrepo.core.internal.Fields;
@@ -16,44 +15,20 @@ import com.slimgears.slimrepo.core.internal.AbstractEntityType;
  * Created by Denis on 05-Apr-15
  * <File Description>
  */
-public class RoleEntity extends AbstractRoleEntity implements Entity<Integer> {
-    public static final ComparableField<RoleEntity, Integer> RoleId = Fields.comparableField("roleId", Integer.class, false);
-    public static final StringField<RoleEntity> RoleDescription = Fields.stringField("roleDescription", true);
+public class RoleEntity extends AbstractRoleEntity {
+    public static final ComparableField<RoleEntity, Integer> RoleId = Fields.comparableField("roleId", Integer.class, RoleEntity::getRoleId, RoleEntity::setRoleId, false);
+    public static final StringField<RoleEntity> RoleDescription = Fields.stringField("roleDescription", RoleEntity::getRoleDescription, RoleEntity::setRoleDescription, true);
     public static final EntityType<Integer, RoleEntity> EntityMetaType = new MetaType();
 
     static class MetaType extends AbstractEntityType<Integer, RoleEntity> {
         protected MetaType() {
-            super("RoleEntity", RoleEntity.class, RoleId, RoleDescription);
+            super(RoleEntity.class, RoleId, RoleDescription);
         }
 
         @Override
         public RoleEntity newInstance() {
             return new RoleEntity();
         }
-
-        @Override
-        public RoleEntity newInstance(FieldValueLookup<RoleEntity> lookup) {
-            return new RoleEntity(
-                    lookup.getValue(RoleId),
-                    lookup.getValue(RoleDescription));
-        }
-
-        @Override
-        public void entityToMap(RoleEntity entity, FieldValueMap<RoleEntity> map) {
-            map
-                    .putValue(RoleId, entity.getRoleId())
-                    .putValue(RoleDescription, entity.getRoleDescription());
-        }
-
-        @Override
-        public void setKey(RoleEntity entity, Integer key) {
-            entity.setRoleId(key);
-        }
-    }
-
-    @Override
-    public Integer getEntityId() {
-        return getRoleId();
     }
 
     private RoleEntity() {

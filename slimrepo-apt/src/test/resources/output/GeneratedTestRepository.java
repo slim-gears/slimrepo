@@ -12,10 +12,13 @@ public class GeneratedTestRepository extends AbstractRepository implements TestR
 
     private final EntitySet.Provider<UserEntity> usersEntitySet;
 
+    private final EntitySet.Provider<ExistingEntity> existingEntitiesEntitySet;
+
     GeneratedTestRepository(SessionServiceProvider sessionServiceProvider) {
         super(sessionServiceProvider);
         this.rolesEntitySet = sessionServiceProvider.getEntitySetProvider(RoleEntity.EntityMetaType);
         this.usersEntitySet = sessionServiceProvider.getEntitySetProvider(UserEntity.EntityMetaType);
+        this.existingEntitiesEntitySet = sessionServiceProvider.getEntitySetProvider(ExistingEntityMeta.EntityMetaType);
     }
 
     @Override
@@ -28,6 +31,11 @@ public class GeneratedTestRepository extends AbstractRepository implements TestR
         return this.usersEntitySet.get();
     }
 
+    @Override
+    public final EntitySet<ExistingEntity> existingEntities() {
+        return this.existingEntitiesEntitySet.get();
+    }
+
     static class Model extends DefaultRepositoryModel {
         public static final Model Instance = new Model();
 
@@ -36,7 +44,7 @@ public class GeneratedTestRepository extends AbstractRepository implements TestR
         private static final String Name = "TestRepository";
 
         private Model() {
-            super(Name, Version, RoleEntity.EntityMetaType, UserEntity.EntityMetaType);
+            super(Name, Version, RoleEntity.EntityMetaType, UserEntity.EntityMetaType, ExistingEntityMeta.EntityMetaType);
         }
     }
 }
