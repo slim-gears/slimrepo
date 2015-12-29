@@ -73,8 +73,19 @@ public class TypeUtils {
     public static TypeName getTypeName(final TypeMirror typeMirror) {
         try {
             return TypeName.get(typeMirror);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             return ClassName.get(TypeUtils.packageName(typeMirror.toString()), TypeUtils.simpleName(typeMirror.toString()));
+        }
+    }
+
+    public static TypeName getTypeName(TypeMirror typeMirror, String defaultPackageName) {
+        String typePackage = TypeUtils.packageName(typeMirror.toString());
+        if (typePackage.isEmpty()) typePackage = defaultPackageName;
+
+        try {
+            return TypeName.get(typeMirror);
+        } catch (Exception e) {
+            return ClassName.get(typePackage, TypeUtils.simpleName(typeMirror.toString()));
         }
     }
 

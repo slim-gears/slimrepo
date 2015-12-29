@@ -6,4 +6,5 @@ import com.slimgears.slimrepo.core.prototype.generated.UserEntity;
 public interface TestRepositoryService extends RepositoryService<TestRepository> {
     EntitySet<RoleEntity> roles();
     EntitySet<UserEntity> users();
+    EntitySet<ExistingEntity> existingEntities();
 }

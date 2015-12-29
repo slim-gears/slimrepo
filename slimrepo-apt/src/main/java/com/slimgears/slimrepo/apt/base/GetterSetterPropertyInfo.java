@@ -17,12 +17,14 @@ public class GetterSetterPropertyInfo extends PropertyInfo {
     private final String name;
     private final ExecutableElement getterElement;
     private final ExecutableElement setterElement;
+    private final TypeName type;
 
     public GetterSetterPropertyInfo(Elements elementUtils, String name, ExecutableElement getterElement, ExecutableElement setterElement) {
         super(elementUtils);
         this.getterElement = getterElement;
         this.setterElement = setterElement;
         this.name = name;
+        this.type = TypeUtils.getTypeName(getterElement.getReturnType(), TypeUtils.packageName(getterElement.getEnclosingElement().asType().toString()));
     }
 
     @Override
@@ -32,7 +34,7 @@ public class GetterSetterPropertyInfo extends PropertyInfo {
 
     @Override
     public TypeName getType() {
-        return TypeUtils.getTypeName(getterElement.getReturnType());
+        return type;
     }
 
     @Override

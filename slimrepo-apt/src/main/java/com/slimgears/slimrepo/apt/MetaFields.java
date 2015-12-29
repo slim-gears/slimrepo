@@ -46,9 +46,18 @@ import javax.lang.model.element.TypeElement;
 @SuppressWarnings("StaticPseudoFunctionalStyleMethod")
 public class MetaFields {
     private static final Map<TypeName, AbstractMetaFieldBuilder> META_FIELD_BUILDER_MAP = new HashMap<>();
-    private final Map<TypeName, AbstractMetaFieldBuilder> metaFieldBuilderMap = new HashMap<>(META_FIELD_BUILDER_MAP);
+    private final Map<TypeName, AbstractMetaFieldBuilder> metaFieldBuilderMap;
 
     public MetaFields(TypeElement type) {
+        TypeName typeName = TypeName.get(type.asType());
+
+        if (type.getAnnotation(Entity.class) != null) {
+            META_FIELD_BUILDER_MAP.put(typeName, RelationalEntityMetaFieldBuilder.INSTANCE);
+        } else if (type.getAnnotation(GenerateEntity.class) != null) {
+            META_FIELD_BUILDER_MAP.put(entityTypeFromAbstract(typeName), RelationalGeneratedEntityMetaFieldBuilder.INSTANCE);
+        }
+
+        metaFieldBuilderMap = new HashMap<>(META_FIELD_BUILDER_MAP);
         mapFieldTypesFromAnnotation(type, ComparableSemantics.class, TYPES_FROM_COMPARABLE_SEMANTICS, ComparableMetaFieldBuilder.INSTANCE);
         mapFieldTypesFromAnnotation(type, BlobSemantics.class, TYPES_FROM_BLOB_SEMANTICS, BlobMetaFieldBuilder.INSTANCE);
         mapFieldTypesFromAnnotation(type, ValueSemantics.class, TYPES_FROM_VALUE_SEMANTICS, ValueMetaFieldBuilder.INSTANCE);

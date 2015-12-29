@@ -16,6 +16,7 @@ import com.squareup.javapoet.TypeSpec;
 
 import java.util.List;
 
+import javax.annotation.Generated;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;

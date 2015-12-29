@@ -63,16 +63,16 @@ public class RepositoryServiceGeneratorTest {
     @Test
     public void forExistingEntities_shouldGenerate_metaModel() {
         testAnnotationProcessing(
-                processedWith(new EntityAnnotationProcessor()),
-                inputFiles("ExistingEntity.java"),
+                processedWith(new GenerateEntityAnnotationProcessor(), new EntityAnnotationProcessor()),
+                inputFiles("ExistingEntity.java", "AbstractRelatedEntity.java"),
                 expectedFiles("ExistingEntityMeta.java"));
     }
 
     @Test
     public void forRepositoryInterface_shouldGenerate_implementationAndRepositoryService() {
         testAnnotationProcessing(
-                processedWith(new RepositoryAnnotationProcessor()),
-                inputFiles("TestRepository.java"),
+                processedWith(new GenerateEntityAnnotationProcessor(), new EntityAnnotationProcessor(), new RepositoryAnnotationProcessor()),
+                inputFiles("TestRepository.java", "ExistingEntity.java", "AbstractRelatedEntity.java"),
                 expectedFiles("GeneratedTestRepository.java", "TestRepositoryService.java", "GeneratedTestRepositoryService.java"));
     }
 

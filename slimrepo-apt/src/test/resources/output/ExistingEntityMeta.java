@@ -1,5 +1,6 @@
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.fields.ComparableField;
+import com.slimgears.slimrepo.core.interfaces.fields.RelationalField;
 import com.slimgears.slimrepo.core.interfaces.fields.StringField;
 import com.slimgears.slimrepo.core.interfaces.fields.ValueGetter;
 import com.slimgears.slimrepo.core.interfaces.fields.ValueSetter;
@@ -17,6 +18,14 @@ public class ExistingEntityMeta {
             new ValueSetter<ExistingEntity, Integer>() { @Override public void setValue(ExistingEntity entity, Integer value) { entity.setId(value); } },
             false);
 
+    public static final RelationalField<ExistingEntity, RelatedEntity> Related = Fields.relationalField(
+            "related",
+            RelatedEntity.EntityMetaType,
+            new ValueGetter<ExistingEntity, RelatedEntity>() { @Override public RelatedEntity getValue(ExistingEntity entity) { return entity.getRelated(); } },
+            new ValueSetter<ExistingEntity, RelatedEntity>() { @Override public void setValue(ExistingEntity entity, RelatedEntity value) { entity.setRelated(value); } },
+            true
+    )
+
     public static final StringField<ExistingEntity> Name = Fields.stringField(
             "name",
             new ValueGetter<ExistingEntity, String>() { @Override public String getValue(ExistingEntity entity) { return entity.getName(); } },
@@ -27,7 +36,7 @@ public class ExistingEntityMeta {
 
     private static class MetaType extends AbstractEntityType<Integer, ExistingEntity> {
         MetaType() {
-            super(ExistingEntity.class, Id, Name);
+            super(ExistingEntity.class, Id, Related, Name);
         }
 
         @Override

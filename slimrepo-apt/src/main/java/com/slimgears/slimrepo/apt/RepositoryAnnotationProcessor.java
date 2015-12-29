@@ -81,7 +81,7 @@ public class RepositoryAnnotationProcessor extends AnnotationProcessorBase {
 
         for (ExecutableElement method : getEntityGetterMethods(repositoryTypeElement)) {
             String methodName = method.getSimpleName().toString();
-            RepositoryGenerator.EntitySetType entitySetType = RepositoryGenerator.getEntitySetType(packageName, method.getReturnType());
+            RepositoryGenerator.EntitySetType entitySetType = RepositoryGenerator.getEntitySetType(processingEnv.getElementUtils(), packageName, method.getReturnType());
 
             repositoryServiceInterfaceBuilder.addMethod(MethodSpec.methodBuilder(methodName)
                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
@@ -92,7 +92,7 @@ public class RepositoryAnnotationProcessor extends AnnotationProcessorBase {
                     .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                     .addAnnotation(Override.class)
                     .returns(entitySetType.entitySetType)
-                    .addCode("return getEntitySet($T.EntityMetaType);\n", entitySetType.entityType)
+                    .addCode("return getEntitySet($T.EntityMetaType);\n", entitySetType.entityMeta)
                     .build());
         }
 

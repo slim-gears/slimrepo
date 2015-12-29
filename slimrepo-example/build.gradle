@@ -42,8 +42,9 @@ android {
 }
 
 dependencies {
-    compile 'com.slimgears.slimrepo:slimrepo-android:0.8.0'
-    apt 'com.slimgears.slimrepo:slimrepo-apt:0.8.0'
+    compile 'com.slimgears.slimrepo:slimrepo-android:0.9.3'
+    apt 'com.slimgears.slimrepo:slimrepo-apt:0.9.3'
+
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.0.31-beta'
