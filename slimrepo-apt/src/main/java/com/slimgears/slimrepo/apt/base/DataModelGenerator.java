@@ -99,7 +99,7 @@ public class DataModelGenerator extends ClassGenerator<DataModelGenerator> {
     }
 
     protected FieldPropertyInfo createFieldInfo(VariableElement element) {
-        return new FieldPropertyInfo(element);
+        return new FieldPropertyInfo(getElementUtils(), element);
     }
 
     protected void processFields(TypeSpec.Builder modelBuilder, MethodSpec.Builder modelCtorBuilder, Iterable<FieldPropertyInfo> fields) {

@@ -36,11 +36,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.util.Elements;
 
 /**
  * Created by ditskovi on 12/24/2015.
@@ -49,10 +47,8 @@ import javax.lang.model.util.Elements;
 public class MetaFields {
     private static final Map<TypeName, AbstractMetaFieldBuilder> META_FIELD_BUILDER_MAP = new HashMap<>();
     private final Map<TypeName, AbstractMetaFieldBuilder> metaFieldBuilderMap = new HashMap<>(META_FIELD_BUILDER_MAP);
-    private final Elements elementUtils;
 
-    public MetaFields(ProcessingEnvironment processingEnvironment, TypeElement type) {
-        elementUtils = processingEnvironment.getElementUtils();
+    public MetaFields(TypeElement type) {
         mapFieldTypesFromAnnotation(type, ComparableSemantics.class, TYPES_FROM_COMPARABLE_SEMANTICS, ComparableMetaFieldBuilder.INSTANCE);
         mapFieldTypesFromAnnotation(type, BlobSemantics.class, TYPES_FROM_BLOB_SEMANTICS, BlobMetaFieldBuilder.INSTANCE);
         mapFieldTypesFromAnnotation(type, ValueSemantics.class, TYPES_FROM_VALUE_SEMANTICS, ValueMetaFieldBuilder.INSTANCE);
@@ -83,12 +79,16 @@ public class MetaFields {
     }
 
 
-    public static String generateEntityTypeName(TypeName superClass) {
+    public static String generatedEntityTypeName(TypeName superClass) {
         return TypeUtils.simpleName(superClass.toString()).replace("Abstract", "");
     }
 
+    public static ClassName generatedMetaEntityClassName(TypeName entityClass) {
+        return ClassName.get(TypeUtils.packageName(entityClass.toString()), TypeUtils.simpleName(entityClass.toString()).concat("Meta"));
+    }
+
     public static TypeName entityTypeFromAbstract(TypeName superClass) {
-        String simpleName = generateEntityTypeName(superClass);
+        String simpleName = generatedEntityTypeName(superClass);
         String packageName = TypeUtils.packageName(superClass.toString());
         return ClassName.get(packageName, simpleName);
     }
@@ -111,18 +111,14 @@ public class MetaFields {
         return (P)Iterables.find(fields, input -> input.getAnnotation(annotationClass) != null, null);
     }
 
-    private boolean isEnumField(PropertyInfo prop) {
-        TypeElement type = typeElementForProperty(prop);
+    private static boolean isEnumField(PropertyInfo prop) {
+        TypeElement type = prop.getTypeElement();
         return type != null && type.getKind() == ElementKind.ENUM;
     }
 
-    private boolean isRelationalField(PropertyInfo prop) {
-        TypeElement type = typeElementForProperty(prop);
-        return (type != null) && (type.getAnnotation(GenerateEntity.class) != null || type.getAnnotation(Entity.class) != null);
-    }
-
-    private TypeElement typeElementForProperty(PropertyInfo prop) {
-        return elementUtils.getTypeElement(prop.getType().toString());
+    private static boolean isRelationalField(PropertyInfo prop, Class<? extends Annotation> annotationClass) {
+        TypeElement type = prop.getTypeElement();
+        return (type != null) && (type.getAnnotation(annotationClass) != null);
     }
 
     public static String getMetaFieldName(String fieldName) {
@@ -130,7 +126,8 @@ public class MetaFields {
     }
 
     private AbstractMetaFieldBuilder getMetaFieldBuilder(PropertyInfo prop) {
-        if (isRelationalField(prop)) return RelationalMetaFieldBuilder.INSTANCE;
+        if (isRelationalField(prop, GenerateEntity.class)) return RelationalGeneratedEntityMetaFieldBuilder.INSTANCE;
+        if (isRelationalField(prop, Entity.class)) return RelationalEntityMetaFieldBuilder.INSTANCE;
         if (isEnumField(prop)) return ComparableMetaFieldBuilder.INSTANCE;
         AbstractMetaFieldBuilder builder = metaFieldBuilderMap.get(prop.getType());
         return builder != null ? builder : BlobMetaFieldBuilder.INSTANCE;
@@ -175,7 +172,7 @@ public class MetaFields {
     }
 
     static class ValueMetaFieldBuilder extends AbstractMetaFieldBuilder {
-        static final ValueMetaFieldBuilder INSTANCE = new ValueMetaFieldBuilder();
+        public static final ValueMetaFieldBuilder INSTANCE = new ValueMetaFieldBuilder();
 
         @Override
         protected TypeName metaFieldType(TypeName entityType, TypeName fieldType) {
@@ -202,7 +199,7 @@ public class MetaFields {
     }
 
     static class ComparableMetaFieldBuilder extends AbstractMetaFieldBuilder {
-        static final ComparableMetaFieldBuilder INSTANCE = new ComparableMetaFieldBuilder();
+        public static final ComparableMetaFieldBuilder INSTANCE = new ComparableMetaFieldBuilder();
 
         @Override
         protected TypeName metaFieldType(TypeName entityType, TypeName fieldType) {
@@ -229,7 +226,7 @@ public class MetaFields {
     }
 
     static class StringMetaFieldBuilder extends AbstractMetaFieldBuilder {
-        static final StringMetaFieldBuilder INSTANCE = new StringMetaFieldBuilder();
+        public static final StringMetaFieldBuilder INSTANCE = new StringMetaFieldBuilder();
 
         @Override
         protected TypeName metaFieldType(TypeName entityType, TypeName fieldType) {
@@ -253,7 +250,7 @@ public class MetaFields {
     }
 
     static class BlobMetaFieldBuilder extends AbstractMetaFieldBuilder {
-        static final BlobMetaFieldBuilder INSTANCE = new BlobMetaFieldBuilder();
+        public static final BlobMetaFieldBuilder INSTANCE = new BlobMetaFieldBuilder();
 
         @Override
         protected TypeName metaFieldType(TypeName entityType, TypeName fieldType) {
@@ -279,13 +276,15 @@ public class MetaFields {
         }
     }
 
-    static class RelationalMetaFieldBuilder extends AbstractMetaFieldBuilder {
-        static final RelationalMetaFieldBuilder INSTANCE = new RelationalMetaFieldBuilder();
-
+    static abstract class AbstractRelationalMetaFieldBuilder extends AbstractMetaFieldBuilder {
         @Override
         protected TypeName metaFieldType(TypeName entityType, TypeName fieldType) {
             return ParameterizedTypeName.get(ClassName.get(RelationalField.class), entityType, fieldType);
         }
+    }
+
+    static class RelationalGeneratedEntityMetaFieldBuilder extends AbstractRelationalMetaFieldBuilder {
+        public static final RelationalGeneratedEntityMetaFieldBuilder INSTANCE = new RelationalGeneratedEntityMetaFieldBuilder();
 
         @Override
         protected FieldSpec.Builder initialize(TypeName entityType, FieldSpec.Builder builder, PropertyInfo prop) {
@@ -300,6 +299,34 @@ public class MetaFields {
                     Fields.class,
                     prop.getName(),
                     relatedEntityType,
+                    ValueGetter.class, entityType, relatedEntityType, relatedEntityType, entityType, prop.getGetterName(),
+                    ValueSetter.class, entityType, relatedEntityType, entityType, relatedEntityType, prop.getSetterName(),
+                    prop.isNullable());
+        }
+    }
+
+    static class RelationalEntityMetaFieldBuilder extends AbstractRelationalMetaFieldBuilder {
+        public static final RelationalEntityMetaFieldBuilder INSTANCE = new RelationalEntityMetaFieldBuilder();
+
+        @Override
+        protected TypeName metaFieldType(TypeName entityType, TypeName fieldType) {
+            return ParameterizedTypeName.get(ClassName.get(RelationalField.class), entityType, fieldType);
+        }
+
+        @Override
+        protected FieldSpec.Builder initialize(TypeName entityType, FieldSpec.Builder builder, PropertyInfo prop) {
+            TypeName relatedEntityType = entityTypeFromAbstract(prop.getType());
+            ClassName metaEntityClassName = generatedMetaEntityClassName(relatedEntityType);
+            return builder.initializer(
+                    "$T.relationalField(" +
+                            "\n    $S," +
+                            "\n    $T.EntityMetaType," +
+                            "\n    new $T<$T, $T>() { @Override public $T getValue($T entity) { return entity.$L(); } }," +
+                            "\n    new $T<$T, $T>() { @Override public void setValue($T entity, $T value) { entity.$L(value); } }," +
+                            "\n    $L)",
+                    Fields.class,
+                    prop.getName(),
+                    metaEntityClassName,
                     ValueGetter.class, entityType, relatedEntityType, relatedEntityType, entityType, prop.getGetterName(),
                     ValueSetter.class, entityType, relatedEntityType, entityType, relatedEntityType, prop.getSetterName(),
                     prop.isNullable());

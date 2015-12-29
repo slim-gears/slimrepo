@@ -84,15 +84,19 @@ public abstract class ClassGenerator<T extends ClassGenerator<T>> {
 
     protected abstract void build(TypeSpec.Builder builder, TypeElement type, TypeElement... interfaces);
 
+    public T className(ClassName className) {
+        this.typeName = className;
+        this.packageName = className.packageName();
+        this.className = className.simpleName();
+        return self();
+    }
+
     public T className(String qualifiedClassName) {
         return className(TypeUtils.packageName(qualifiedClassName), TypeUtils.simpleName(qualifiedClassName));
     }
 
     public T className(String packageName, String className) {
-        this.packageName = packageName;
-        this.className = className;
-        this.typeName = ClassName.get(packageName, className);
-        return self();
+        return className(ClassName.get(packageName, className));
     }
 
     public T addInterfaces(Type... interfaces) {

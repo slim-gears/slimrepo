@@ -35,10 +35,10 @@ public class EntityMetaGenerator extends ClassGenerator<EntityMetaGenerator> {
     public EntityMetaGenerator(ProcessingEnvironment processingEnvironment, TypeElement entityTypeElement) {
         super(processingEnvironment);
         this.entityTypeElement = entityTypeElement;
-        className(TypeUtils.packageName(entityTypeElement.asType().toString()), TypeUtils.simpleName(entityTypeElement.asType().toString()).concat("Meta"));
+        className(MetaFields.generatedMetaEntityClassName(TypeName.get(entityTypeElement.asType())));
     }
 
-    static class PropertyDescriptor {
+    class PropertyDescriptor {
         String name;
         ExecutableElement getter;
         ExecutableElement setter;
@@ -52,7 +52,7 @@ public class EntityMetaGenerator extends ClassGenerator<EntityMetaGenerator> {
         }
 
         GetterSetterPropertyInfo createPropertyInfo() {
-            return new GetterSetterPropertyInfo(getName(), getter, setter);
+            return new GetterSetterPropertyInfo(getElementUtils(), getName(), getter, setter);
         }
     }
 
@@ -104,17 +104,20 @@ public class EntityMetaGenerator extends ClassGenerator<EntityMetaGenerator> {
         PropertyFinder propertyFinder = new PropertyFinder();
         entityTypeElement.accept(propertyFinder, null);
         TypeName entityTypeName = TypeUtils.getTypeName(entityTypeElement.asType());
-        MetaFields metaFields = new MetaFields(getProcessingEnvironment(), entityTypeElement);
+        MetaFields metaFields = new MetaFields(entityTypeElement);
         List<GetterSetterPropertyInfo> properties = Stream.of(propertyFinder.getProperties())
                 .map(PropertyDescriptor::createPropertyInfo)
                 .collect(Collectors.toList());
+
+        GetterSetterPropertyInfo keyProperty = MetaFields.getKeyField(getTypeName(), properties);
+        properties.remove(keyProperty);
+        properties.add(0, keyProperty);
+        TypeName keyType = TypeUtils.box(keyProperty.getType());
 
         for (GetterSetterPropertyInfo prop : properties) {
             builder.addField(metaFields.buildMetaField(entityTypeName, prop));
         }
 
-        PropertyInfo keyProperty = MetaFields.getKeyField(getTypeName(), properties);
-        TypeName keyType = TypeUtils.box(keyProperty.getType());
 
         builder
                 .addModifiers(Modifier.PUBLIC)

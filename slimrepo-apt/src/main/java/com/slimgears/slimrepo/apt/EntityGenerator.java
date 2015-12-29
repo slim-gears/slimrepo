@@ -35,7 +35,7 @@ public class EntityGenerator extends DataModelGenerator {
         super.superClass(superClass);
         className(
                 TypeUtils.packageName(superClass.toString()),
-                MetaFields.generateEntityTypeName(superClass));
+                MetaFields.generatedEntityTypeName(superClass));
         return this;
     }
 
@@ -49,7 +49,7 @@ public class EntityGenerator extends DataModelGenerator {
 
     @Override
     protected void build(TypeSpec.Builder builder, TypeElement type, List<FieldPropertyInfo> fields) {
-        MetaFields metaFields = new MetaFields(getProcessingEnvironment(), type);
+        MetaFields metaFields = new MetaFields(type);
 
         FieldPropertyInfo keyField = MetaFields.getKeyField(getTypeName(), fields);
         fields.remove(keyField);

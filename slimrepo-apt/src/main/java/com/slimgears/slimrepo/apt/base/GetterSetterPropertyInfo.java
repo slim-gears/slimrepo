@@ -7,6 +7,8 @@ import com.squareup.javapoet.TypeName;
 import java.lang.annotation.Annotation;
 
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.util.Elements;
 
 /**
  * Created by ditskovi on 12/27/2015.
@@ -16,7 +18,8 @@ public class GetterSetterPropertyInfo extends PropertyInfo {
     private final ExecutableElement getterElement;
     private final ExecutableElement setterElement;
 
-    public GetterSetterPropertyInfo(String name, ExecutableElement getterElement, ExecutableElement setterElement) {
+    public GetterSetterPropertyInfo(Elements elementUtils, String name, ExecutableElement getterElement, ExecutableElement setterElement) {
+        super(elementUtils);
         this.getterElement = getterElement;
         this.setterElement = setterElement;
         this.name = name;
@@ -51,4 +54,8 @@ public class GetterSetterPropertyInfo extends PropertyInfo {
         return annotation;
     }
 
+    @Override
+    public TypeElement getTypeElement() {
+        return elementUtils.getTypeElement(getterElement.getReturnType().toString());
+    }
 }

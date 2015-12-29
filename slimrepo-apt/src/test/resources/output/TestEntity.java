@@ -1,7 +1,7 @@
 import com.slimgears.slimrepo.core.interfaces.entities.EntityBuilder;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
-import com.slimgears.slimrepo.core.interfaces.fields.BlobField;
 import com.slimgears.slimrepo.core.interfaces.fields.ComparableField;
+import com.slimgears.slimrepo.core.interfaces.fields.RelationalField;
 import com.slimgears.slimrepo.core.interfaces.fields.StringField;
 import com.slimgears.slimrepo.core.interfaces.fields.ValueField;
 import com.slimgears.slimrepo.core.interfaces.fields.ValueGetter;
@@ -26,11 +26,18 @@ class TestEntity extends AbstractTestEntity {
             new ValueSetter<TestEntity, String>() { @Override public void setValue(TestEntity entity, String value) { entity.setName(value); } },
             true);
 
-    public static final BlobField<TestEntity, RelatedEntity> Related = Fields.blobField(
+    public static final RelationalField<TestEntity, RelatedEntity> Related = Fields.relationalField(
             "related",
-            RelatedEntity.class,
+            RelatedEntity.EntityMetaType,
             new ValueGetter<TestEntity, RelatedEntity>() { @Override public RelatedEntity getValue(TestEntity entity) { return entity.getRelated(); } },
             new ValueSetter<TestEntity, RelatedEntity>() { @Override public void setValue(TestEntity entity, RelatedEntity value) { entity.setRelated(value); } },
+            true);
+
+    public static final RelationalField<TestEntity, ExistingEntity> RelatedExisting = Fields.relationalField(
+            "relatedExisting",
+            ExistingEntityMeta.EntityMetaType,
+            new ValueGetter<TestEntity, ExistingEntity>() { @Override public ExistingEntity getValue(TestEntity entity) { return entity.getRelatedExisting(); } },
+            new ValueSetter<TestEntity, ExistingEntity>() { @Override public void setValue(TestEntity entity, ExistingEntity value) { entity.setRelatedExisting(value); } },
             true);
 
     public static final ComparableField<TestEntity, TestEnum> EnumValue = Fields.comparableField(
@@ -52,10 +59,11 @@ class TestEntity extends AbstractTestEntity {
     private TestEntity() {
     }
 
-    public TestEntity(int id, String name, RelatedEntity related, TestEnum enumValue, CustomType customTypeValue) {
+    public TestEntity(int id, String name, RelatedEntity related, ExistingEntity relatedExisting, TestEnum enumValue, CustomType customTypeValue) {
         this.id = id;
         this.name = name;
         this.related = related;
+        this.relatedExisting = relatedExisting;
         this.enumValue = enumValue;
         this.customTypeValue = customTypeValue;
     }
@@ -95,6 +103,15 @@ class TestEntity extends AbstractTestEntity {
         return (RelatedEntity)this.related;
     }
 
+    public TestEntity setRelatedExisting(ExistingEntity relatedExisting) {
+        this.relatedExisting = relatedExisting;
+        return this;
+    }
+
+    public ExistingEntity getRelatedExisting() {
+        return this.relatedExisting;
+    }
+
     public TestEntity setEnumValue(TestEnum enumValue) {
         this.enumValue = enumValue;
         return this;
@@ -115,7 +132,7 @@ class TestEntity extends AbstractTestEntity {
 
     private static class MetaType extends AbstractEntityType<Integer, TestEntity> {
         MetaType() {
-            super(TestEntity.class, Id, Name, Related, EnumValue, CustomTypeValue);
+            super(TestEntity.class, Id, Name, Related, RelatedExisting, EnumValue, CustomTypeValue);
         }
 
         @Override
@@ -143,6 +160,11 @@ class TestEntity extends AbstractTestEntity {
 
         public Builder related(RelatedEntity related) {
             model.setRelated(related);
+            return this;
+        }
+
+        public Builder relatedExisting(ExistingEntity relatedExisting) {
+            model.setRelatedExisting(relatedExisting);
             return this;
         }
 

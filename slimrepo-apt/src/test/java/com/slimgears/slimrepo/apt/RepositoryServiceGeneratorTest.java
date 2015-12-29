@@ -9,6 +9,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.util.Arrays;
+
 import javax.annotation.processing.AbstractProcessor;
 import javax.tools.JavaFileObject;
 
@@ -37,7 +39,11 @@ public class RepositoryServiceGeneratorTest {
         return transform(asList(files), input -> JavaFileObjects.forResource(path + '/' + input));
     }
 
-    private void testAnnotationProcessing(AbstractProcessor processor, Iterable<JavaFileObject> inputs, Iterable<JavaFileObject> expectedOutputs) {
+    private static Iterable<AbstractProcessor> processedWith(AbstractProcessor... processors) {
+        return Arrays.asList(processors);
+    }
+
+    private void testAnnotationProcessing(Iterable<AbstractProcessor> processor, Iterable<JavaFileObject> inputs, Iterable<JavaFileObject> expectedOutputs) {
         assert_()
                 .about(javaSources())
                 .that(inputs)
@@ -49,15 +55,15 @@ public class RepositoryServiceGeneratorTest {
     @Test
     public void forAbstractEntities_shouldGenerate_concreteEntities() {
         testAnnotationProcessing(
-                new GenerateEntityAnnotationProcessor(),
-                inputFiles("AbstractRelatedEntity.java", "AbstractTestEntity.java"),
-                expectedFiles("TestEntity.java", "RelatedEntity.java"));
+                processedWith(new GenerateEntityAnnotationProcessor(), new EntityAnnotationProcessor()),
+                inputFiles("ExistingEntity.java", "AbstractRelatedEntity.java", "AbstractTestEntity.java"),
+                expectedFiles("TestEntity.java", "RelatedEntity.java", "ExistingEntityMeta.java"));
     }
 
     @Test
     public void forExistingEntities_shouldGenerate_metaModel() {
         testAnnotationProcessing(
-                new EntityAnnotationProcessor(),
+                processedWith(new EntityAnnotationProcessor()),
                 inputFiles("ExistingEntity.java"),
                 expectedFiles("ExistingEntityMeta.java"));
     }
@@ -65,7 +71,7 @@ public class RepositoryServiceGeneratorTest {
     @Test
     public void forRepositoryInterface_shouldGenerate_implementationAndRepositoryService() {
         testAnnotationProcessing(
-                new RepositoryAnnotationProcessor(),
+                processedWith(new RepositoryAnnotationProcessor()),
                 inputFiles("TestRepository.java"),
                 expectedFiles("GeneratedTestRepository.java", "TestRepositoryService.java", "GeneratedTestRepositoryService.java"));
     }
@@ -73,7 +79,7 @@ public class RepositoryServiceGeneratorTest {
     @Test
     public void forCustomOrmRepository_shouldGenerate_customRepositoryImplementationAndService() {
         testAnnotationProcessing(
-                new RepositoryAnnotationProcessor(),
+                processedWith(new RepositoryAnnotationProcessor()),
                 inputFiles("CustomOrmRepository.java"),
                 expectedFiles("GeneratedCustomOrmRepository.java", "CustomOrmRepositoryService.java", "GeneratedCustomOrmRepositoryService.java"));
     }
