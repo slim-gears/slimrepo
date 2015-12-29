@@ -42,8 +42,8 @@ android {
 }
 
 dependencies {
-    compile 'com.slimgears.slimrepo:slimrepo-android:0.9.3'
-    apt 'com.slimgears.slimrepo:slimrepo-apt:0.9.3'
+    compile 'com.slimgears.slimrepo:slimrepo-android:0.9.4'
+    apt 'com.slimgears.slimrepo:slimrepo-apt:0.9.4'
 
 
     testCompile 'junit:junit:4.12'
