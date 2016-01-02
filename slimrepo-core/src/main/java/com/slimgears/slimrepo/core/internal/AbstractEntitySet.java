@@ -1,12 +1,12 @@
 package com.slimgears.slimrepo.core.internal;
 
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Maps;
 import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.interfaces.fields.ValueField;
-import com.slimgears.slimrepo.core.utilities.Maps;
 
 import java.io.IOException;
 import java.util.Arrays;
