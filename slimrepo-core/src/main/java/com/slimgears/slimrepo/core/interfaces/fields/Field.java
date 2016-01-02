@@ -15,7 +15,10 @@ public interface Field<TEntity, T> {
         EntityType<?, ?> getEntityType();
         String getName();
         Class<T> getValueType();
+        T generateValue();
         boolean isNullable();
+        boolean isKey();
+        boolean isAutoIncremented();
     }
 
     T getValue(TEntity entity);

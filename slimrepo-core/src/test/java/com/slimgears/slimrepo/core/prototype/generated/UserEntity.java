@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class UserEntity extends AbstractUserEntity {
-    static class MetaType extends AbstractEntityType<Integer, UserEntity> {
+    static class MetaType extends AbstractEntityType<String, UserEntity> {
         public MetaType() {
             //noinspection unchecked
             super(UserEntity.class, UserId, UserFirstName, UserLastName, LastVisitDate, Role, AccountStatus, Comments);
@@ -31,9 +31,8 @@ public class UserEntity extends AbstractUserEntity {
         }
     }
 
-    public static final ComparableField<UserEntity, Integer> UserId = Fields.comparableField(
+    public static final StringField<UserEntity> UserId = Fields.stringField(
             "userId",
-            Integer.class,
             UserEntity::getUserId,
             UserEntity::setUserId,
             false);
@@ -71,13 +70,13 @@ public class UserEntity extends AbstractUserEntity {
             UserEntity::getComments,
             UserEntity::setComments,
             true);
-    public static final EntityType<Integer, UserEntity> EntityMetaType = new MetaType();
+    public static final EntityType<String, UserEntity> EntityMetaType = new MetaType();
 
     private UserEntity() {
 
     }
 
-    public UserEntity(int userId, String userFirstName, String userLastName, Date lastVisitDate, RoleEntity role, AccountStatus accountStatus, ArrayList comments) {
+    public UserEntity(String userId, String userFirstName, String userLastName, Date lastVisitDate, RoleEntity role, AccountStatus accountStatus, ArrayList comments) {
         this.userId = userId;
         this.userFirstName = userFirstName;
         this.userLastName = userLastName;
@@ -90,7 +89,7 @@ public class UserEntity extends AbstractUserEntity {
     public static class Builder {
         private UserEntity model = new UserEntity();
 
-        public Builder userId(int id) {
+        public Builder userId(String id) {
             model.setUserId(id);
             return this;
         }
@@ -138,11 +137,11 @@ public class UserEntity extends AbstractUserEntity {
         return new UserEntity();
     }
 
-    public int getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public UserEntity setUserId(int userId) {
+    public UserEntity setUserId(String userId) {
         this.userId = userId;
         return this;
     }

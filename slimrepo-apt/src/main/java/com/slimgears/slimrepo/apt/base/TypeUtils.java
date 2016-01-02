@@ -1,6 +1,5 @@
 package com.slimgears.slimrepo.apt.base;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;

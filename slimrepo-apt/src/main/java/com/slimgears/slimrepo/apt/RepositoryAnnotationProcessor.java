@@ -36,6 +36,7 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.MirroredTypesException;
+import javax.lang.model.util.Elements;
 
 import static com.google.common.collect.Collections2.filter;
 import static com.google.common.collect.Collections2.transform;
@@ -48,8 +49,10 @@ import static com.google.common.collect.Collections2.transform;
 public class RepositoryAnnotationProcessor extends AnnotationProcessorBase {
     @Override
     protected boolean processType(TypeElement repositoryTypeElement) throws IOException {
-        String repositoryImplementationName = "Generated" + repositoryTypeElement.getSimpleName().toString();
-        String packageName = TypeUtils.packageName(repositoryTypeElement.getQualifiedName().toString());
+        Elements elementUtils = processingEnv.getElementUtils();
+        String packageName = elementUtils.getPackageOf(repositoryTypeElement).getQualifiedName().toString();
+        String nameWithoutPackage = repositoryTypeElement.toString().substring(packageName.isEmpty() ? 0 : packageName.length() + 1).replace('.', '_');
+        String repositoryImplementationName = "Generated" + nameWithoutPackage;
 
         new RepositoryGenerator(processingEnv)
                 .className(packageName, repositoryImplementationName)
@@ -58,7 +61,7 @@ public class RepositoryAnnotationProcessor extends AnnotationProcessorBase {
                 .build();
 
         ClassName repositoryImplClassName = ClassName.get(packageName, repositoryImplementationName);
-        String repositoryServiceInterfaceName = repositoryTypeElement.getSimpleName().toString() + "Service";
+        String repositoryServiceInterfaceName = nameWithoutPackage + "Service";
 
         TypeSpec.Builder repositoryServiceInterfaceBuilder = TypeSpec.interfaceBuilder(repositoryServiceInterfaceName)
                 .addAnnotation(AnnotationSpec

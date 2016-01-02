@@ -83,4 +83,12 @@ public class RepositoryServiceGeneratorTest {
                 inputFiles("CustomOrmRepository.java"),
                 expectedFiles("GeneratedCustomOrmRepository.java", "CustomOrmRepositoryService.java", "GeneratedCustomOrmRepositoryService.java"));
     }
+
+    @Test
+    public void forInnerRepository_shouldGenerate_repositoryImplementationAndService() {
+        testAnnotationProcessing(
+                processedWith(new GenerateEntityAnnotationProcessor(), new EntityAnnotationProcessor(), new RepositoryAnnotationProcessor()),
+                inputFiles("RepositoryContainer.java"),
+                expectedFiles("GeneratedRepositoryContainer_InnerRepository.java", "RepositoryContainer_InnerRepositoryService.java", "GeneratedRepositoryContainer_InnerRepositoryService.java"));
+    }
 }

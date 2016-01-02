@@ -9,6 +9,7 @@ import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlDatabaseScheme;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlStatementBuilder;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -18,7 +19,7 @@ import java.util.Set;
  * Created by Denis on 21-May-15.
  */
 public class SqliteSchemeProvider extends AbstractSqlSchemeProvider {
-    private final static Set<String> IGNORED_TABLES = new HashSet<>(Arrays.asList("android_metadata"));
+    private final static Set<String> IGNORED_TABLES = new HashSet<>(Collections.singletonList("android_metadata"));
 
     private final static String SQL_GET_TABLE_NAMES = "SELECT `name` FROM `sqlite_master`";
     private final static String SQL_GET_FOREIGN_KEY_LIST = "PRAGMA foreign_key_list(`%s`)";

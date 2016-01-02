@@ -2,6 +2,7 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.apt;
 
+import com.annimon.stream.Stream;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.slimgears.slimrepo.apt.base.PropertyInfo;
@@ -103,10 +104,10 @@ public class MetaFields {
     }
 
     public static <P extends PropertyInfo> P getKeyField(TypeName entityTypeName, Iterable<? extends P> fields) {
-        P field = findAnnotatedField(fields, Key.class);
-        if (field == null) {
-            field = findFieldByName(fields, "id", getEntityIdFieldName(entityTypeName));
-        }
+        P field = Stream.of(fields)
+                .filter(f -> isKeyField(entityTypeName, f))
+                .findFirst()
+                .orElseGet(null);
 
         if (field == null) {
             throw new RuntimeException(String.format(
@@ -116,6 +117,13 @@ public class MetaFields {
                     getEntityIdFieldName(entityTypeName)));
         }
         return field;
+    }
+
+    public static boolean isKeyField(TypeName entityTypeName, PropertyInfo field) {
+        return
+                field.getAnnotation(Key.class) != null ||
+                field.getName().equals("id") ||
+                field.getName().equals(getEntityIdFieldName(entityTypeName));
     }
 
     private static String getEntityIdFieldName(TypeName entityTypeName) {
@@ -172,6 +180,7 @@ public class MetaFields {
         META_FIELD_BUILDER_MAP.put(TypeName.BYTE, ComparableMetaFieldBuilder.INSTANCE);
         META_FIELD_BUILDER_MAP.put(TypeName.DOUBLE, ComparableMetaFieldBuilder.INSTANCE);
         META_FIELD_BUILDER_MAP.put(TypeName.FLOAT, ComparableMetaFieldBuilder.INSTANCE);
+        META_FIELD_BUILDER_MAP.put(TypeName.BOOLEAN, ValueMetaFieldBuilder.INSTANCE);
         META_FIELD_BUILDER_MAP.put(TypeName.get(Date.class), ComparableMetaFieldBuilder.INSTANCE);
         META_FIELD_BUILDER_MAP.put(TypeName.get(String.class), StringMetaFieldBuilder.INSTANCE);
     }
@@ -182,7 +191,7 @@ public class MetaFields {
 
     static abstract class AbstractMetaFieldBuilder {
         public FieldSpec build(TypeName entityType, PropertyInfo prop) {
-            TypeName type = metaFieldType(entityType, prop.getType());
+            TypeName type = metaFieldType(entityType, TypeUtils.box(prop.getType()));
             FieldSpec.Builder builder = FieldSpec.builder(type, getMetaFieldName(prop.getName()), Modifier.STATIC, Modifier.PUBLIC, Modifier.FINAL);
             return initialize(entityType, builder, prop).build();
         }
@@ -265,7 +274,7 @@ public class MetaFields {
                     prop.getName(),
                     ValueGetter.class, entityType, String.class, String.class, entityType, prop.getGetterName(),
                     ValueSetter.class, entityType, String.class, entityType, String.class, prop.getSetterName(),
-                    prop.isNullable());
+                    prop.isNullable() && !isKeyField(entityType, prop));
         }
     }
 

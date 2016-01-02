@@ -12,7 +12,7 @@ import java.util.Date;
  * <File Description>
  */
 public class AbstractUserEntity {
-    protected int userId;
+    protected String userId;
     protected String userFirstName;
     protected String userLastName;
     protected Date lastVisitDate;

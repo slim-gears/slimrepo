@@ -44,10 +44,12 @@ public class RepositoryServicePrototypeTest {
     public void addEntitiesThenQuery() throws IOException {
         repositoryService.update(repository -> {
             UserEntity userJohnDoe = repository.users().add(UserEntity.builder()
+                    .userId("id-1")
                     .userFirstName("John")
                     .userLastName("Doe")
                     .build());
             UserEntity userJakeSmith = repository.users().add(UserEntity.builder()
+                    .userId("id-2")
                     .userFirstName("Jake")
                     .userLastName("Smith")
                     .build());
@@ -60,8 +62,8 @@ public class RepositoryServicePrototypeTest {
 
             repository.saveChanges();
 
-            Assert.assertEquals(1, userJohnDoe.getUserId());
-            Assert.assertEquals(2, userJakeSmith.getUserId());
+            Assert.assertEquals("id-1", userJohnDoe.getUserId());
+            Assert.assertEquals("id-2", userJakeSmith.getUserId());
 
             Assert.assertEquals(1, roleUser.getRoleId());
             Assert.assertEquals(2, roleAdmin.getRoleId());
@@ -88,10 +90,10 @@ public class RepositoryServicePrototypeTest {
     @Test
     public void queryWithWhere() throws IOException {
         repositoryService.users().add(
-                UserEntity.builder().userFirstName("John").userLastName("Doe").build(),
-                UserEntity.builder().userFirstName("Jake").userLastName("Smith").build(),
-                UserEntity.builder().userFirstName("Bill").userLastName("Doors").build(),
-                UserEntity.builder().userFirstName("Bred").userLastName("Beat").build());
+                UserEntity.builder().userId("id-1").userFirstName("John").userLastName("Doe").build(),
+                UserEntity.builder().userId("id-2").userFirstName("Jake").userLastName("Smith").build(),
+                UserEntity.builder().userId("id-3").userFirstName("Bill").userLastName("Doors").build(),
+                UserEntity.builder().userId("id-4").userFirstName("Bred").userLastName("Beat").build());
 
         Assert.assertEquals(4, queryUsersCountWhere(null));
 

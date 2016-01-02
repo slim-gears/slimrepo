@@ -37,7 +37,9 @@ public class SqliteQueryProvider<TKey, TEntity> extends SqlQueryProvider<TKey, T
 
         @Override
         public <T> FieldValueMap<TEntity> putValue(Field<TEntity, T> field, T value) {
-            if (field == entityType.getKeyField()) return this;
+            if (field.metaInfo().isAutoIncremented()) {
+                return this;
+            }
 
             Object dbValue = fieldTypeMapper.fromFieldType(field, value);
             String fieldName = field.metaInfo().getName();
@@ -70,22 +72,19 @@ public class SqliteQueryProvider<TKey, TEntity> extends SqlQueryProvider<TKey, T
         this.fieldTypeMapper = serviceProvider.getOrmServiceProvider().getFieldTypeMapper();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public PreparedQuery<Void> prepareInsert(final Collection<TEntity> entitites) {
-        return new PreparedQuery<Void>() {
-            @SuppressWarnings("unchecked")
-            @Override
-            public Void execute() throws IOException {
-                String tableName = serviceProvider.getOrmServiceProvider().getSyntaxProvider().tableName(entityType);
-                EntityCache<TKey, TEntity> cache = entityServiceProvider.getEntityCache();
-                for (TEntity entity : entitites) {
-                    long id = insertEntity(tableName, entity);
-                    if (keyType == Integer.class) entityType.setKey(entity, (TKey)(Integer)(int)id);
-                    else if (keyType == Long.class) entityType.setKey(entity, (TKey)(Long)id);
-                    cache.put(entity);
-                }
-                return null;
+        return () -> {
+            String tableName = serviceProvider.getOrmServiceProvider().getSyntaxProvider().tableName(entityType);
+            EntityCache<TKey, TEntity> cache = entityServiceProvider.getEntityCache();
+            for (TEntity entity : entitites) {
+                long id = insertEntity(tableName, entity);
+                if (keyType == Integer.class) entityType.setKey(entity, (TKey)(Integer)(int)id);
+                else if (keyType == Long.class) entityType.setKey(entity, (TKey)(Long)id);
+                cache.put(entity);
             }
+            return null;
         };
     }
 

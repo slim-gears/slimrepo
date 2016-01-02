@@ -56,12 +56,12 @@ class RepositorySqlDatabaseScheme implements SqlDatabaseScheme {
 
             @Override
             public boolean isPrimaryKey() {
-                return entityType.getKeyField() == field;
+                return metaInfo.isKey();
             }
 
             @Override
             public boolean isAutoIncremented() {
-                return isPrimaryKey() && field instanceof ComparableField;
+                return metaInfo.isAutoIncremented();
             }
 
             @Override

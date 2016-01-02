@@ -18,7 +18,11 @@ import com.slimgears.slimrepo.core.interfaces.fields.ValueField;
 import com.slimgears.slimrepo.core.interfaces.fields.ValueGetter;
 import com.slimgears.slimrepo.core.interfaces.fields.ValueSetter;
 
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.util.Base64;
 import java.util.Collection;
+import java.util.UUID;
 
 /**
  * Created by Denis on 11-Apr-15
@@ -59,8 +63,23 @@ public class Fields {
         }
 
         @Override
+        public T generateValue() {
+            throw new RuntimeException("Cannot generate value of type " + type.getSimpleName());
+        }
+
+        @Override
         public boolean isNullable() {
             return nullable;
+        }
+
+        @Override
+        public boolean isKey() {
+            return getEntityType().getKeyField() == this;
+        }
+
+        @Override
+        public boolean isAutoIncremented() {
+            return false;
         }
 
         @Override
@@ -146,6 +165,17 @@ public class Fields {
         }
 
         @Override
+        public boolean isAutoIncremented() {
+            return isKey();
+        }
+
+        @Override
+        public T generateValue() {
+            if (isAutoIncremented()) return null;
+            return super.generateValue();
+        }
+
+        @Override
         public BinaryCondition<TEntity, T> greaterThan(T value) {
             return Conditions.greaterThan(this, value);
         }
@@ -174,6 +204,15 @@ public class Fields {
     static class StringFieldImplementation<TEntity> extends AbstractValueField<TEntity, String> implements StringField<TEntity> {
         StringFieldImplementation(String name, ValueGetter<TEntity, String> getter, ValueSetter<TEntity, String> setter, boolean nullable) {
             super(name, String.class, getter, setter, nullable);
+        }
+
+        @Override
+        public String generateValue() {
+            UUID uuid = UUID.randomUUID();
+            ByteBuffer buffer = ByteBuffer.wrap(new byte[16]);
+            buffer.putLong(uuid.getMostSignificantBits());
+            buffer.putLong(uuid.getLeastSignificantBits());
+            return new BigInteger(buffer.array()).abs().toString(32);
         }
 
         @Override

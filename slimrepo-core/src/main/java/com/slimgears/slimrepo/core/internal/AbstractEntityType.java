@@ -68,6 +68,10 @@ public abstract class AbstractEntityType<TKey, TEntity> implements EntityType<TK
 
     @Override
     public void entityToMap(TEntity entity, FieldValueMap<TEntity> map) {
+        if (!keyField.metaInfo().isAutoIncremented() && keyField.getValue(entity) == null) {
+            keyField.setValue(entity, keyField.metaInfo().generateValue());
+        }
+
         for (Field field : fields) {
             //noinspection unchecked
             map.putValue(field, field.getValue(entity));

@@ -165,7 +165,7 @@ public class PrototypeTest {
                         or(
                                 and(
                                         UserEntity.UserFirstName.contains("John"),
-                                        UserEntity.UserId.greaterThan(20)
+                                        UserEntity.UserId.startsWith("id-2")
                                 ),
                                 UserEntity.UserLastName.startsWith("Smi")
                         ))
@@ -308,7 +308,7 @@ public class PrototypeTest {
             rows[i] = new EntityFieldValueMap<>(
                     UserEntity.EntityMetaType,
                     UserEntity.builder()
-                            .userId(i)
+                            .userId("id-" + i)
                             .userFirstName("John")
                             .userLastName("Doe")
                             .build());
