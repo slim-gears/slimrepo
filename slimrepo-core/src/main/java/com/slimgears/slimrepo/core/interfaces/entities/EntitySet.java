@@ -49,6 +49,7 @@ public interface EntitySet<TEntity> {
     TEntity[] add(TEntity... entities) throws IOException;
     TEntity add(TEntity entity) throws IOException;
     void addAll(Iterable<TEntity> entities) throws IOException;
+    void mergeAll(Iterable<TEntity> entities) throws IOException;
     void remove(TEntity entity) throws IOException;
     void removeAll(Iterable<TEntity> entities) throws IOException;
 }

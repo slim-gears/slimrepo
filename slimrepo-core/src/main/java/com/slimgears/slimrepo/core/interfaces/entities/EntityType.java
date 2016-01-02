@@ -18,6 +18,8 @@ public interface EntityType<TKey, TEntity> {
     ValueField<TEntity, TKey> getKeyField();
     Collection<Field<TEntity, ?>> getFields();
     Collection<RelationalField<TEntity, ?>> getRelationalFields();
+    TEntity clone(TEntity entity);
+    void copy(TEntity from, TEntity to);
     TEntity newInstance();
     TEntity newInstance(FieldValueLookup<TEntity> lookup);
     void entityToMap(TEntity entity, FieldValueMap<TEntity> map);

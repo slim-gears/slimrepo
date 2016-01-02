@@ -36,4 +36,12 @@ public class AutoEntitySet<TKey, TEntity, TRepository extends Repository> extend
             repository.saveChanges();
         }
     }
+
+    @Override
+    public void mergeAll(Iterable<TEntity> entities) throws IOException {
+        try (TRepository repository = repositoryService.open()) {
+            repository.entities(entityType).mergeAll(entities);
+            repository.saveChanges();
+        }
+    }
 }

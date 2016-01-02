@@ -2,7 +2,7 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal;
 
-import com.google.common.collect.Iterables;
+import com.google.common.collect.Collections2;
 import com.slimgears.slimrepo.core.interfaces.Repository;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
@@ -22,16 +22,16 @@ import com.slimgears.slimrepo.core.internal.query.QueryProvider;
 import java.io.IOException;
 import java.util.Collection;
 
-import static com.google.common.collect.Collections2.transform;
+import static com.google.common.collect.Iterables.concat;
+import static com.google.common.collect.Iterables.transform;
 
 /**
  * Created by Denis on 05-Apr-15
  * <File Description>
  */
-public class DefaultEntitySet<TKey, TEntity> extends AbstractEntitySet<TEntity> implements
+public class DefaultEntitySet<TKey, TEntity> extends AbstractEntitySet<TKey, TEntity> implements
         RepositorySessionNotifier.Listener {
     protected final SessionEntityServiceProvider<TKey, TEntity> sessionEntityServiceProvider;
-    protected final EntityType<TKey, TEntity> entityType;
     private EntityCache<TKey, TEntity> entityCache;
     private EntityStateTracker<TEntity> stateTracker;
     private QueryProvider<TKey, TEntity> queryProvider;
@@ -59,8 +59,8 @@ public class DefaultEntitySet<TKey, TEntity> extends AbstractEntitySet<TEntity> 
     }
 
     public DefaultEntitySet(SessionEntityServiceProvider<TKey, TEntity> sessionEntityServiceProvider, EntityType<TKey, TEntity> entityType) {
+        super(entityType);
         this.sessionEntityServiceProvider = sessionEntityServiceProvider;
-        this.entityType = entityType;
     }
 
     @Override
@@ -106,12 +106,15 @@ public class DefaultEntitySet<TKey, TEntity> extends AbstractEntitySet<TEntity> 
     public void onDiscardingChanges(Repository session) {
         EntityStateTracker<TEntity> tracker = getStateTracker();
         EntityCache<TKey, TEntity> cache = getCache();
-        for (TEntity entity : Iterables.concat(
+
+        //noinspection StaticPseudoFunctionalStyleMethod
+        for (TKey key : transform(concat(
                 tracker.getModifiedEntities(),
                 tracker.getAddedEntities(),
-                tracker.getModifiedEntities())) {
-            cache.invalidate(entityType.getKey(entity));
+                tracker.getModifiedEntities()), entityType::getKey)) {
+            cache.invalidate(key);
         }
+
         tracker.clearChanges();
     }
 
@@ -144,7 +147,7 @@ public class DefaultEntitySet<TKey, TEntity> extends AbstractEntitySet<TEntity> 
     }
 
     private Collection<TKey> entitiesToIds(Collection<TEntity> entities) {
-        return transform(entities, entityType::getKey);
+        return Collections2.transform(entities, entityType::getKey);
     }
 
     protected QueryProvider<TKey, TEntity> getQueryProvider() {

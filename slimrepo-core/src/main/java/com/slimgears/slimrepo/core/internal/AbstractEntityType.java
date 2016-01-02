@@ -57,13 +57,27 @@ public abstract class AbstractEntityType<TKey, TEntity> implements EntityType<TK
 
     @Override
     public TEntity newInstance(FieldValueLookup<TEntity> lookup) {
-
         TEntity entity = newInstance();
         for (Field field : fields) {
             //noinspection unchecked
             field.setValue(entity, lookup.getValue(field));
         }
         return entity;
+    }
+
+    @Override
+    public TEntity clone(TEntity entity) {
+        TEntity newEntity = newInstance();
+        copy(entity, newEntity);
+        return newEntity;
+    }
+
+    @Override
+    public void copy(TEntity from, TEntity to) {
+        for (Field field : fields) {
+            //noinspection unchecked
+            field.setValue(to, field.getValue(from));
+        }
     }
 
     @Override

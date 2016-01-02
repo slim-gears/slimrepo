@@ -3,8 +3,10 @@ package com.slimgears.slimrepo.core.internal;
 import com.google.common.collect.Collections2;
 import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
+import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.interfaces.fields.ValueField;
+import com.slimgears.slimrepo.core.utilities.Maps;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -12,11 +14,20 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import static com.google.common.collect.Iterables.filter;
 
 /**
  * Created by Denis on 03-May-15.
  */
-public abstract class AbstractEntitySet<TEntity> implements EntitySet<TEntity> {
+public abstract class AbstractEntitySet<TKey, TEntity> implements EntitySet<TEntity> {
+    protected final EntityType<TKey, TEntity> entityType;
+
+    protected AbstractEntitySet(EntityType<TKey, TEntity> entityType) {
+        this.entityType = entityType;
+    }
+
     @Override
     public final long countAll() throws IOException {
         return query().prepare().count();
@@ -69,7 +80,7 @@ public abstract class AbstractEntitySet<TEntity> implements EntitySet<TEntity> {
 
     @Override
     public final <T> Collection<T> map(Transformer<TEntity, T> mapper) throws IOException {
-        return Collections2.transform(query().prepare().toList(), mapper::transform);
+        return Collections2.transform(toList(), mapper::transform);
     }
 
     @Override
@@ -88,5 +99,26 @@ public abstract class AbstractEntitySet<TEntity> implements EntitySet<TEntity> {
     @Override
     public void remove(TEntity entity) throws IOException {
         removeAll(Collections.singletonList(entity));
+    }
+
+    @Override
+    public void mergeAll(Iterable<TEntity> entities) throws IOException {
+        ValueField<TEntity, TKey> keyField = entityType.getKeyField();
+        Map<TKey, TEntity> index = Maps.uniqueIndex(entities, entityType::getKey);
+        Map<TKey, TEntity> existingEntities = query()
+                .where(keyField.in(index.keySet()))
+                .prepare()
+                .toMap(keyField);
+
+        Set<TKey> existingKeys = existingEntities.keySet();
+        //noinspection StaticPseudoFunctionalStyleMethod
+        Iterable<TEntity> newEntities = filter(
+                entities,
+                e -> !existingKeys.contains(keyField.getValue(e)));
+
+        addAll(newEntities);
+        for (TEntity entity : existingEntities.values()) {
+            entityType.copy(index.get(keyField.getValue(entity)), entity);
+        }
     }
 }
