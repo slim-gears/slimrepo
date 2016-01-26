@@ -2,11 +2,9 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.apt;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.base.Predicate;
-import com.slimgears.slimrepo.apt.base.AnnotationProcessorBase;
-import com.slimgears.slimrepo.apt.base.TypeUtils;
+import com.slimgears.slimapt.AnnotationProcessorBase;
+import com.slimgears.slimapt.TypeUtils;
 import com.slimgears.slimrepo.core.annotations.OrmProvider;
 import com.slimgears.slimrepo.core.interfaces.RepositoryService;
 import com.slimgears.slimrepo.core.internal.AbstractRepository;
@@ -34,8 +32,6 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.MirroredTypeException;
-import javax.lang.model.type.MirroredTypesException;
 import javax.lang.model.util.Elements;
 
 import static com.google.common.collect.Collections2.filter;
@@ -168,14 +164,6 @@ public class RepositoryAnnotationProcessor extends AnnotationProcessorBase {
         }
         ctorBuilder.addCode("this(new $T(" + Joiner.on(", ").join(parameterNames) + "));\n", TypeName.get(ormServiceProviderTypeElement.asType()));
         return ctorBuilder.build();
-    }
-
-    private void writeType(String packageName, TypeSpec type) throws IOException {
-        JavaFile javaFile = JavaFile
-                .builder(packageName, type)
-                .indent("    ")
-                .build();
-        javaFile.writeTo(processingEnv.getFiler());
     }
 
     private Iterable<ExecutableElement> getEntityGetterMethods(TypeElement element) {

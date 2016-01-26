@@ -7,11 +7,13 @@ dependencies {
     compile "com.squareup:javapoet:$javaPoetVersion"
     compile "com.google.guava:guava:$guavaVersion"
     compile "com.annimon:stream:$annimonStreamVersion"
+    compile "com.github.slim-gears:slimapt:$slimAptVersion"
     compile project(':slimrepo-core')
     
     testCompile project(path: ':slimrepo-core', configuration: 'testOutput')
     testCompile "com.google.testing.compile:compile-testing:$googleCompileTestingVersion"
     testCompile "com.google.truth:truth:$googleTruthVersion"
+    testCompile "com.github.slim-gears:slimapt:$slimAptVersion:tests"
 
     testCompile files(Jvm.current().getToolsJar())
 }

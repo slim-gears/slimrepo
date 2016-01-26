@@ -1,9 +1,9 @@
 package com.slimgears.slimrepo.apt;// Copyright 2015 Denis Itskovich
 // Refer to LICENSE.txt for license details
 
-import com.slimgears.slimrepo.apt.base.ClassGenerator;
-import com.slimgears.slimrepo.apt.base.ElementVisitorBase;
-import com.slimgears.slimrepo.apt.base.TypeUtils;
+import com.slimgears.slimapt.ClassGenerator;
+import com.slimgears.slimapt.ElementVisitorBase;
+import com.slimgears.slimapt.TypeUtils;
 import com.slimgears.slimrepo.core.annotations.Entity;
 import com.slimgears.slimrepo.core.annotations.GenerateRepository;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;

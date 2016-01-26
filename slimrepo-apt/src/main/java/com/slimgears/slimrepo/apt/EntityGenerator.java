@@ -2,9 +2,9 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.apt;
 
-import com.slimgears.slimrepo.apt.base.DataModelGenerator;
-import com.slimgears.slimrepo.apt.base.FieldPropertyInfo;
-import com.slimgears.slimrepo.apt.base.TypeUtils;
+import com.slimgears.slimapt.DataModelGenerator;
+import com.slimgears.slimapt.FieldPropertyInfo;
+import com.slimgears.slimapt.TypeUtils;
 import com.slimgears.slimrepo.core.annotations.GenerateEntity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityBuilder;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;

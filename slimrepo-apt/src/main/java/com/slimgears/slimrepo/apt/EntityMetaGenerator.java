@@ -4,11 +4,10 @@ package com.slimgears.slimrepo.apt;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
-import com.slimgears.slimrepo.apt.base.ClassGenerator;
-import com.slimgears.slimrepo.apt.base.ElementVisitorBase;
-import com.slimgears.slimrepo.apt.base.GetterSetterPropertyInfo;
-import com.slimgears.slimrepo.apt.base.PropertyInfo;
-import com.slimgears.slimrepo.apt.base.TypeUtils;
+import com.slimgears.slimapt.ClassGenerator;
+import com.slimgears.slimapt.ElementVisitorBase;
+import com.slimgears.slimapt.GetterSetterPropertyInfo;
+import com.slimgears.slimapt.TypeUtils;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;

@@ -2,7 +2,7 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.apt;
 
-import com.slimgears.slimrepo.apt.base.AnnotationProcessorBase;
+import com.slimgears.slimapt.AnnotationProcessorBase;
 
 import java.io.IOException;
 

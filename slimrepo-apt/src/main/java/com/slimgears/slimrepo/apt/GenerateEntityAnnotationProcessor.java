@@ -2,7 +2,7 @@ package com.slimgears.slimrepo.apt;
 // Copyright 2015 Denis Itskovich
 // Refer to LICENSE.txt for license details
 
-import com.slimgears.slimrepo.apt.base.AnnotationProcessorBase;
+import com.slimgears.slimapt.AnnotationProcessorBase;
 
 import java.io.IOException;
 
