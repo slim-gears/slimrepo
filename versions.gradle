@@ -5,5 +5,5 @@ ext {
     googleTruthVersion = '0.25'
     appacheCommonsIoVersion = '2.4'
     annimonStreamVersion = '1.0.3'
-    slimAptVersion = '0.1.3'
+    slimAptVersion = '0.1.5'
 }
