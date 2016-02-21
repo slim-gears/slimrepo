@@ -2,8 +2,7 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal.query;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Iterators;
+import com.annimon.stream.function.Function;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
@@ -13,6 +12,7 @@ import com.slimgears.slimrepo.core.internal.AbstractRowIterator;
 import com.slimgears.slimrepo.core.internal.OrderFieldInfo;
 import com.slimgears.slimrepo.core.internal.interfaces.CloseableIterator;
 import com.slimgears.slimrepo.core.internal.interfaces.EntityCache;
+import com.slimgears.slimrepo.core.utilities.Iterators;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 /**
  * Created by Denis on 07-Apr-15
@@ -158,14 +157,16 @@ public class DefaultEntitySelectQuery<TKey, TEntity>
         }
     }
 
+    @SafeVarargs
     @Override
-    public Builder<TEntity> orderAsc(Field<TEntity, ?>... fields) {
+    public final Builder<TEntity> orderAsc(Field<TEntity, ?>... fields) {
         addOrderFields(true, fields);
         return builder();
     }
 
+    @SafeVarargs
     @Override
-    public Builder<TEntity> orderDesc(Field<TEntity, ?>... fields) {
+    public final Builder<TEntity> orderDesc(Field<TEntity, ?>... fields) {
         addOrderFields(false, fields);
         return builder();
     }
@@ -181,12 +182,9 @@ public class DefaultEntitySelectQuery<TKey, TEntity>
         SelectQueryParams<TKey, TEntity> queryParams = this.queryParams.fork();
         queryParams.fields = Arrays.asList(keyField, valueField);
 
-        iterateRows(queryProvider.prepareSelect(queryParams), new Function<FieldValueLookup<TEntity>, Void>() {
-            @Override
-            public Void apply(FieldValueLookup<TEntity> input) {
-                map.put(input.getValue(keyField), input.getValue(valueField));
-                return null;
-            }
+        iterateRows(queryProvider.prepareSelect(queryParams), input -> {
+            map.put(input.getValue(keyField), input.getValue(valueField));
+            return null;
         });
         return map;
     }
@@ -213,12 +211,9 @@ public class DefaultEntitySelectQuery<TKey, TEntity>
     @Override
     public <K> Map<K, TEntity> toMap(final Field<TEntity, K> keyField) throws IOException {
         final Map<K, TEntity> map = new HashMap<>();
-        iterateRows(getPreparedSelectQuery(), new Function<FieldValueLookup<TEntity>, Void>() {
-            @Override
-            public Void apply(FieldValueLookup<TEntity> row) {
-                map.put(row.getValue(keyField), toEntity(row));
-                return null;
-            }
+        iterateRows(getPreparedSelectQuery(), row -> {
+            map.put(row.getValue(keyField), toEntity(row));
+            return null;
         });
         return map;
     }
@@ -226,7 +221,7 @@ public class DefaultEntitySelectQuery<TKey, TEntity>
     @Override
     public TEntity[] toArray() throws IOException {
         try (CloseableIterator<TEntity> entities = iterator()) {
-            return Iterators.toArray(entities, queryParams.entityType.getEntityClass());
+            return Iterators.toArray(entities, entityType.getEntityClass());
         } catch (RuntimeException e) {
             if (e.getCause() instanceof IOException) throw (IOException)e.getCause();
             throw e;
@@ -275,11 +270,6 @@ public class DefaultEntitySelectQuery<TKey, TEntity>
 
     private TEntity toEntity(final FieldValueLookup<TEntity> lookup) {
         TKey id = lookup.getValue(keyField);
-        return entityCache.get(id, new Callable<TEntity>() {
-            @Override
-            public TEntity call() throws Exception {
-                return entityType.newInstance(lookup);
-            }
-        });
+        return entityCache.get(id, () -> entityType.newInstance(lookup));
     }
 }

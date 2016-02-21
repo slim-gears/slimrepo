@@ -2,9 +2,6 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.slimgears.slimrepo.core.interfaces.Repository;
 import com.slimgears.slimrepo.core.interfaces.RepositoryService;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
@@ -14,6 +11,8 @@ import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMappingRegistrar
 import com.slimgears.slimrepo.core.internal.interfaces.OrmServiceProvider;
 import com.slimgears.slimrepo.core.internal.interfaces.RepositoryModel;
 import com.slimgears.slimrepo.core.internal.interfaces.SessionServiceProvider;
+import com.slimgears.slimrepo.core.utilities.HashMapLoadingCache;
+import com.slimgears.slimrepo.core.utilities.LoadingCache;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -23,8 +22,8 @@ import java.util.concurrent.ExecutionException;
  * <File Description>
  */
 public abstract class AbstractRepositoryService<TRepository extends Repository> implements RepositoryService<TRepository> {
-    LoadingCache<EntityType, AutoEntitySet> sessionEntityServiceProviderCache = CacheBuilder.newBuilder()
-            .build(new CacheLoader<EntityType, AutoEntitySet>() {
+    LoadingCache<EntityType, AutoEntitySet> sessionEntityServiceProviderCache = HashMapLoadingCache.newCache(
+            new LoadingCache.Loader<EntityType, AutoEntitySet>() {
                 @Override
                 public AutoEntitySet load(EntityType entityType) throws Exception {
                     //noinspection unchecked

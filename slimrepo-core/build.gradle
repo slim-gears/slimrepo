@@ -15,6 +15,7 @@ artifacts {
 }
 
 dependencies {
-    compile "com.google.guava:guava:$guavaVersion"
+    compile "com.annimon:stream:$annimonStreamVersion"
+    //compile "net.sourceforge.streamsupport:streamsupport:$streamsupportVersion"
     testCompile "commons-io:commons-io:$appacheCommonsIoVersion"
 }

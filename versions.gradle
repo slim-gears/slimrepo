@@ -4,6 +4,7 @@ ext {
     googleCompileTestingVersion = '0.6'
     googleTruthVersion = '0.25'
     appacheCommonsIoVersion = '2.4'
-    annimonStreamVersion = '1.0.3'
+    annimonStreamVersion = '1.0.6'
+    streamsupportVersion = '1.4.2'
     slimAptVersion = '0.1.5'
 }

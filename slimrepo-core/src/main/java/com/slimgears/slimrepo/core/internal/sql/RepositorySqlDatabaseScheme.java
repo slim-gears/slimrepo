@@ -1,24 +1,41 @@
 package com.slimgears.slimrepo.core.internal.sql;
 
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
-import com.slimgears.slimrepo.core.interfaces.fields.ComparableField;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.interfaces.fields.RelationalField;
 import com.slimgears.slimrepo.core.internal.interfaces.RepositoryModel;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlDatabaseScheme;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlStatementBuilder;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
  * Created by Denis on 21-May-15.
+ *
  */
 class RepositorySqlDatabaseScheme implements SqlDatabaseScheme {
+    private final static Map<Class, Object> DEFAULT_VALUES = new HashMap<>();
     private final SqlStatementBuilder.SyntaxProvider syntaxProvider;
     private final RepositoryModel repositoryModel;
     private final Map<EntityType, TableScheme> tableSchemeMap = new LinkedHashMap<>();
     private final Map<String, TableScheme> nameToTableSchemeMap = new LinkedHashMap<>();
+
+    static {
+        DEFAULT_VALUES.put(int.class, 0);
+        DEFAULT_VALUES.put(Integer.class, 0);
+        DEFAULT_VALUES.put(float.class, 0.0);
+        DEFAULT_VALUES.put(Float.class, 0.0);
+        DEFAULT_VALUES.put(Float.class, 0.0);
+        DEFAULT_VALUES.put(double.class, 0.0);
+        DEFAULT_VALUES.put(Double.class, 0.0);
+        DEFAULT_VALUES.put(long.class, 0L);
+        DEFAULT_VALUES.put(Long.class, 0L);
+        DEFAULT_VALUES.put(short.class, 0);
+        DEFAULT_VALUES.put(Short.class, 0);
+        DEFAULT_VALUES.put(String.class, "''");
+    }
 
     class EntityTypeTableScheme<TKey, TEntity> implements TableScheme {
         private final EntityType<TKey, TEntity> entityType;
@@ -47,6 +64,11 @@ class RepositorySqlDatabaseScheme implements SqlDatabaseScheme {
             @Override
             public String getType() {
                 return syntaxProvider.typeName(field);
+            }
+
+            @Override
+            public Object getDefaultValue() {
+                return isNotNull() ? DEFAULT_VALUES.get(metaInfo.getValueType()) : "NULL";
             }
 
             @Override

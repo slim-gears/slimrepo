@@ -1,9 +1,9 @@
 package com.slimgears.slimrepo.android;
 
+import android.annotation.SuppressLint;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.google.common.base.Joiner;
 import com.slimgears.slimrepo.android.core.SqliteOrmServiceProvider;
 import com.slimgears.slimrepo.android.core.SqliteSchemeProvider;
 import com.slimgears.slimrepo.core.interfaces.Repository;
@@ -16,6 +16,7 @@ import com.slimgears.slimrepo.core.prototype.generated.GeneratedUserRepositorySe
 import com.slimgears.slimrepo.core.prototype.generated.RoleEntity;
 import com.slimgears.slimrepo.core.prototype.generated.UserEntity;
 import com.slimgears.slimrepo.core.prototype.generated.UserRepositoryService;
+import com.slimgears.slimrepo.core.utilities.Joiner;
 
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.Matcher;
@@ -39,6 +40,7 @@ import static com.slimgears.slimrepo.android.SchemeMatchers.matchTableNames;
 
 /**
  * Created by Denis on 18-May-15.
+ *
  */
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 18, manifest=Config.NONE)
@@ -113,6 +115,11 @@ public class MigrationsTest {
                         "roleDescription"));
     }
 
+    @Test
+    public void addingNonNullableFieldMigration() throws IOException {
+        testMigration("non-nullable-field-addition-migration-db.sql");
+    }
+
     private UserRepositoryService createRepositoryService() {
         return new GeneratedUserRepositoryService(ormServiceProvider);
     }
@@ -174,12 +181,10 @@ public class MigrationsTest {
     }
 
 
+    @SuppressLint("NewApi")
     private String loadScriptFromResource(String scriptName) throws IOException {
-        InputStream stream = ClassLoader.getSystemResourceAsStream(scriptName);
-        try {
+        try (InputStream stream = ClassLoader.getSystemResourceAsStream(scriptName)) {
             return Joiner.on("\n").join(IOUtils.readLines(stream));
-        } finally {
-            stream.close();
         }
     }
 }

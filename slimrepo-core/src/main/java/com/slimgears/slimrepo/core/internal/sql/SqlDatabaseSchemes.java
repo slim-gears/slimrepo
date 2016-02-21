@@ -1,11 +1,13 @@
 package com.slimgears.slimrepo.core.internal.sql;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import com.annimon.stream.Collectors;
+import com.annimon.stream.Stream;
+import com.annimon.stream.function.Function;
+import com.annimon.stream.function.Predicate;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlDatabaseScheme;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlDatabaseSchemeDifference;
+import com.slimgears.slimrepo.core.utilities.Maps;
+import com.slimgears.slimrepo.core.utilities.Sets;
 
 import java.util.Map;
 import java.util.Objects;
@@ -13,17 +15,13 @@ import java.util.Set;
 
 /**
  * Created by Denis on 22-May-15.
+ *
  */
 public class SqlDatabaseSchemes {
-    private final static Predicate<SqlDatabaseSchemeDifference.TableSchemeDifference> PREDICATE_NOT_EMPTY_TABLE_DIFF = new Predicate<SqlDatabaseSchemeDifference.TableSchemeDifference>() {
-        @Override
-        public boolean apply(SqlDatabaseSchemeDifference.TableSchemeDifference input) {
-            return
-                    !input.getAddedFields().isEmpty() ||
-                    !input.getDeletedFields().isEmpty() ||
-                    !input.getModifiedFields().isEmpty();
-        }
-    };
+    private final static Predicate<SqlDatabaseSchemeDifference.TableSchemeDifference> PREDICATE_NOT_EMPTY_TABLE_DIFF = input ->
+            !input.getAddedFields().isEmpty() ||
+            !input.getDeletedFields().isEmpty() ||
+            !input.getModifiedFields().isEmpty();
 
     static class DatabaseSchemeDifference implements SqlDatabaseSchemeDifference {
         private final SqlDatabaseScheme oldDatabaseScheme;
@@ -47,11 +45,15 @@ public class SqlDatabaseSchemes {
             Set<String> addedTableNames = Sets.difference(newTableNames, oldTableNames);
             Set<String> deletedTableNames = Sets.difference(oldTableNames, newTableNames);
 
-            this.addedTablesMap = Maps.asMap(addedTableNames, tableForName(newTables));
-            this.deletedTablesMap = Maps.asMap(deletedTableNames, tableForName(oldTables));
+            this.addedTablesMap = Maps.asMap(addedTableNames, newTables::get);
+            this.deletedTablesMap = Maps.asMap(deletedTableNames, oldTables::get);
 
             Set<String> commonTableNames = Sets.intersection(newTableNames, oldTableNames);
-            modifiedTablesMap = Maps.filterValues(Maps.toMap(commonTableNames, nameToTableDifference(oldTables, newTables)), PREDICATE_NOT_EMPTY_TABLE_DIFF);
+            modifiedTablesMap = Stream
+                    .of(commonTableNames)
+                    .map(nameToTableDifference(oldTables, newTables))
+                    .filter(PREDICATE_NOT_EMPTY_TABLE_DIFF)
+                    .collect(Collectors.toMap(diff -> diff.getOldTableScheme().getName(), diff -> diff));
         }
 
         @Override
@@ -100,11 +102,11 @@ public class SqlDatabaseSchemes {
             Set<String> addedFieldNames = Sets.difference(newFieldNames, oldFieldNames);
             Set<String> deletedFieldNames = Sets.difference(oldFieldNames, newFieldNames);
 
-            this.addedFieldsMap = Maps.asMap(addedFieldNames, fieldForName(newFields));
-            this.deletedFieldsMap = Maps.asMap(deletedFieldNames, fieldForName(oldFields));
+            this.addedFieldsMap = Maps.asMap(addedFieldNames, newFields::get);
+            this.deletedFieldsMap = Maps.asMap(deletedFieldNames, oldFields::get);
 
             Set<String> commonFieldNames = Sets.intersection(newFieldNames, oldFieldNames);
-            this.modifiedFieldsMap = Maps.asMap(Sets.filter(commonFieldNames, differentFieldsPredicate(oldFields, newFields)), fieldForName(newFields));
+            this.modifiedFieldsMap = Maps.asMap(Sets.filter(commonFieldNames, differentFieldsPredicate(oldFields, newFields)), newFields::get);
         }
 
         @Override
@@ -167,38 +169,10 @@ public class SqlDatabaseSchemes {
     }
 
     private static Predicate<String> differentFieldsPredicate(final Map<String, SqlDatabaseScheme.FieldScheme> oldFields, final Map<String, SqlDatabaseScheme.FieldScheme> newFields) {
-        return new Predicate<String>() {
-            @Override
-            public boolean apply(String name) {
-                return !fieldsEqual(oldFields.get(name), newFields.get(name));
-            }
-        };
+        return name -> !fieldsEqual(oldFields.get(name), newFields.get(name));
     }
 
     private static Function<String, SqlDatabaseSchemeDifference.TableSchemeDifference> nameToTableDifference(final Map<String, SqlDatabaseScheme.TableScheme> oldTables, final Map<String, SqlDatabaseScheme.TableScheme> newTables) {
-        return new Function<String, SqlDatabaseSchemeDifference.TableSchemeDifference>() {
-            @Override
-            public SqlDatabaseSchemeDifference.TableSchemeDifference apply(String name) {
-                return compareTables(oldTables.get(name), newTables.get(name));
-            }
-        };
-    }
-
-    private static Function<String, SqlDatabaseScheme.TableScheme> tableForName(final Map<String, SqlDatabaseScheme.TableScheme> nameToTable) {
-        return new Function<String, SqlDatabaseScheme.TableScheme>() {
-            @Override
-            public SqlDatabaseScheme.TableScheme apply(String input) {
-                return nameToTable.get(input);
-            }
-        };
-    }
-
-    private static Function<String, SqlDatabaseScheme.FieldScheme> fieldForName(final Map<String, SqlDatabaseScheme.FieldScheme> nameToField) {
-        return new Function<String, SqlDatabaseScheme.FieldScheme>() {
-            @Override
-            public SqlDatabaseScheme.FieldScheme apply(String input) {
-                return nameToField.get(input);
-            }
-        };
+        return name -> compareTables(oldTables.get(name), newTables.get(name));
     }
 }

@@ -4,12 +4,14 @@ import java.util.Map;
 
 /**
  * Created by Denis on 22-May-15.
+ *
  */
 public interface SqlDatabaseScheme {
     interface FieldScheme {
         TableScheme getTable();
         String getName();
         String getType();
+        Object getDefaultValue();
         boolean isNotNull();
         boolean isPrimaryKey();
         boolean isAutoIncremented();

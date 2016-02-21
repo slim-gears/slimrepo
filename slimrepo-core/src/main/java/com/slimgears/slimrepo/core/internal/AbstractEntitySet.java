@@ -1,12 +1,13 @@
 package com.slimgears.slimrepo.core.internal;
 
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Maps;
+import com.annimon.stream.Collectors;
+import com.annimon.stream.Stream;
 import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.interfaces.fields.ValueField;
+import com.slimgears.slimrepo.core.utilities.Maps;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -16,10 +17,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.google.common.collect.Iterables.filter;
 
 /**
  * Created by Denis on 03-May-15.
+ *
  */
 public abstract class AbstractEntitySet<TKey, TEntity> implements EntitySet<TEntity> {
     protected final EntityType<TKey, TEntity> entityType;
@@ -80,7 +81,7 @@ public abstract class AbstractEntitySet<TKey, TEntity> implements EntitySet<TEnt
 
     @Override
     public final <T> Collection<T> map(Transformer<TEntity, T> mapper) throws IOException {
-        return Collections2.transform(toList(), mapper::transform);
+        return Stream.of(toList()).map(mapper::transform).collect(Collectors.toList());
     }
 
     @Override
@@ -112,13 +113,14 @@ public abstract class AbstractEntitySet<TKey, TEntity> implements EntitySet<TEnt
 
         Set<TKey> existingKeys = existingEntities.keySet();
         //noinspection StaticPseudoFunctionalStyleMethod
-        Iterable<TEntity> newEntities = filter(
-                entities,
-                e -> !existingKeys.contains(keyField.getValue(e)));
+        Collection<TEntity> newEntities = Stream
+                .of(entities)
+                .filter(e -> !existingKeys.contains(keyField.getValue(e)))
+                .collect(Collectors.toList());
 
         addAll(newEntities);
-        for (TEntity entity : existingEntities.values()) {
-            entityType.copy(index.get(keyField.getValue(entity)), entity);
-        }
+        Stream
+                .of(existingEntities.values())
+                .forEach(entity -> entityType.copy(index.get(keyField.getValue(entity)), entity));
     }
 }

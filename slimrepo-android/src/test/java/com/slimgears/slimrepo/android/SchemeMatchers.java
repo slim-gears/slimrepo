@@ -1,8 +1,7 @@
 package com.slimgears.slimrepo.android;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlDatabaseScheme;
+import com.slimgears.slimrepo.core.utilities.Sets;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -15,6 +14,7 @@ import java.util.Set;
 
 /**
  * Created by Denis on 02-Jun-15.
+ *
  */
 public class SchemeMatchers {
     public static Matcher<SqlDatabaseScheme> matchTableFieldNames(final String tableName, final String... fieldNames) {

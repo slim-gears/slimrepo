@@ -44,6 +44,7 @@ public class SimpleSqlDatabaseScheme implements SqlDatabaseScheme {
         private final boolean nullable;
         private final boolean primaryKey;
         private final FieldScheme foreignField;
+        private final Object defaultValue;
 
         public SimpleFieldScheme(
                 TableScheme tableScheme,
@@ -51,13 +52,15 @@ public class SimpleSqlDatabaseScheme implements SqlDatabaseScheme {
                 String type,
                 boolean nullable,
                 boolean primaryKey,
-                FieldScheme foreignField) {
+                FieldScheme foreignField,
+                Object defaultValue) {
             this.tableScheme = tableScheme;
             this.name = name;
             this.type = type;
             this.nullable = nullable;
             this.primaryKey = primaryKey;
             this.foreignField = foreignField;
+            this.defaultValue = defaultValue;
         }
 
         @Override
@@ -73,6 +76,11 @@ public class SimpleSqlDatabaseScheme implements SqlDatabaseScheme {
         @Override
         public String getType() {
             return type;
+        }
+
+        @Override
+        public Object getDefaultValue() {
+            return defaultValue;
         }
 
         @Override
@@ -138,8 +146,9 @@ public class SimpleSqlDatabaseScheme implements SqlDatabaseScheme {
                 String type,
                 boolean nullable,
                 boolean primaryKey,
-                FieldScheme foreignField) {
-            FieldScheme field = new SimpleFieldScheme(this, name, type, nullable, primaryKey, foreignField);
+                FieldScheme foreignField,
+                Object defaultValue) {
+            FieldScheme field = new SimpleFieldScheme(this, name, type, nullable, primaryKey, foreignField, defaultValue);
             fields.put(name, field);
             if (field.isPrimaryKey()) keyField = field;
             return field;

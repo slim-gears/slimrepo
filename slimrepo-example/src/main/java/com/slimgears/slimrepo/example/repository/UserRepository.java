@@ -7,12 +7,13 @@ import com.slimgears.slimrepo.core.annotations.GenerateRepository;
 import com.slimgears.slimrepo.core.annotations.OrmProvider;
 import com.slimgears.slimrepo.core.interfaces.Repository;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
+import com.slimgears.slimrepo.example.BuildConfig;
 
 /**
  * Created by Denis on 22-Apr-15
  * <File Description>
  */
-@GenerateRepository(version = 1, name = "UserDatabase")
+@GenerateRepository(version = BuildConfig.VERSION_CODE, name = "UserDatabase")
 @OrmProvider(SqliteOrmServiceProvider.class)
 public interface UserRepository extends Repository {
     EntitySet<UserEntity> users();

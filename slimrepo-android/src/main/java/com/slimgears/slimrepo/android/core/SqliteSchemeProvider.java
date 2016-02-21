@@ -10,6 +10,7 @@ import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlStatementBuilder;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -17,9 +18,11 @@ import java.util.Set;
 
 /**
  * Created by Denis on 21-May-15.
+ *
  */
 public class SqliteSchemeProvider extends AbstractSqlSchemeProvider {
     private final static Set<String> IGNORED_TABLES = new HashSet<>(Collections.singletonList("android_metadata"));
+    private final static Map<String, Object> DEFAULT_VALUES = new HashMap<>();
 
     private final static String SQL_GET_TABLE_NAMES = "SELECT `name` FROM `sqlite_master`";
     private final static String SQL_GET_FOREIGN_KEY_LIST = "PRAGMA foreign_key_list(`%s`)";
@@ -35,6 +38,12 @@ public class SqliteSchemeProvider extends AbstractSqlSchemeProvider {
     private final static int FOREIGN_KEY_TO_FIELD = 4;
 
     private final SQLiteDatabase database;
+
+    static {
+        DEFAULT_VALUES.put("INTEGER", 0);
+        DEFAULT_VALUES.put("REAL", 0.0);
+        DEFAULT_VALUES.put("TEXT", "''");
+    }
 
     public SqliteSchemeProvider(SqlStatementBuilder.SyntaxProvider syntaxProvider, SQLiteDatabase database) {
         super(syntaxProvider);
@@ -82,7 +91,8 @@ public class SqliteSchemeProvider extends AbstractSqlSchemeProvider {
                 boolean notNull = cursor.getInt(TABLE_SCHEME_FIELD_NOT_NULL) != 0;
                 boolean primaryKey = cursor.getInt(TABLE_SCHEME_FIELD_PRIMARY_KEY) != 0;
                 SqlDatabaseScheme.FieldScheme foreignField = foreignKeys.get(fieldName);
-                tableScheme.addField(fieldName, fieldType, notNull, primaryKey, foreignField);
+                Object defaultValue = notNull ? DEFAULT_VALUES.get(fieldType.toUpperCase()) : "NULL";
+                tableScheme.addField(fieldName, fieldType, notNull, primaryKey, foreignField, defaultValue);
                 cursor.moveToNext();
             }
         } finally {

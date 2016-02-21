@@ -15,5 +15,5 @@ CREATE TABLE IF NOT EXISTS `UserEntity` (
     `age` INTEGER NOT NULL)
 {Params: []}
 INSERT INTO `UserEntity` (`userId`, `userFirstName`, `userLastName`, `lastVisitDate`, `role`, `accountStatus`, `comments`, `age`)
-SELECT `userId`, `userFirstName`, `userLastName`, `lastVisitDate`, `role`, `accountStatus`, NULL, `age` FROM `UserEntity_Backup`
+SELECT `userId`, `userFirstName`, `userLastName`, `lastVisitDate`, `role`, `accountStatus`, `comments`, 0 FROM `UserEntity_Backup`
 {Params: []}

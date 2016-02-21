@@ -1,6 +1,6 @@
 package com.slimgears.slimrepo.core.internal;
 
-import com.google.common.collect.Iterables;
+import com.annimon.stream.Stream;
 import com.slimgears.slimrepo.core.interfaces.Repository;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.fields.RelationalField;
@@ -13,6 +13,7 @@ import java.util.Map;
 
 /**
  * Created by Denis on 03-May-15.
+ *
  */
 public class DefaultEntitySessionNotifier implements EntitySessionNotifier, RepositorySessionNotifier.Listener {
     private final Map<EntityType, RepositorySessionNotifier.Listener> listenerMap = new HashMap<>();
@@ -37,23 +38,13 @@ public class DefaultEntitySessionNotifier implements EntitySessionNotifier, Repo
 
     @Override
     public void onSavingChanges(final Repository session) throws IOException {
-        notify(new Notifier() {
-            @Override
-            public void notify(RepositorySessionNotifier.Listener listener) throws IOException {
-                listener.onSavingChanges(session);
-            }
-        });
+        notify(listener -> listener.onSavingChanges(session));
     }
 
     @Override
     public void onDiscardingChanges(final Repository session) {
         try {
-            notify(new Notifier() {
-                @Override
-                public void notify(RepositorySessionNotifier.Listener listener) throws IOException {
-                    listener.onDiscardingChanges(session);
-                }
-            });
+            notify(listener -> listener.onDiscardingChanges(session));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -62,12 +53,7 @@ public class DefaultEntitySessionNotifier implements EntitySessionNotifier, Repo
     @Override
     public void onClosing(final Repository session) {
         try {
-            notify(new Notifier() {
-                @Override
-                public void notify(RepositorySessionNotifier.Listener listener) throws IOException {
-                    listener.onClosing(session);
-                }
-            });
+            notify(listener -> listener.onClosing(session));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -79,8 +65,7 @@ public class DefaultEntitySessionNotifier implements EntitySessionNotifier, Repo
 
     private void notify(Map<EntityType, RepositorySessionNotifier.Listener> listeners, Notifier notifier) throws IOException {
         while (!listeners.isEmpty()) {
-            EntityType<?, ?> entityType = Iterables.getFirst(listeners.keySet(), null);
-            assert entityType != null;
+            EntityType<?, ?> entityType = Stream.of(listeners.keySet()).findFirst().get();
             notifyEntityType(entityType, listeners, notifier);
         }
     }

@@ -2,7 +2,8 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal.query;
 
-import com.google.common.base.Predicate;
+import com.annimon.stream.Collectors;
+import com.annimon.stream.Stream;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueMap;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
@@ -11,8 +12,6 @@ import com.slimgears.slimrepo.core.internal.UpdateFieldInfo;
 
 import java.io.IOException;
 import java.util.ArrayList;
-
-import static com.google.common.collect.Collections2.filter;
 
 /**
  * Created by Denis on 07-Apr-15
@@ -57,12 +56,7 @@ public class DefaultEntityUpdateQuery<TKey, TEntity>
 
     @Override
     public <T> Builder<TEntity> exclude(final Field<TEntity, T> field) {
-        queryParams.updates = filter(queryParams.updates, new Predicate<UpdateFieldInfo>() {
-            @Override
-            public boolean apply(UpdateFieldInfo input) {
-                return input.field != field;
-            }
-        });
+        queryParams.updates = Stream.of(queryParams.updates).filter(i -> i.field != field).collect(Collectors.toList());
         return this;
     }
 

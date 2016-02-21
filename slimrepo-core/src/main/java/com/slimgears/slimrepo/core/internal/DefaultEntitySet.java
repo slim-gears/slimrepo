@@ -2,7 +2,9 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal;
 
-import com.google.common.collect.Collections2;
+import com.annimon.stream.Collectors;
+import com.annimon.stream.Stream;
+import com.slimgears.slimrepo.core.annotations.Entity;
 import com.slimgears.slimrepo.core.interfaces.Repository;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
@@ -22,8 +24,6 @@ import com.slimgears.slimrepo.core.internal.query.QueryProvider;
 import java.io.IOException;
 import java.util.Collection;
 
-import static com.google.common.collect.Iterables.concat;
-import static com.google.common.collect.Iterables.transform;
 
 /**
  * Created by Denis on 05-Apr-15
@@ -107,13 +107,14 @@ public class DefaultEntitySet<TKey, TEntity> extends AbstractEntitySet<TKey, TEn
         EntityStateTracker<TEntity> tracker = getStateTracker();
         EntityCache<TKey, TEntity> cache = getCache();
 
-        //noinspection StaticPseudoFunctionalStyleMethod
-        for (TKey key : transform(concat(
-                tracker.getModifiedEntities(),
-                tracker.getAddedEntities(),
-                tracker.getModifiedEntities()), entityType::getKey)) {
-            cache.invalidate(key);
-        }
+        //noinspection unchecked
+        Stream
+                .of(tracker.getModifiedEntities(),
+                    tracker.getAddedEntities(),
+                    tracker.getModifiedEntities())
+                .flatMap(Stream::of)
+                .map(entityType::getKey)
+                .forEach(cache::invalidate);
 
         tracker.clearChanges();
     }
@@ -130,7 +131,9 @@ public class DefaultEntitySet<TKey, TEntity> extends AbstractEntitySet<TKey, TEn
     private void delete(Collection<TEntity> entities) throws IOException {
         if (entities.isEmpty()) return;
         deleteQuery()
-                .where(entityType.getKeyField().in(entitiesToIds(entities)))
+                .where(entityType.getKeyField().in(Stream.of(entities)
+                                .map(entityType::getKey)
+                                .collect(Collectors.toList())))
                 .prepare()
                 .execute();
     }
@@ -144,10 +147,6 @@ public class DefaultEntitySet<TKey, TEntity> extends AbstractEntitySet<TKey, TEn
                     .prepare()
                     .execute();
         }
-    }
-
-    private Collection<TKey> entitiesToIds(Collection<TEntity> entities) {
-        return Collections2.transform(entities, entityType::getKey);
     }
 
     protected QueryProvider<TKey, TEntity> getQueryProvider() {

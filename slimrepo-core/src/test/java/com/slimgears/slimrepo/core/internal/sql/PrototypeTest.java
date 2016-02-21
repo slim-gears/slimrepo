@@ -2,11 +2,10 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal.sql;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
+import com.annimon.stream.Collectors;
+import com.annimon.stream.Stream;
 import com.slimgears.slimrepo.core.interfaces.RepositoryService;
+import com.slimgears.slimrepo.core.interfaces.conditions.Conditions;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimrepo.core.internal.EntityFieldValueMap;
@@ -27,6 +26,7 @@ import com.slimgears.slimrepo.core.prototype.generated.GeneratedUserRepositorySe
 import com.slimgears.slimrepo.core.prototype.generated.RoleEntity;
 import com.slimgears.slimrepo.core.prototype.generated.UserEntity;
 import com.slimgears.slimrepo.core.utilities.Dates;
+import com.slimgears.slimrepo.core.utilities.Joiner;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
@@ -85,8 +85,8 @@ public class PrototypeTest {
         @Override
         public T answer(InvocationOnMock invocation) throws Throwable {
             String sql = (String)invocation.getArguments()[0];
-            Iterable<Object> params = Iterables.skip(Arrays.asList(invocation.getArguments()), 1);
-            String sqlWithParams = sql + "\n{Params: [" + Joiner.on(", ").join(params) + "]}";
+            Stream<Object> params = Stream.of(invocation.getArguments()).skip(1);
+            String sqlWithParams = sql + "\n{Params: [" + params.map(Object::toString).collect(Collectors.joining(", ")) + "]}";
             sqlStatements.add(sqlWithParams);
             System.out.println(sqlWithParams);
             return answer;
@@ -138,7 +138,7 @@ public class PrototypeTest {
         when(executorMock.select(Matchers.any(String.class), Matchers.<String>anyVararg()))
                 .thenAnswer(answer(rowsMock(10)));
         when(executorMock.count(Matchers.any(String.class), Matchers.<String>anyVararg()))
-                .thenAnswer(answer(0l));
+                .thenAnswer(answer(0L));
 
         doAnswer(answer(null))
                 .when(executorMock)
@@ -162,8 +162,8 @@ public class PrototypeTest {
         //noinspection unchecked
         testQuery(repository -> repository.users().query()
                 .where(
-                        or(
-                                and(
+                        Conditions.or(
+                                Conditions.and(
                                         UserEntity.UserFirstName.contains("John"),
                                         UserEntity.UserId.startsWith("id-2")
                                 ),
@@ -231,6 +231,12 @@ public class PrototypeTest {
     public void repositoryUpgradeWhenFieldAdded() throws IOException {
         databaseSchemeMock.hideFields(UserEntity.EntityMetaType, UserEntity.Comments);
         assertUpgrade("upgrade-field-added.sql");
+    }
+
+    @Test
+    public void repositoryUpgradeWhenNonNullableFieldAdded() throws IOException {
+        databaseSchemeMock.hideFields(UserEntity.EntityMetaType, UserEntity.Age);
+        assertUpgrade("upgrade-non-nullable-field-added.sql");
     }
 
     @Test
@@ -346,12 +352,12 @@ public class PrototypeTest {
         Assert.assertNotNull(sqlStatements);
         Assert.assertNotEquals(0, sqlStatements.size());
         String actualSql = Joiner.on("\n").join(sqlStatements);
-        List<String> actualLines = Lists.newArrayList(Splitter.on("\n").split(actualSql));
+        String[] actualLines = actualSql.split("\n");
         try (InputStream stream = getClass().getResourceAsStream("/sql/" + resourceId)) {
             List<String> expectedLines = IOUtils.readLines(stream);
-            Assert.assertEquals(expectedLines.size(), actualLines.size());
+            Assert.assertEquals(expectedLines.size(), actualLines.length);
             for (int i = 0; i < expectedLines.size(); ++i) {
-                Assert.assertEquals("Line mismatch", expectedLines.get(i), actualLines.get(i));
+                Assert.assertEquals("Line mismatch", expectedLines.get(i), actualLines[i]);
             }
         }
     }

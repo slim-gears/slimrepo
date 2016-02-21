@@ -5,5 +5,6 @@ CREATE TABLE IF NOT EXISTS `UserEntity` (
     `lastVisitDate` INTEGER,
     `role` INTEGER REFERENCES `RoleEntity` (`roleId`),
     `accountStatus` INTEGER,
-    `comments` BLOB)
+    `comments` BLOB,
+    `age` INTEGER NOT NULL)
 {Params: []}

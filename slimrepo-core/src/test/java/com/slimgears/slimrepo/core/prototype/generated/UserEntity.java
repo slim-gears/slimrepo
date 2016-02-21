@@ -22,7 +22,7 @@ public class UserEntity extends AbstractUserEntity {
     static class MetaType extends AbstractEntityType<String, UserEntity> {
         public MetaType() {
             //noinspection unchecked
-            super(UserEntity.class, UserId, UserFirstName, UserLastName, LastVisitDate, Role, AccountStatus, Comments);
+            super(UserEntity.class, UserId, UserFirstName, UserLastName, LastVisitDate, Role, AccountStatus, Comments, Age);
         }
 
         @Override
@@ -70,13 +70,19 @@ public class UserEntity extends AbstractUserEntity {
             UserEntity::getComments,
             UserEntity::setComments,
             true);
+    public static final ComparableField<UserEntity, Integer> Age = Fields.comparableField(
+            "age",
+            Integer.class,
+            UserEntity::getAge,
+            UserEntity::setAge,
+            false);
     public static final EntityType<String, UserEntity> EntityMetaType = new MetaType();
 
     private UserEntity() {
 
     }
 
-    public UserEntity(String userId, String userFirstName, String userLastName, Date lastVisitDate, RoleEntity role, AccountStatus accountStatus, ArrayList comments) {
+    public UserEntity(String userId, String userFirstName, String userLastName, Date lastVisitDate, RoleEntity role, AccountStatus accountStatus, ArrayList comments, int age) {
         this.userId = userId;
         this.userFirstName = userFirstName;
         this.userLastName = userLastName;
@@ -84,6 +90,7 @@ public class UserEntity extends AbstractUserEntity {
         this.accountStatus = accountStatus;
         this.role = role;
         this.comments = comments;
+        this.age = age;
     }
 
     public static class Builder {
@@ -121,6 +128,11 @@ public class UserEntity extends AbstractUserEntity {
 
         public Builder comments(ArrayList<String> comments) {
             model.setComments(comments);
+            return this;
+        }
+
+        public Builder age(int age) {
+            model.setAge(age);
             return this;
         }
 
@@ -197,6 +209,15 @@ public class UserEntity extends AbstractUserEntity {
 
     public UserEntity setComments(ArrayList<String> comments) {
         this.comments = comments;
+        return this;
+    }
+
+    public int getAge() {
+        return this.age;
+    }
+
+    public UserEntity setAge(int age) {
+        this.age = age;
         return this;
     }
 }

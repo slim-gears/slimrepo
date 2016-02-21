@@ -2,9 +2,8 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal.sql.sqlite;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Collections2;
+import com.annimon.stream.Collectors;
+import com.annimon.stream.Stream;
 import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
 import com.slimgears.slimrepo.core.interfaces.conditions.RelationalCondition;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
@@ -32,23 +31,14 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Iterables.transform;
-
 /**
  * Created by Denis on 08-Apr-15
  * <File Description>
  */
+@SuppressWarnings("StaticPseudoFunctionalStyleMethod")
 class SqliteStatementBuilder implements SqlStatementBuilder {
     private final PredicateBuilder predicateBuilder;
     private final SyntaxProvider syntaxProvider;
-
-    private final Function<String, String> FUNC_SIMPLE_FIELD_NAME = new Function<String, String>() {
-        @Override
-        public String apply(String input) {
-            return syntaxProvider.simpleFieldName(input);
-        }
-    };
 
     public SqliteStatementBuilder(PredicateBuilder predicateBuilder, SyntaxProvider syntaxProvider) {
         this.predicateBuilder = predicateBuilder;
@@ -102,17 +92,25 @@ class SqliteStatementBuilder implements SqlStatementBuilder {
 
     @Override
     public <TKey, TEntity> String insertStatement(InsertQueryParams<TKey, TEntity> params, SqlCommand.Parameters sqlParams) {
-        Iterable<Field> fields = fieldsToInsert(params.entityType);
+        Stream<Field> fields = fieldsToInsert(params.entityType);
         return
                 insertClause(params.entityType, fields) +
-                valuesClause(fields, sqlParams, entitiesToRows(params.entityType, params.entities));
+                valuesClause(fields, sqlParams, entitiesToRows(params.entityType, Stream.of(params.entities)));
     }
 
     @Override
     public String copyData(String fromTable, SqlDatabaseScheme.TableScheme toTable, Iterable<String> fieldNames) {
+        Set<String> fieldNameSet = Stream.of(fieldNames).collect(Collectors.toSet());
+        Collection<String> toFields = Stream.of(toTable.getFields().values())
+                .map(SqlDatabaseScheme.FieldScheme::getName)
+                .collect(Collectors.toList());
+
+        Stream<String> fromFields = Stream.of(toFields)
+                .map(field -> fieldNameSet.contains(field) ? syntaxProvider.simpleFieldName(field) : toTable.getField(field).getDefaultValue().toString());
+
         return
-                insertClause(toTable.getName(), fieldNames) +
-                selectFromClause(fieldNames, fromTable);
+                insertClause(toTable.getName(), Stream.of(toFields)) +
+                selectFromClause(fromTable, fromFields);
     }
 
     @Override
@@ -132,44 +130,31 @@ class SqliteStatementBuilder implements SqlStatementBuilder {
         return "DROP TABLE IF EXISTS " + syntaxProvider.tableName(name);
     }
 
-    protected String insertClause(EntityType entityType, Iterable<Field> fields) {
+    protected String insertClause(EntityType entityType, Stream<Field> fields) {
         return "INSERT INTO " +
                 syntaxProvider.tableName(entityType) +
-                " (" + Joiner.on(", ").join(fieldNames(fields)) + ")\n";
+                " (" + fields.map(this::fieldName).collect(Collectors.joining(", ")) + ")\n";
     }
 
-    protected String insertClause(String tableName, Iterable<String> fieldNames) {
+    protected String insertClause(String tableName, Stream<String> fieldNames) {
         return "INSERT INTO " +
                 syntaxProvider.tableName(tableName) +
-                " (" + Joiner.on(", ").join(transform(fieldNames, FUNC_SIMPLE_FIELD_NAME)) + ")\n";
+                " (" + fieldNames.map(syntaxProvider::simpleFieldName).collect(Collectors.joining(", ")) + ")\n";
     }
 
-    protected String valuesClause(final Iterable<Field> fields, final SqlCommand.Parameters parameters, Iterable<FieldValueLookup> rows) {
-        return "VALUES " +
-                Joiner.on(", ").join(transform(rows, new Function<FieldValueLookup, String>() {
-                    @Override
-                    public String apply(final FieldValueLookup row) {
-                        return "(" +
-                                Joiner.on(", ").join(transform(fields,
-                                        new Function<Field, String>() {
-                                            @Override
-                                            public String apply(Field field) {
-                                                //noinspection unchecked
-                                                return substituteParameter(parameters, field, row.getValue(field));
-                                            }
-                        })) + ")";
-                    }
-                }));
-    }
-
-    private Iterable<Field> fieldsToInsert(final EntityType entityType) {
+    protected String valuesClause(final Stream<Field> fields, final SqlCommand.Parameters parameters, Stream<FieldValueLookup> rows) {
         //noinspection unchecked
-        return filter((Iterable<Field>) entityType.getFields(), new com.google.common.base.Predicate<Field>() {
-            @Override
-            public boolean apply(Field field) {
-                return !isAutoIncremented(entityType, field);
-            }
-        });
+        return "VALUES " +
+                rows
+                        .map(row -> "(" + fields
+                                .map(field -> substituteParameter(parameters, field, row.getValue(field)))
+                                .collect(Collectors.joining(", ")) + ")")
+                        .collect(Collectors.joining(", "));
+    }
+
+    private Stream<Field> fieldsToInsert(final EntityType entityType) {
+        //noinspection unchecked
+        return Stream.of(entityType.getFields()).filter(field -> !isAutoIncremented(entityType, (Field)field));
     }
 
     private String limitClause(QueryPagination pagination) {
@@ -188,7 +173,7 @@ class SqliteStatementBuilder implements SqlStatementBuilder {
 
     private String joinClauses(Iterable<RelationalField> relationalFields) {
         StringBuilder builder = new StringBuilder();
-        addJoinClauses(builder, new HashSet<EntityType>(), relationalFields);
+        addJoinClauses(builder, new HashSet<>(), relationalFields);
         return builder.toString();
     }
 
@@ -220,21 +205,14 @@ class SqliteStatementBuilder implements SqlStatementBuilder {
     }
 
     private <TEntity> String selectClause(EntityType entityType, Iterable<Field<TEntity, ?>> fields) {
-        return "SELECT\n    " + Joiner.on(",\n    ").join(fieldsAsAliases(allRelatedFields(entityType, fields))) + "\n";
+        return "SELECT\n    " + allRelatedFields(entityType, Stream.of(fields))
+                .map(this::fieldAsAlias)
+                .collect(Collectors.joining(",\n    ")) + "\n";
     }
 
-    private String selectFromClause(Iterable<String> fieldNames, String fromTable) {
-        return "SELECT " + Joiner.on(", ").join(transform(fieldNames, FUNC_SIMPLE_FIELD_NAME)) + " " +
+    private String selectFromClause(String fromTable, Stream<String> fieldNames) {
+        return "SELECT " + fieldNames.collect(Collectors.joining(", ")) + " " +
                 "FROM " + syntaxProvider.tableName(fromTable);
-    }
-
-    private Iterable<String> fieldsAsAliases(Iterable<Field> fields) {
-        return transform(fields, new Function<Field, String>() {
-            @Override
-            public String apply(Field field) {
-                return fieldAsAlias(field);
-            }
-        });
     }
 
     private String fieldAsAlias(Field field) {
@@ -243,27 +221,19 @@ class SqliteStatementBuilder implements SqlStatementBuilder {
 
     private String orderByClause(Collection<OrderFieldInfo> orderFields) {
         if (orderFields == null || orderFields.isEmpty()) return "";
-        return "ORDER BY " + Joiner.on(", ")
-                .join(transform(orderFields,
-                        new Function<OrderFieldInfo, String>() {
-                            @Override
-                            public String apply(OrderFieldInfo orderField) {
-                                return qualifiedFieldName(orderField.field) + " " + (orderField.ascending ? "ASC" : "DESC");
-                            }
-                        })) + "\n";
+        return "ORDER BY " + Stream
+                .of(orderFields)
+                .map(orderField -> qualifiedFieldName(orderField.field) + " " + (orderField.ascending ? "ASC" : "DESC"))
+                .collect(Collectors.joining(", ")) + "\n";
     }
 
     private String setClause(final Collection<UpdateFieldInfo> updateFields, final SqlCommand.Parameters parameters) {
         if (updateFields == null || updateFields.isEmpty()) return "";
-        return "SET " + Joiner
-                .on(", ")
-                .join(transform(updateFields,
-                        new Function<UpdateFieldInfo, String>() {
-                            @Override
-                            public String apply(UpdateFieldInfo updateField) {
-                                return fieldName(updateField.field) + " = " + substituteParameter(parameters, updateField.field, updateField.value);
-                            }
-                        })) + "\n";
+        //noinspection unchecked
+        return "SET " + Stream
+                .of(updateFields)
+                .map(updateField -> fieldName(updateField.field) + " = " + substituteParameter(parameters, updateField.field, updateField.value))
+                .collect(Collectors.joining(", ")) + "\n";
     }
 
     private String updateClause(EntityType entityType) {
@@ -272,33 +242,6 @@ class SqliteStatementBuilder implements SqlStatementBuilder {
 
     private String fromClause(EntityType entityType) {
         return "FROM " + syntaxProvider.tableName(entityType) + "\n";
-    }
-
-    private Iterable<String> fieldNames(EntityType entityType) {
-        //noinspection unchecked
-        return fieldNames(entityType.getFields());
-    }
-
-    private Iterable<String> allRelatedFieldNames(EntityType<?, ?> entityType) {
-        return qualifiedFieldNames(allRelatedFields(entityType));
-    }
-
-    private Iterable<String> qualifiedFieldNames(Iterable<Field> fields) {
-        return transform(fields, new Function<Field, String>() {
-            @Override
-            public String apply(Field field) {
-                return syntaxProvider.qualifiedFieldName(field);
-            }
-        });
-    }
-
-    private Iterable<String> fieldNames(Iterable<Field> fields) {
-        return transform(fields, new Function<Field, String>() {
-            @Override
-            public String apply(Field field) {
-                return fieldName(field);
-            }
-        });
     }
 
     private String columnDefinition(SqlDatabaseScheme.FieldScheme field) {
@@ -313,24 +256,12 @@ class SqliteStatementBuilder implements SqlStatementBuilder {
         return syntaxProvider.simpleFieldName(field);
     }
 
-    private <TKey, TEntity> Collection<FieldValueLookup> entitiesToRows(final EntityType<TKey, TEntity> entityType, Collection<TEntity> entities) {
-        return Collections2.transform(entities, new Function<TEntity, FieldValueLookup>() {
-            @Override
-            public FieldValueLookup apply(TEntity entity) {
-                return new EntityFieldValueMap<>(entityType, entity);
-            }
-        });
+    private <TKey, TEntity> Stream<FieldValueLookup> entitiesToRows(final EntityType<TKey, TEntity> entityType, Stream<TEntity> entities) {
+        return entities.map(entity -> new EntityFieldValueMap<>(entityType, entity));
     }
 
     private String columnDefinitions(final SqlDatabaseScheme.TableScheme tableScheme) {
-        return Joiner
-                .on(",\n    ")
-                .join(transform(tableScheme.getFields().values(), new Function<SqlDatabaseScheme.FieldScheme, String>() {
-                    @Override
-                    public String apply(SqlDatabaseScheme.FieldScheme field) {
-                        return columnDefinition(field);
-                    }
-                }));
+        return Stream.of(tableScheme.getFields().values()).map(this::columnDefinition).collect(Collectors.joining(",\n    "));
     }
 
     private String columnConstraints(SqlDatabaseScheme.FieldScheme field) {
@@ -360,33 +291,25 @@ class SqliteStatementBuilder implements SqlStatementBuilder {
         return syntaxProvider.qualifiedFieldName(field);
     }
 
-    private Iterable<Field> allRelatedFields(EntityType entityType) {
-        //noinspection unchecked
-        return allRelatedFields(entityType, entityType.getFields());
-    }
-
-    private <TEntity> Iterable<Field> allRelatedFields(EntityType entityType, Iterable<Field<TEntity, ?>> selectedFields) {
+    private <TEntity> Stream<Field> allRelatedFields(EntityType entityType, Stream<Field<TEntity, ?>> selectedFields) {
         Set<Field> fields = new LinkedHashSet<>();
-        addAllRelatedFields(fields, new HashSet<EntityType>(), entityType, selectedFields);
-        return fields;
+        addAllRelatedFields(fields, new HashSet<>(), entityType, selectedFields);
+        return Stream.of(fields);
     }
 
     private void addAllRelatedFields(Set<Field> fields, Set<EntityType> processedEntityTypes, EntityType entityType) {
         //noinspection unchecked
-        addAllRelatedFields(fields, processedEntityTypes, entityType, entityType.getFields());
+        addAllRelatedFields(fields, processedEntityTypes, entityType, Stream.of(entityType.getFields()));
     }
 
-    private <TEntity> void addAllRelatedFields(Set<Field> fields, Set<EntityType> processedEntityTypes, EntityType entityType, Iterable<Field<TEntity, ?>> selectedFields) {
+    private <TEntity> void addAllRelatedFields(Set<Field> fields, Set<EntityType> processedEntityTypes, EntityType entityType, Stream<Field<TEntity, ?>> selectedFields) {
         if (!processedEntityTypes.add(entityType)) return;
 
-        for (Field field : selectedFields) {
-            if (fields.add(field)) {
-                if (field instanceof RelationalField) {
-                    RelationalField relationalField = (RelationalField)field;
-                    addAllRelatedFields(fields, processedEntityTypes, relationalField.metaInfo().getRelatedEntityType());
-                }
-            }
-        }
+        selectedFields
+                .filter(fields::add)
+                .filter(field -> field instanceof RelationalField)
+                .map(field -> (RelationalField)field)
+                .forEach(field -> addAllRelatedFields(fields, processedEntityTypes, field.metaInfo().getRelatedEntityType()));
     }
 
     private Iterable<RelationalField> findRelationalFieldsInCondition(Condition<?> condition) {

@@ -1,18 +1,19 @@
 package com.slimgears.slimrepo.core.internal.sql;
 
-import com.google.common.collect.Collections2;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlDatabaseScheme;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import com.annimon.stream.Collectors;
+import com.annimon.stream.Stream;
 
 /**
  * Created by Denis on 25-May-15.
+ *
  */
 class SqlDatabaseSchemeProxy implements SqlDatabaseScheme {
     private final SqlDatabaseScheme databaseScheme;
@@ -26,18 +27,14 @@ class SqlDatabaseSchemeProxy implements SqlDatabaseScheme {
     }
 
     public void hideTables(EntityType<?, ?>... entityTypes) {
-        hiddenTables.addAll(
-                Collections2.transform(
-                        Arrays.asList(entityTypes),
-                        EntityType::getName));
+        hiddenTables.addAll(Stream.of(entityTypes).map(EntityType::getName).collect(Collectors.toList()));
     }
 
     @SafeVarargs
     public final <TKey, TEntity> void hideFields(final EntityType<TKey, TEntity> entityType, Field<TEntity, ?>... fields) {
-        hiddenFields.addAll(
-                Collections2.transform(
-                        Arrays.asList(fields),
-                        field -> fullFieldName(entityType.getName(), field.metaInfo().getName())));
+        hiddenFields.addAll(Stream.of(fields)
+                                    .map(field -> fullFieldName(entityType.getName(), field.metaInfo().getName()))
+                                    .collect(Collectors.toList()));
     }
 
     private String fullFieldName(String tableName, String fieldName) {
@@ -53,11 +50,9 @@ class SqlDatabaseSchemeProxy implements SqlDatabaseScheme {
     public Map<String, SqlDatabaseScheme.TableScheme> getTables() {
         if (tableSchemeMap == null) {
             tableSchemeMap = new LinkedHashMap<>();
-            for (SqlDatabaseScheme.TableScheme tableScheme : databaseScheme.getTables().values()) {
-                if (!hiddenTables.contains(tableScheme.getName())) {
-                    tableSchemeMap.put(tableScheme.getName(), new TableScheme(tableScheme));
-                }
-            }
+            Stream.of(databaseScheme.getTables().values())
+                    .filter(table -> !hiddenTables.contains(table.getName()))
+                    .forEach(table -> tableSchemeMap.put(table.getName(), new TableScheme(table)));
         }
         return tableSchemeMap;
     }
@@ -121,6 +116,11 @@ class SqlDatabaseSchemeProxy implements SqlDatabaseScheme {
             @Override
             public String getType() {
                 return fieldScheme.getType();
+            }
+
+            @Override
+            public Object getDefaultValue() {
+                return fieldScheme.getDefaultValue();
             }
 
             @Override

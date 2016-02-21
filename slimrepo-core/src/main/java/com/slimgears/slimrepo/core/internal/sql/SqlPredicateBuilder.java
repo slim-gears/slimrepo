@@ -2,8 +2,8 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal.sql;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Iterators;
+import com.annimon.stream.Collectors;
+import com.annimon.stream.Stream;
 import com.slimgears.slimrepo.core.interfaces.conditions.RelationalCondition;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.interfaces.conditions.BinaryCondition;
@@ -17,6 +17,8 @@ import com.slimgears.slimrepo.core.interfaces.conditions.UnaryCondition;
 import com.slimgears.slimrepo.core.internal.PredicateVisitor;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommand;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlStatementBuilder;
+import com.slimgears.slimrepo.core.utilities.Iterators;
+import com.slimgears.slimrepo.core.utilities.Joiner;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -161,16 +163,6 @@ public class SqlPredicateBuilder implements SqlStatementBuilder.PredicateBuilder
                 value = (V)String.format(argFormat, value);
         }
         return syntaxProvider.valueToString(condition.getField(), value);
-    }
-
-    protected <T, V> String joinValues(FieldCondition<T, V> condition, V[] values) {
-        String[] strValues = new String[values.length];
-        for (int i = 0; i < values.length; ++i) {
-            strValues[i] = valueToString(condition, values[i]);
-        }
-        return Joiner
-                .on(", ")
-                .join(strValues);
     }
 
     private String joinStrings(String... strings) {
