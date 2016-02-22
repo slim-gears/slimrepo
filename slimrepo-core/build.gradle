@@ -16,6 +16,6 @@ artifacts {
 
 dependencies {
     compile "com.annimon:stream:$annimonStreamVersion"
-    //compile "net.sourceforge.streamsupport:streamsupport:$streamsupportVersion"
+    compile "javax.annotation:jsr250-api:$jsr250ApiVersion"
     testCompile "commons-io:commons-io:$appacheCommonsIoVersion"
 }

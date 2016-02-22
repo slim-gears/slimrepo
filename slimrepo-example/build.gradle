@@ -42,11 +42,13 @@ android {
 }
 
 dependencies {
-    compile 'com.slimgears.slimrepo:slimrepo-android:0.9.15'
-    apt 'com.slimgears.slimrepo:slimrepo-apt:0.9.15'
+    compile 'com.slimgears.slimrepo:slimrepo-android:0.9.16'
+    apt 'com.slimgears.slimrepo:slimrepo-apt:0.9.16'
+//    compile project(':slimrepo-android')
+//    apt project(':slimrepo-apt')
 
 
     testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:2.0.31-beta'
+    testCompile 'org.mockito:mockito-core:2.0.42-beta'
     testCompile 'org.robolectric:robolectric:3.0'
 }

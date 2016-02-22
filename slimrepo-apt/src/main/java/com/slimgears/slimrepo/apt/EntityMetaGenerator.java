@@ -25,6 +25,7 @@ import javax.lang.model.element.TypeElement;
 
 /**
  * Created by ditskovi on 12/24/2015.
+ *
  */
 public class EntityMetaGenerator extends ClassGenerator<EntityMetaGenerator> {
     private final TypeElement entityTypeElement;
@@ -42,7 +43,7 @@ public class EntityMetaGenerator extends ClassGenerator<EntityMetaGenerator> {
         TypeName entityTypeName = TypeUtils.getTypeName(entityTypeElement.asType());
         MetaFields metaFields = new MetaFields(entityTypeElement);
         List<GetterSetterPropertyInfo> properties = Stream.of(propertyFinder.getProperties())
-                .map(PropertyFinder.PropertyDescriptor::createPropertyInfo)
+                .map(GetterSetterPropertyInfo.class::cast)
                 .collect(Collectors.toList());
 
         GetterSetterPropertyInfo keyProperty = MetaFields.getKeyField(getTypeName(), properties);

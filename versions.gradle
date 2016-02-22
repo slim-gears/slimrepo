@@ -6,5 +6,6 @@ ext {
     appacheCommonsIoVersion = '2.4'
     annimonStreamVersion = '1.0.6'
     streamsupportVersion = '1.4.2'
-    slimAptVersion = '0.1.5'
+    slimAptVersion = '0.1.10'
+    jsr250ApiVersion = '1.0'
 }
