@@ -9,16 +9,7 @@ import com.slimgears.slimrepo.core.annotations.GenerateRepository;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.core.internal.DefaultRepositoryModel;
 import com.slimgears.slimrepo.core.internal.interfaces.SessionServiceProvider;
-import com.squareup.javapoet.AnnotationSpec;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterizedTypeName;
-import com.squareup.javapoet.TypeName;
-import com.squareup.javapoet.TypeSpec;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.squareup.javapoet.*;
 
 import javax.annotation.Generated;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -30,10 +21,11 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.SimpleTypeVisitor7;
 import javax.lang.model.util.Types;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Denis on 02-Apr-15
- * <File Description>
  */
 public class RepositoryGenerator extends ClassGenerator<RepositoryGenerator> {
     protected RepositoryGenerator(ProcessingEnvironment processingEnvironment) {

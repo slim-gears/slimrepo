@@ -4,7 +4,6 @@ package com.slimgears.slimrepo.android.core;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
-
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueMap;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
@@ -15,12 +14,11 @@ import com.slimgears.slimrepo.core.internal.sql.SqlQueryProvider;
 import com.slimgears.slimrepo.core.internal.sql.SqlSessionEntityServiceProvider;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlSessionServiceProvider;
 
-import java.io.IOException;
 import java.util.Collection;
 
 /**
  * Created by Denis on 18-Apr-15
- * <File Description>
+ *
  */
 public class SqliteQueryProvider<TKey, TEntity> extends SqlQueryProvider<TKey, TEntity> {
     private final SQLiteDatabase database;

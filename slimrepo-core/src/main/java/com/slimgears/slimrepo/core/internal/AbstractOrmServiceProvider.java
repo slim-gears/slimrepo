@@ -10,7 +10,7 @@ import com.slimgears.slimrepo.core.internal.interfaces.OrmServiceProvider;
 
 /**
  * Created by Denis on 24-Apr-15
- * <File Description>
+ *
  */
 public abstract class AbstractOrmServiceProvider implements OrmServiceProvider {
     private FieldTypeMappingRegistrar typeMappingRegistrar;

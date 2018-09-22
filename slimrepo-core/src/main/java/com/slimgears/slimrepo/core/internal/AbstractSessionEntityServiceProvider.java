@@ -9,7 +9,7 @@ import com.slimgears.slimrepo.core.internal.interfaces.SessionEntityServiceProvi
 
 /**
  * Created by Denis on 14-Apr-15
- * <File Description>
+ *
  */
 public abstract class AbstractSessionEntityServiceProvider<TKey, TEntity> implements SessionEntityServiceProvider<TKey, TEntity> {
     private EntityCache<TKey, TEntity> entityCache;

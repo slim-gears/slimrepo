@@ -6,7 +6,7 @@ import com.slimgears.slimrepo.core.interfaces.fields.Field;
 
 /**
  * Created by Denis on 24-Apr-15
- * <File Description>
+ *
  */
 public interface FieldTypeMapper {
     <T> T toFieldType(Field<?, T> field, Object value);

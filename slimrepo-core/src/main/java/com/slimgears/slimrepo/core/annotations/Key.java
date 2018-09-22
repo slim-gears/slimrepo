@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 
 /**
  * Created by Denis on 20-Apr-15
- * <File Description>
+ *
  */
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.SOURCE)

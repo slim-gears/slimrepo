@@ -2,16 +2,16 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.prototype.generated;
 
-import com.slimgears.slimrepo.core.prototype.UserRepository;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.core.internal.AbstractRepository;
 import com.slimgears.slimrepo.core.internal.DefaultRepositoryModel;
 import com.slimgears.slimrepo.core.internal.interfaces.RepositoryModel;
 import com.slimgears.slimrepo.core.internal.interfaces.SessionServiceProvider;
+import com.slimgears.slimrepo.core.prototype.UserRepository;
 
 /**
  * Created by Denis on 09-Apr-15
- * <File Description>
+ *
  */
 public class GeneratedUserRepository extends AbstractRepository implements UserRepository {
     private final EntitySet.Provider<UserEntity> usersEntitySet;

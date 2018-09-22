@@ -6,7 +6,7 @@ import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
 
 /**
  * Created by Denis on 06-Apr-15
- * <File Description>
+ *
  */
 public interface ComparableField<TEntity, T> extends ValueField<TEntity, T> {
     Condition<TEntity> greaterThan(T value);

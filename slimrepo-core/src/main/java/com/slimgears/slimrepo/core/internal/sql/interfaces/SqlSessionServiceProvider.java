@@ -6,7 +6,7 @@ import com.slimgears.slimrepo.core.internal.interfaces.SessionServiceProvider;
 
 /**
  * Created by Denis on 09-Apr-15
- * <File Description>
+ *
  */
 public interface SqlSessionServiceProvider extends SessionServiceProvider {
     SqlCommandExecutor getExecutor();

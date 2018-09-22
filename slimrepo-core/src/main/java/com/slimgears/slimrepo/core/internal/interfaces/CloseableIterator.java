@@ -7,7 +7,7 @@ import java.util.Iterator;
 
 /**
  * Created by Denis on 10-Apr-15
- * <File Description>
+ *
  */
 public interface CloseableIterator<T> extends Iterator<T>, Closeable {
 }

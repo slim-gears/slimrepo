@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 /**
  * Created by Denis on 07-Apr-15
- * <File Description>
+ *
  */
 public class DefaultEntityUpdateQuery<TKey, TEntity>
         extends AbstractEntityQuery<TKey, TEntity, EntityUpdateQuery, EntityUpdateQuery.Builder<TEntity>, UpdateQueryParams<TKey, TEntity>>

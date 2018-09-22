@@ -6,7 +6,7 @@ import com.slimgears.slimrepo.core.interfaces.fields.Field;
 
 /**
  * Created by Denis on 09-Apr-15
- * <File Description>
+ *
  */
 public interface FieldValueLookup<TEntity> {
     interface Provider<TEntity> {

@@ -7,7 +7,7 @@ import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMappingRegistrar
 
 /**
 * Created by Denis on 30-Apr-15
-* <File Description>
+*
 */
 public abstract class AbstractSpecificTypeConverter<TSource, TDestination>
         extends AbstractTypeConverter<TSource, TDestination>

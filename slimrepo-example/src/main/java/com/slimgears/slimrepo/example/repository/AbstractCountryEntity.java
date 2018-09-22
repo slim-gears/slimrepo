@@ -6,7 +6,7 @@ import com.slimgears.slimrepo.core.annotations.GenerateEntity;
 
 /**
  * Created by Denis on 22-Apr-15
- * <File Description>
+ *
  */
 @GenerateEntity
 public class AbstractCountryEntity {

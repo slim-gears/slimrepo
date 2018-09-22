@@ -9,7 +9,7 @@ import java.util.Date;
 
 /**
  * Created by Denis on 07-Apr-15
- * <File Description>
+ *
  */
 public class AbstractUserEntity {
     protected String userId;

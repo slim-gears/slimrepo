@@ -6,7 +6,7 @@ import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
 
 /**
  * Created by Denis on 13-Apr-15
- * <File Description>
+ *
  */
 public interface QueryBuilder<T, TQuery, TBuilder extends QueryBuilder<T, TQuery, TBuilder>> {
     TBuilder where(Condition<T> condition);

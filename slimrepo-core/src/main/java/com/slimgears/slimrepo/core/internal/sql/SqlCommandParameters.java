@@ -11,7 +11,7 @@ import java.util.Map;
 
 /**
 * Created by Denis on 08-Apr-15
-* <File Description>
+*
 */
 class SqlCommandParameters implements SqlCommand.Parameters {
     private final List<String> parameters = new ArrayList<>();

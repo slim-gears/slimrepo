@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  * Created by Denis on 09-Apr-15
- * <File Description>
+ *
  */
 public abstract class AbstractEntityType<TKey, TEntity> implements EntityType<TKey, TEntity> {
     private final String name;

@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentMap;
 
 /**
  * Created by Denis on 07-Apr-15
- * <File Description>
+ *
  */
 public class HashMapEntityCache<TKey, TEntity> implements EntityCache<TKey, TEntity> {
     private final ConcurrentMap<TKey, TEntity> entityCache = new ConcurrentHashMap<>();

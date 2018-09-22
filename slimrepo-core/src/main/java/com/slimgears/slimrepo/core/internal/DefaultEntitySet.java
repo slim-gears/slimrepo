@@ -4,18 +4,13 @@ package com.slimgears.slimrepo.core.internal;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
-import com.slimgears.slimrepo.core.annotations.Entity;
 import com.slimgears.slimrepo.core.interfaces.Repository;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.queries.EntityDeleteQuery;
 import com.slimgears.slimrepo.core.interfaces.queries.EntitySelectQuery;
 import com.slimgears.slimrepo.core.interfaces.queries.EntityUpdateQuery;
-import com.slimgears.slimrepo.core.internal.interfaces.EntityCache;
-import com.slimgears.slimrepo.core.internal.interfaces.EntityStateTracker;
-import com.slimgears.slimrepo.core.internal.interfaces.RepositorySessionNotifier;
-import com.slimgears.slimrepo.core.internal.interfaces.SessionEntityServiceProvider;
-import com.slimgears.slimrepo.core.internal.interfaces.SessionServiceProvider;
+import com.slimgears.slimrepo.core.internal.interfaces.*;
 import com.slimgears.slimrepo.core.internal.query.DefaultEntityDeleteQuery;
 import com.slimgears.slimrepo.core.internal.query.DefaultEntitySelectQuery;
 import com.slimgears.slimrepo.core.internal.query.DefaultEntityUpdateQuery;
@@ -27,7 +22,7 @@ import java.util.Collection;
 
 /**
  * Created by Denis on 05-Apr-15
- * <File Description>
+ *
  */
 public class DefaultEntitySet<TKey, TEntity> extends AbstractEntitySet<TKey, TEntity> implements
         RepositorySessionNotifier.Listener {

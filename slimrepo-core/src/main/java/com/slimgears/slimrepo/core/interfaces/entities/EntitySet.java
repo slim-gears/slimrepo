@@ -16,7 +16,7 @@ import java.util.Map;
 
 /**
  * Created by Denis on 02-Apr-15
- * <File Description>
+ *
  */
 public interface EntitySet<TEntity> {
     interface Provider<TEntity> {

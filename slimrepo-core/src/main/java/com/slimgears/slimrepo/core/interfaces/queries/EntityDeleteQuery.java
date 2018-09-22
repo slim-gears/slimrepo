@@ -6,7 +6,7 @@ import java.io.IOException;
 
 /**
  * Created by Denis on 07-Apr-15
- * <File Description>
+ *
  */
 public interface EntityDeleteQuery {
     interface Builder<T> extends QueryBuilder<T, EntityDeleteQuery, Builder<T>> {

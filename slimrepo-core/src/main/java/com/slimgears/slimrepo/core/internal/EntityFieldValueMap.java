@@ -3,15 +3,15 @@
 package com.slimgears.slimrepo.core.internal;
 
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
-import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueMap;
+import com.slimgears.slimrepo.core.interfaces.fields.Field;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by Denis on 09-Apr-15
- * <File Description>
+ *
  */
 public class EntityFieldValueMap<TKey, TEntity> implements FieldValueMap<TEntity> {
     private final Map<String, Object> valueMap = new HashMap<>();

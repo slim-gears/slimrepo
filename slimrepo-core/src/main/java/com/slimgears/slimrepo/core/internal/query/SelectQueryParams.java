@@ -11,7 +11,7 @@ import java.util.Collection;
 
 /**
 * Created by Denis on 13-Apr-15
-* <File Description>
+*
 */
 public class SelectQueryParams<TKey, TEntity> extends ConditionalQueryParams<TKey, TEntity, SelectQueryParams<TKey, TEntity>> {
     public Collection<Field<TEntity, ?>> fields;

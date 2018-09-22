@@ -16,7 +16,7 @@ import java.io.IOException;
 
 /**
  * Created by Denis on 14-Apr-15
- * <File Description>
+ *
  */
 public abstract class AbstractSqlSessionServiceProvider extends AbstractSessionServiceProvider implements SqlSessionServiceProvider {
     private SqlCommandExecutor sqlExecutor;

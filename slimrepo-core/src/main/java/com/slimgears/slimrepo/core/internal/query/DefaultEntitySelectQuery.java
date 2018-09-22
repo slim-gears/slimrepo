@@ -15,15 +15,11 @@ import com.slimgears.slimrepo.core.internal.interfaces.EntityCache;
 import com.slimgears.slimrepo.core.utilities.Iterators;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Denis on 07-Apr-15
- * <File Description>
+ *
  */
 public class DefaultEntitySelectQuery<TKey, TEntity>
         extends AbstractEntityQuery<TKey, TEntity, EntitySelectQuery<TEntity>, EntitySelectQuery.Builder<TEntity>, SelectQueryParams<TKey, TEntity>>

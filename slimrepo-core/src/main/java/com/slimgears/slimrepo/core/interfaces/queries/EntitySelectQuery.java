@@ -9,7 +9,7 @@ import java.util.Map;
 
 /**
  * Created by Denis on 02-Apr-15
- * <File Description>
+ *
  */
 public interface EntitySelectQuery<T> extends SelectQuery<T> {
     interface Builder<T> extends QueryBuilder<T, EntitySelectQuery<T>, Builder<T>> {

@@ -6,7 +6,7 @@ import java.util.concurrent.Callable;
 
 /**
  * Created by Denis on 07-Apr-15
- * <File Description>
+ *
  */
 @SuppressWarnings("unused")
 public interface EntityCache<TKey, TEntity> {

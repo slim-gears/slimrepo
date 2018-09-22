@@ -13,7 +13,7 @@ import com.slimgears.slimrepo.core.internal.query.UpdateQueryParams;
 
 /**
  * Created by Denis on 08-Apr-15
- * <File Description>
+ *
  */
 public interface SqlStatementBuilder {
     interface SyntaxProvider {

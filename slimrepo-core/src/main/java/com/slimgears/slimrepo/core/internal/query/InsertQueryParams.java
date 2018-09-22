@@ -8,7 +8,7 @@ import java.util.Collection;
 
 /**
  * Created by Denis on 13-Apr-15
- * <File Description>
+ *
  */
 public class InsertQueryParams<TKey, TEntity> extends AbstractQueryParams<TKey, TEntity, InsertQueryParams<TKey, TEntity>> {
     public final Collection<TEntity> entities;

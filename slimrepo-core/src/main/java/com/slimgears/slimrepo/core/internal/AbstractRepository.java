@@ -12,7 +12,7 @@ import java.io.IOException;
 
 /**
  * Created by Denis on 09-Apr-15
- * <File Description>
+ *
  */
 public class AbstractRepository implements Repository {
     private final TransactionProvider transactionProvider;

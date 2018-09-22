@@ -8,7 +8,7 @@ import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlStatementBuilder;
 
 /**
  * Created by Denis on 15-Apr-15
- * <File Description>
+ *
  */
 public abstract class AbstractSqliteOrmServiceProvider extends AbstractSqlOrmServiceProvider {
     @Override

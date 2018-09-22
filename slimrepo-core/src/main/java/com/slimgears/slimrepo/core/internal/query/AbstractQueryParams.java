@@ -9,7 +9,7 @@ import java.util.Collection;
 
 /**
 * Created by Denis on 13-Apr-15
-* <File Description>
+*
 */
 public abstract class AbstractQueryParams<TKey, TEntity, TQueryParams extends AbstractQueryParams<TKey, TEntity, TQueryParams>> {
     public final EntityType<TKey, TEntity> entityType;

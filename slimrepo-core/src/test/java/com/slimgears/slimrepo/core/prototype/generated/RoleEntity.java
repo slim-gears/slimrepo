@@ -2,18 +2,16 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.prototype.generated;
 
-import com.slimgears.slimrepo.core.prototype.AbstractRoleEntity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
-import com.slimgears.slimrepo.core.interfaces.entities.FieldValueMap;
-import com.slimgears.slimrepo.core.internal.Fields;
 import com.slimgears.slimrepo.core.interfaces.fields.ComparableField;
 import com.slimgears.slimrepo.core.interfaces.fields.StringField;
-import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimrepo.core.internal.AbstractEntityType;
+import com.slimgears.slimrepo.core.internal.Fields;
+import com.slimgears.slimrepo.core.prototype.AbstractRoleEntity;
 
 /**
  * Created by Denis on 05-Apr-15
- * <File Description>
+ *
  */
 public class RoleEntity extends AbstractRoleEntity {
     public static final ComparableField<RoleEntity, Integer> RoleId = Fields.comparableField("roleId", Integer.class, RoleEntity::getRoleId, RoleEntity::setRoleId, false);

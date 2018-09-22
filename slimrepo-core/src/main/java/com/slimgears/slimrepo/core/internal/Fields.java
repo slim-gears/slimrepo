@@ -2,31 +2,18 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal;
 
-import com.slimgears.slimrepo.core.interfaces.conditions.BinaryCondition;
-import com.slimgears.slimrepo.core.interfaces.conditions.CollectionCondition;
-import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
-import com.slimgears.slimrepo.core.interfaces.conditions.Conditions;
-import com.slimgears.slimrepo.core.interfaces.conditions.TernaryCondition;
-import com.slimgears.slimrepo.core.interfaces.conditions.UnaryCondition;
+import com.slimgears.slimrepo.core.interfaces.conditions.*;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
-import com.slimgears.slimrepo.core.interfaces.fields.BlobField;
-import com.slimgears.slimrepo.core.interfaces.fields.ComparableField;
-import com.slimgears.slimrepo.core.interfaces.fields.Field;
-import com.slimgears.slimrepo.core.interfaces.fields.RelationalField;
-import com.slimgears.slimrepo.core.interfaces.fields.StringField;
-import com.slimgears.slimrepo.core.interfaces.fields.ValueField;
-import com.slimgears.slimrepo.core.interfaces.fields.ValueGetter;
-import com.slimgears.slimrepo.core.interfaces.fields.ValueSetter;
+import com.slimgears.slimrepo.core.interfaces.fields.*;
 
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
-import java.util.Base64;
 import java.util.Collection;
 import java.util.UUID;
 
 /**
  * Created by Denis on 11-Apr-15
- * <File Description>
+ *
  */
 public class Fields {
     static class AbstractField<TEntity, T>

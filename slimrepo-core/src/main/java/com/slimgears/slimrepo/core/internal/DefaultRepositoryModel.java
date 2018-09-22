@@ -7,7 +7,7 @@ import com.slimgears.slimrepo.core.internal.interfaces.RepositoryModel;
 
 /**
  * Created by Denis on 15-Apr-15
- * <File Description>
+ *
  */
 public class DefaultRepositoryModel implements RepositoryModel {
     private final String name;

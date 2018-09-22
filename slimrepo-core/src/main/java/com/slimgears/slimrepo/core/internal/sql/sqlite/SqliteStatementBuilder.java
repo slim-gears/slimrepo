@@ -15,25 +15,16 @@ import com.slimgears.slimrepo.core.internal.EntityFieldValueMap;
 import com.slimgears.slimrepo.core.internal.OrderFieldInfo;
 import com.slimgears.slimrepo.core.internal.PredicateVisitor;
 import com.slimgears.slimrepo.core.internal.UpdateFieldInfo;
-import com.slimgears.slimrepo.core.internal.query.DeleteQueryParams;
-import com.slimgears.slimrepo.core.internal.query.InsertQueryParams;
-import com.slimgears.slimrepo.core.internal.query.QueryPagination;
-import com.slimgears.slimrepo.core.internal.query.SelectQueryParams;
-import com.slimgears.slimrepo.core.internal.query.UpdateQueryParams;
+import com.slimgears.slimrepo.core.internal.query.*;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommand;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlDatabaseScheme;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlStatementBuilder;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by Denis on 08-Apr-15
- * <File Description>
+ *
  */
 @SuppressWarnings("StaticPseudoFunctionalStyleMethod")
 class SqliteStatementBuilder implements SqlStatementBuilder {

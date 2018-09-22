@@ -7,7 +7,7 @@ import java.util.Date;
 
 /**
  * Created by Denis on 24-Apr-15
- * <File Description>
+ *
  */
 public class Dates {
     static final long MILLISECONDS_IN_SECOND = 1000;

@@ -6,7 +6,6 @@ import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
-
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.internal.interfaces.CloseableIterator;
@@ -22,7 +21,7 @@ import java.util.Map;
 
 /**
  * Created by Denis on 10-Apr-15
- * <File Description>
+ *
  */
 public class SqliteCommandExecutor implements SqlCommandExecutor {
     private final SQLiteDatabase database;

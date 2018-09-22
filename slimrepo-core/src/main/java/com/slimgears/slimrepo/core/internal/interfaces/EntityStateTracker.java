@@ -6,7 +6,7 @@ import java.util.Collection;
 
 /**
  * Created by Denis on 09-Apr-15
- * <File Description>
+ *
  */
 public interface EntityStateTracker<TEntity> {
     Collection<TEntity> getModifiedEntities();

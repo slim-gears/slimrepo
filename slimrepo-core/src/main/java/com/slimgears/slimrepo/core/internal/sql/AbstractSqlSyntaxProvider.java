@@ -14,7 +14,7 @@ import java.util.Map;
 
 /**
  * Created by Denis on 18-Apr-15
- * <File Description>
+ *
  */
 public abstract class AbstractSqlSyntaxProvider implements SqlStatementBuilder.SyntaxProvider {
     private static final Map<Class, String> CLASS_TO_TYPE_NAME_MAP = new HashMap<>();

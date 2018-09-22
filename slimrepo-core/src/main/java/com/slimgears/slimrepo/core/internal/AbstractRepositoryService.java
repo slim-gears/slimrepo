@@ -6,11 +6,7 @@ import com.slimgears.slimrepo.core.interfaces.Repository;
 import com.slimgears.slimrepo.core.interfaces.RepositoryService;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
-import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMappingInstaller;
-import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMappingRegistrar;
-import com.slimgears.slimrepo.core.internal.interfaces.OrmServiceProvider;
-import com.slimgears.slimrepo.core.internal.interfaces.RepositoryModel;
-import com.slimgears.slimrepo.core.internal.interfaces.SessionServiceProvider;
+import com.slimgears.slimrepo.core.internal.interfaces.*;
 import com.slimgears.slimrepo.core.utilities.HashMapLoadingCache;
 import com.slimgears.slimrepo.core.utilities.LoadingCache;
 
@@ -19,7 +15,7 @@ import java.util.concurrent.ExecutionException;
 
 /**
  * Created by Denis on 09-Apr-15
- * <File Description>
+ *
  */
 public abstract class AbstractRepositoryService<TRepository extends Repository> implements RepositoryService<TRepository> {
     LoadingCache<EntityType, AutoEntitySet> sessionEntityServiceProviderCache = HashMapLoadingCache.newCache(

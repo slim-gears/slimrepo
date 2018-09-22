@@ -2,15 +2,15 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal.query;
 
-import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
+import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.internal.UpdateFieldInfo;
 
 import java.util.Collection;
 
 /**
 * Created by Denis on 13-Apr-15
-* <File Description>
+*
 */
 public class UpdateQueryParams<TKey, TEntity> extends ConditionalQueryParams<TKey, TEntity, UpdateQueryParams<TKey, TEntity>> {
     public Collection<UpdateFieldInfo> updates;

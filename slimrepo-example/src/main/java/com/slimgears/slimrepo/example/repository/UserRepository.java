@@ -11,7 +11,7 @@ import com.slimgears.slimrepo.example.BuildConfig;
 
 /**
  * Created by Denis on 22-Apr-15
- * <File Description>
+ *
  */
 @GenerateRepository(version = BuildConfig.VERSION_CODE, name = "UserDatabase")
 @OrmProvider(SqliteOrmServiceProvider.class)

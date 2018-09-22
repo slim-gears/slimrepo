@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-
 import com.slimgears.slimrepo.example.R;
 import com.slimgears.slimrepo.example.repository.GeneratedUserRepositoryService;
 import com.slimgears.slimrepo.example.repository.UserEntity;
@@ -22,7 +21,7 @@ import java.util.List;
 
 /**
  * Created by Denis on 22-Apr-15
- * <File Description>
+ *
  */
 public class MainActivity extends Activity {
 

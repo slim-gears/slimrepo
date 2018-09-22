@@ -4,7 +4,7 @@ package com.slimgears.slimrepo.core.interfaces.conditions;
 
 /**
  * Created by Denis on 11-Apr-15
- * <File Description>
+ *
  */
 public enum PredicateType {
     FIELD_IS_NULL,

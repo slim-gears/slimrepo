@@ -8,7 +8,7 @@ import java.util.Collection;
 
 /**
  * Created by Denis on 11-Apr-15
- * <File Description>
+ *
  */
 public interface ValueField<TEntity, T> extends Field<TEntity, T> {
     Condition<TEntity> eq(T value);

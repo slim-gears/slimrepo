@@ -6,7 +6,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
-
 import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMappingRegistrar;
 import com.slimgears.slimrepo.core.internal.interfaces.RepositoryModel;
 import com.slimgears.slimrepo.core.internal.interfaces.SessionServiceProvider;
@@ -17,7 +16,7 @@ import java.io.IOException;
 
 /**
  * Created by Denis on 15-Apr-15
- * <File Description>
+ *
  */
 public class SqliteOrmServiceProvider extends AbstractSqliteOrmServiceProvider {
     private final Context context;

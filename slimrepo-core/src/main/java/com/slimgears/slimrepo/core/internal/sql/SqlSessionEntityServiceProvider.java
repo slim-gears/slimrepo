@@ -10,7 +10,7 @@ import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlSessionServiceProv
 
 /**
  * Created by Denis on 14-Apr-15
- * <File Description>
+ *
  */
 public class SqlSessionEntityServiceProvider<TKey, TEntity>
         extends AbstractSessionEntityServiceProvider<TKey, TEntity>

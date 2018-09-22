@@ -11,35 +11,23 @@ import com.slimgears.slimrepo.core.internal.AbstractRepository;
 import com.slimgears.slimrepo.core.internal.AbstractRepositoryService;
 import com.slimgears.slimrepo.core.internal.interfaces.OrmServiceProvider;
 import com.slimgears.slimrepo.core.internal.interfaces.SessionServiceProvider;
-import com.squareup.javapoet.AnnotationSpec;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterizedTypeName;
-import com.squareup.javapoet.TypeName;
-import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.*;
 
+import javax.annotation.Generated;
+import javax.annotation.processing.SupportedAnnotationTypes;
+import javax.lang.model.element.*;
+import javax.lang.model.util.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import javax.annotation.Generated;
-import javax.annotation.processing.SupportedAnnotationTypes;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.util.Elements;
 
 import static com.google.common.collect.Collections2.filter;
 import static com.google.common.collect.Collections2.transform;
 
 /**
  * Created by Denis on 22-Apr-15
- * <File Description>
+ *
  */
 @SupportedAnnotationTypes("com.slimgears.slimrepo.core.annotations.GenerateRepository")
 public class RepositoryAnnotationProcessor extends AnnotationProcessorBase {

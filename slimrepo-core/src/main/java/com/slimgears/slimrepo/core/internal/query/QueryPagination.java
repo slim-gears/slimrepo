@@ -4,7 +4,7 @@ package com.slimgears.slimrepo.core.internal.query;
 
 /**
 * Created by Denis on 13-Apr-15
-* <File Description>
+*
 */
 public class QueryPagination {
     public int limit = -1;

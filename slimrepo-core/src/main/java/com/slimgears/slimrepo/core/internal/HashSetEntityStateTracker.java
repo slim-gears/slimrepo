@@ -9,7 +9,7 @@ import java.util.Set;
 
 /**
  * Created by Denis on 09-Apr-15
- * <File Description>
+ *
  */
 public class HashSetEntityStateTracker<TEntity> implements EntityStateTracker<TEntity> {
     private final Set<TEntity> modifiedEntities = new LinkedHashSet<>();

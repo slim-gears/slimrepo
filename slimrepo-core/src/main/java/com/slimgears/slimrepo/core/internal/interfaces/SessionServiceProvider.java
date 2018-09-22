@@ -9,7 +9,7 @@ import java.io.Closeable;
 
 /**
  * Created by Denis on 14-Apr-15
- * <File Description>
+ *
  */
 public interface SessionServiceProvider extends RepositorySessionNotifier, RepositorySessionNotifier.Listener, Closeable {
     <TKey, TEntity> SessionEntityServiceProvider<TKey, TEntity> getEntityServiceProvider(EntityType<TKey, TEntity> entityType);

@@ -10,7 +10,7 @@ import com.slimgears.slimrepo.core.prototype.UserRepository;
 
 /**
  * Created by Denis on 09-Apr-15
- * <File Description>
+ *
  */
 public class GeneratedUserRepositoryService extends AbstractRepositoryService<UserRepository> implements UserRepositoryService {
     public GeneratedUserRepositoryService(OrmServiceProvider ormServiceProvider) {

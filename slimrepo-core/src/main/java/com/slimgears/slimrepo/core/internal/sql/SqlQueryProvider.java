@@ -5,12 +5,7 @@ package com.slimgears.slimrepo.core.internal.sql;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimrepo.core.internal.interfaces.CloseableIterator;
-import com.slimgears.slimrepo.core.internal.query.DeleteQueryParams;
-import com.slimgears.slimrepo.core.internal.query.InsertQueryParams;
-import com.slimgears.slimrepo.core.internal.query.PreparedQuery;
-import com.slimgears.slimrepo.core.internal.query.QueryProvider;
-import com.slimgears.slimrepo.core.internal.query.SelectQueryParams;
-import com.slimgears.slimrepo.core.internal.query.UpdateQueryParams;
+import com.slimgears.slimrepo.core.internal.query.*;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommand;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommandExecutor;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlSessionServiceProvider;
@@ -20,7 +15,7 @@ import java.util.Collection;
 
 /**
  * Created by Denis on 13-Apr-15
- * <File Description>
+ *
  */
 public class SqlQueryProvider<TKey, TEntity> implements QueryProvider<TKey, TEntity> {
     protected final EntityType<TKey, TEntity> entityType;

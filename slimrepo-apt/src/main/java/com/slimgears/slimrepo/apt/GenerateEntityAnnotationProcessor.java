@@ -4,14 +4,13 @@ package com.slimgears.slimrepo.apt;
 
 import com.slimgears.slimapt.AnnotationProcessorBase;
 
-import java.io.IOException;
-
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.TypeElement;
+import java.io.IOException;
 
 /**
  * Created by Denis on 02-Apr-15
- * <File Description>
+ *
  */
 @SupportedAnnotationTypes("com.slimgears.slimrepo.core.annotations.GenerateEntity")
 public class GenerateEntityAnnotationProcessor extends AnnotationProcessorBase {

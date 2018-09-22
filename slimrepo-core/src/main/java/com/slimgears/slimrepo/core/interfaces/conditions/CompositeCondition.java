@@ -4,7 +4,7 @@ package com.slimgears.slimrepo.core.interfaces.conditions;
 
 /**
  * Created by Denis on 11-Apr-15
- * <File Description>
+ *
  */
 public interface CompositeCondition<TEntity> extends Condition<TEntity> {
     Condition<TEntity>[] getArguments();

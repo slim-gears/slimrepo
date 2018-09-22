@@ -9,7 +9,7 @@ import com.slimgears.slimrepo.core.internal.sql.AbstractSqlSyntaxProvider;
 
 /**
  * Created by Denis on 11-Apr-15
- * <File Description>
+ *
  */
 public class SqliteSyntaxProvider extends AbstractSqlSyntaxProvider {
     public SqliteSyntaxProvider(FieldTypeMappingRegistrar mappingRegistrar) {

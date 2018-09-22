@@ -6,7 +6,7 @@ import com.slimgears.slimrepo.core.interfaces.fields.Field;
 
 /**
 * Created by Denis on 08-Apr-15
-* <File Description>
+*
 */
 public class OrderFieldInfo {
     public final boolean ascending;

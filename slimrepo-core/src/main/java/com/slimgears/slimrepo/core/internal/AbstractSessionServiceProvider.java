@@ -5,11 +5,7 @@ package com.slimgears.slimrepo.core.internal;
 import com.slimgears.slimrepo.core.interfaces.Repository;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
-import com.slimgears.slimrepo.core.internal.interfaces.EntitySessionNotifier;
-import com.slimgears.slimrepo.core.internal.interfaces.RepositoryCreator;
-import com.slimgears.slimrepo.core.internal.interfaces.RepositorySessionNotifier;
-import com.slimgears.slimrepo.core.internal.interfaces.SessionEntityServiceProvider;
-import com.slimgears.slimrepo.core.internal.interfaces.SessionServiceProvider;
+import com.slimgears.slimrepo.core.internal.interfaces.*;
 import com.slimgears.slimrepo.core.utilities.HashMapLoadingCache;
 import com.slimgears.slimrepo.core.utilities.LoadingCache;
 
@@ -20,7 +16,7 @@ import java.util.concurrent.ExecutionException;
 
 /**
  * Created by Denis on 14-Apr-15
- * <File Description>
+ *
  */
 public abstract class AbstractSessionServiceProvider implements SessionServiceProvider {
     private final List<RepositorySessionNotifier.Listener> sessionListeners = new ArrayList<>();

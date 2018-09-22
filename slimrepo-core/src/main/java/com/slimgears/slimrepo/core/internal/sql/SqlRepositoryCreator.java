@@ -5,12 +5,7 @@ package com.slimgears.slimrepo.core.internal.sql;
 import com.slimgears.slimrepo.core.internal.interfaces.RepositoryCreator;
 import com.slimgears.slimrepo.core.internal.interfaces.RepositoryModel;
 import com.slimgears.slimrepo.core.internal.interfaces.TransactionProvider;
-import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommandExecutor;
-import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlDatabaseScheme;
-import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlDatabaseSchemeDifference;
-import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlSchemeProvider;
-import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlSessionServiceProvider;
-import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlStatementBuilder;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.*;
 import com.slimgears.slimrepo.core.utilities.Sets;
 
 import java.io.IOException;
@@ -18,7 +13,7 @@ import java.util.Set;
 
 /**
  * Created by Denis on 15-Apr-15
- * <File Description>
+ *
  */
 class SqlRepositoryCreator implements RepositoryCreator {
     private final TransactionProvider transactionProvider;

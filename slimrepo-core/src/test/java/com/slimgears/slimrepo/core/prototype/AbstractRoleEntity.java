@@ -4,7 +4,7 @@ package com.slimgears.slimrepo.core.prototype;
 
 /**
  * Created by Denis on 07-Apr-15
- * <File Description>
+ *
  */
 public class AbstractRoleEntity {
     protected int roleId;

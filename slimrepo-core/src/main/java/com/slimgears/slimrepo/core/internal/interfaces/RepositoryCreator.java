@@ -6,7 +6,7 @@ import java.io.IOException;
 
 /**
  * Created by Denis on 15-Apr-15
- * <File Description>
+ *
  */
 public interface RepositoryCreator {
     void createRepository(RepositoryModel model) throws IOException;

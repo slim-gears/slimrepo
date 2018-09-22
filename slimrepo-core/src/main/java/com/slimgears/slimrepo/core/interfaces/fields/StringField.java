@@ -6,7 +6,7 @@ import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
 
 /**
  * Created by Denis on 06-Apr-15
- * <File Description>
+ *
  */
 public interface StringField<TEntity> extends ValueField<TEntity, String> {
     Condition<TEntity> contains(String substr);

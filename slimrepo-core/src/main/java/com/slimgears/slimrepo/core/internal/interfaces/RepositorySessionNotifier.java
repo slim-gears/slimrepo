@@ -8,7 +8,7 @@ import java.io.IOException;
 
 /**
  * Created by Denis on 18-Apr-15
- * <File Description>
+ *
  */
 public interface RepositorySessionNotifier {
     interface Listener {

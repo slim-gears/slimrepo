@@ -6,7 +6,7 @@ import java.util.Map;
 
 /**
 * Created by Denis on 08-Apr-15
-* <File Description>
+*
 */
 public interface SqlCommand {
     String getStatement();

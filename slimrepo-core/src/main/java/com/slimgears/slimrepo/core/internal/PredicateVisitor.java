@@ -2,17 +2,11 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal;
 
-import com.slimgears.slimrepo.core.interfaces.conditions.BinaryCondition;
-import com.slimgears.slimrepo.core.interfaces.conditions.CollectionCondition;
-import com.slimgears.slimrepo.core.interfaces.conditions.CompositeCondition;
-import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
-import com.slimgears.slimrepo.core.interfaces.conditions.RelationalCondition;
-import com.slimgears.slimrepo.core.interfaces.conditions.TernaryCondition;
-import com.slimgears.slimrepo.core.interfaces.conditions.UnaryCondition;
+import com.slimgears.slimrepo.core.interfaces.conditions.*;
 
 /**
  * Created by Denis on 11-Apr-15
- * <File Description>
+ *
  */
 public abstract class PredicateVisitor<TEntity, T> {
     public T visit(Condition<TEntity> condition) {

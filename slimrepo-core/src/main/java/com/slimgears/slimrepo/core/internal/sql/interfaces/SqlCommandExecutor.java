@@ -9,7 +9,7 @@ import java.io.IOException;
 
 /**
  * Created by Denis on 08-Apr-15
- * <File Description>
+ *
  */
 public interface SqlCommandExecutor {
     long count(String statement, String... parameters) throws IOException;

@@ -7,7 +7,7 @@ import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlStatementBuilder;
 
 /**
  * Created by Denis on 08-Apr-15
- * <File Description>
+ *
  */
 class SqlLazyCommand implements SqlCommand {
     private final SqlStatementBuilder sqlBuilder;

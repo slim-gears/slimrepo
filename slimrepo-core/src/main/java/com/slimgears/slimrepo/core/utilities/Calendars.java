@@ -6,7 +6,7 @@ import java.util.Calendar;
 
 /**
  * Created by Denis on 24-Apr-15
- * <File Description>
+ *
  */
 public class Calendars {
     public static Calendar now() {

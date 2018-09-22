@@ -3,14 +3,13 @@ package com.slimgears.slimrepo.apt;// Copyright 2015 Denis Itskovich
 
 
 import com.slimgears.slimapt.AnnotationProcessingTestBase;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 /**
  * Created by Denis on 03-Apr-15
- * <File Description>
+ *
  */
 @RunWith(JUnit4.class)
 public class RepositoryServiceGeneratorTest extends AnnotationProcessingTestBase {

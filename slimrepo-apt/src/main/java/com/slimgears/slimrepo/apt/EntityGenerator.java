@@ -8,24 +8,18 @@ import com.slimgears.slimapt.TypeUtils;
 import com.slimgears.slimrepo.core.annotations.GenerateEntity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityBuilder;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
-import com.squareup.javapoet.AnnotationSpec;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.ParameterizedTypeName;
-import com.squareup.javapoet.TypeName;
-import com.squareup.javapoet.TypeSpec;
-
-import java.util.List;
+import com.squareup.javapoet.*;
 
 import javax.annotation.Generated;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import java.util.List;
 
 /**
  * Created by Denis on 21-Apr-15
- * <File Description>
+ *
  */
 public class EntityGenerator extends DataModelGenerator {
     public EntityGenerator(ProcessingEnvironment processingEnvironment) {

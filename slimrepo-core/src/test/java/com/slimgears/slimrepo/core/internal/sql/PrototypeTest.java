@@ -43,7 +43,7 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 /**
  * Created by Denis on 07-Apr-15
- * <File Description>
+ *
  */
 @RunWith(JUnit4.class)
 public class PrototypeTest {

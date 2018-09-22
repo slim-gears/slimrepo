@@ -4,7 +4,7 @@ package com.slimgears.slimrepo.core.interfaces.fields;
 
 /**
  * Created by Denis on 11-Apr-15
- * <File Description>
+ *
  */
 public interface BlobField<TEntity, T> extends Field<TEntity, T> {
 }

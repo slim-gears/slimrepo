@@ -8,7 +8,7 @@ import java.io.IOException;
 
 /**
  * Created by Denis on 07-Apr-15
- * <File Description>
+ *
  */
 public interface EntityUpdateQuery {
     interface Builder<T> extends QueryBuilder<T, EntityUpdateQuery, Builder<T>> {

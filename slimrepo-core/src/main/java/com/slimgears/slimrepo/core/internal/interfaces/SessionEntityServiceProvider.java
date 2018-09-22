@@ -6,7 +6,7 @@ import com.slimgears.slimrepo.core.internal.query.QueryProvider;
 
 /**
  * Created by Denis on 14-Apr-15
- * <File Description>
+ *
  */
 public interface SessionEntityServiceProvider<TKey, TEntity>  {
     QueryProvider<TKey, TEntity> getQueryProvider();

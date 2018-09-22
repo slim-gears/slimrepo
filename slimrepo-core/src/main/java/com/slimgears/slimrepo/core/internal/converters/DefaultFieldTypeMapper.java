@@ -14,7 +14,7 @@ import java.util.Map;
 
 /**
  * Created by Denis on 24-Apr-15
- * <File Description>
+ *
  */
 public class DefaultFieldTypeMapper implements FieldTypeMapper, FieldTypeMappingRegistrar {
 

@@ -3,12 +3,11 @@
 package com.slimgears.slimrepo.example.repository;
 
 import android.os.Bundle;
-
 import com.slimgears.slimrepo.core.annotations.GenerateEntity;
 
 /**
  * Created by Denis on 22-Apr-15
- * <File Description>
+ *
  */
 @GenerateEntity
 public class AbstractUserEntity {

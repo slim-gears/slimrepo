@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-
 import com.slimgears.slimrepo.example.R;
 import com.slimgears.slimrepo.example.repository.CountryEntity;
 import com.slimgears.slimrepo.example.repository.GeneratedUserRepositoryService;
@@ -19,7 +18,7 @@ import java.io.IOException;
 
 /**
  * Created by Denis on 23-Apr-15
- * <File Description>
+ *
  */
 public class AddCountryActivity extends Activity {
     private UserRepositoryService mUserRepositoryService;

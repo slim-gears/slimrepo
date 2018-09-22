@@ -2,18 +2,8 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal.sql;
 
-import com.annimon.stream.Collectors;
-import com.annimon.stream.Stream;
-import com.slimgears.slimrepo.core.interfaces.conditions.RelationalCondition;
+import com.slimgears.slimrepo.core.interfaces.conditions.*;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
-import com.slimgears.slimrepo.core.interfaces.conditions.BinaryCondition;
-import com.slimgears.slimrepo.core.interfaces.conditions.CollectionCondition;
-import com.slimgears.slimrepo.core.interfaces.conditions.CompositeCondition;
-import com.slimgears.slimrepo.core.interfaces.conditions.FieldCondition;
-import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
-import com.slimgears.slimrepo.core.interfaces.conditions.PredicateType;
-import com.slimgears.slimrepo.core.interfaces.conditions.TernaryCondition;
-import com.slimgears.slimrepo.core.interfaces.conditions.UnaryCondition;
 import com.slimgears.slimrepo.core.internal.PredicateVisitor;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommand;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlStatementBuilder;
@@ -26,7 +16,7 @@ import java.util.Map;
 
 /**
  * Created by Denis on 11-Apr-15
- * <File Description>
+ *
  */
 public class SqlPredicateBuilder implements SqlStatementBuilder.PredicateBuilder {
     private static final Map<PredicateType, String> OPERATOR_FORMATS = new HashMap<>();

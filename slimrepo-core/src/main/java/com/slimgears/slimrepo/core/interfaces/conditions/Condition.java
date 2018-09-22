@@ -4,7 +4,7 @@ package com.slimgears.slimrepo.core.interfaces.conditions;
 
 /**
  * Created by Denis on 02-Apr-15
- * <File Description>
+ *
  */
 public interface Condition<TEntity> {
     PredicateType getType();

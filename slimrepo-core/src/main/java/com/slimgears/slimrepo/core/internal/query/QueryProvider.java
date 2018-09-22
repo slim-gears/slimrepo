@@ -9,7 +9,7 @@ import java.util.Collection;
 
 /**
  * Created by Denis on 12-Apr-15
- * <File Description>
+ *
  */
 public interface QueryProvider<TKey, TEntity> {
     PreparedQuery<CloseableIterator<FieldValueLookup<TEntity>>> prepareSelect(SelectQueryParams<TKey, TEntity> query);

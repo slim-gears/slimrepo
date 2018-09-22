@@ -3,7 +3,6 @@
 package com.slimgears.slimrepo.android.core;
 
 import android.database.sqlite.SQLiteDatabase;
-
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.internal.interfaces.SessionEntityServiceProvider;
 import com.slimgears.slimrepo.core.internal.interfaces.TransactionProvider;
@@ -17,7 +16,7 @@ import java.io.IOException;
 
 /**
  * Created by Denis on 15-Apr-15
- * <File Description>
+ *
  */
 public class SqliteSessionServiceProvider extends AbstractSqlSessionServiceProvider {
     private final SQLiteDatabase database;

@@ -6,7 +6,7 @@ import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 
 /**
  * Created by Denis on 15-Apr-15
- * <File Description>
+ *
  */
 public interface RepositoryModel {
     String getName();

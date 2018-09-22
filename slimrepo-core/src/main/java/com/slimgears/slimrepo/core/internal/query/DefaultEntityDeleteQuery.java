@@ -2,14 +2,14 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal.query;
 
-import com.slimgears.slimrepo.core.interfaces.queries.EntityDeleteQuery;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
+import com.slimgears.slimrepo.core.interfaces.queries.EntityDeleteQuery;
 
 import java.io.IOException;
 
 /**
  * Created by Denis on 07-Apr-15
- * <File Description>
+ *
  */
 public class DefaultEntityDeleteQuery<TKey, TEntity>
         extends AbstractEntityQuery<TKey, TEntity, EntityDeleteQuery, EntityDeleteQuery.Builder<TEntity>, DeleteQueryParams<TKey, TEntity>>

@@ -6,7 +6,7 @@ import java.io.IOException;
 
 /**
  * Created by Denis on 02-Apr-15
- * <File Description>
+ *
  */
 public interface RepositoryService<TRepository extends Repository> {
     interface UpdateAction<TRepository extends Repository> {

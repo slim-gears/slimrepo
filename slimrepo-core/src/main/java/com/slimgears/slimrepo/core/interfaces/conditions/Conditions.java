@@ -2,15 +2,11 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.interfaces.conditions;
 
-import com.slimgears.slimrepo.core.interfaces.fields.ComparableField;
-import com.slimgears.slimrepo.core.interfaces.fields.Field;
-import com.slimgears.slimrepo.core.interfaces.fields.RelationalField;
-import com.slimgears.slimrepo.core.interfaces.fields.StringField;
-import com.slimgears.slimrepo.core.interfaces.fields.ValueField;
+import com.slimgears.slimrepo.core.interfaces.fields.*;
 
 /**
  * Created by Denis on 11-Apr-15
- * <File Description>
+ *
  */
 public class Conditions {
     static abstract class AbstractCondition<TEntity> implements Condition<TEntity> {

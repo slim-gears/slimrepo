@@ -8,7 +8,7 @@ import com.slimgears.slimrepo.core.interfaces.queries.QueryBuilder;
 
 /**
  * Created by Denis on 07-Apr-15
- * <File Description>
+ *
  */
 public abstract class AbstractEntityQuery<
         TKey,

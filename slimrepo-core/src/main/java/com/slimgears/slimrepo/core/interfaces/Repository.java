@@ -10,7 +10,7 @@ import java.io.IOException;
 
 /**
 * Created by Denis on 09-Apr-15
-* <File Description>
+*
 */
 public interface Repository extends Closeable {
     <TKey, TEntity> EntitySet<TEntity> entities(EntityType<TKey, TEntity> entityType);
