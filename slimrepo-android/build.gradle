@@ -1,7 +1,7 @@
-apply plugin: 'android-lib-aio'
-apply plugin: 'publishing-aio'
+apply from: "$scriptsDir/android-lib.gradle"
+apply from: "$scriptsDir/bintray.gradle"
 
 dependencies {
-    compile project(':slimrepo-core')
-    testCompile project(path: ':slimrepo-core', configuration: 'testOutput')
+    implementation project(':slimrepo-core')
+    testImplementation project(path: ':slimrepo-core', configuration: 'testOutput')
 }

@@ -9,32 +9,22 @@ import com.slimgears.slimrepo.core.interfaces.conditions.Conditions;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimrepo.core.internal.EntityFieldValueMap;
-import com.slimgears.slimrepo.core.internal.interfaces.CloseableIterator;
-import com.slimgears.slimrepo.core.internal.interfaces.RepositoryCreator;
-import com.slimgears.slimrepo.core.internal.interfaces.RepositoryModel;
-import com.slimgears.slimrepo.core.internal.interfaces.SessionServiceProvider;
-import com.slimgears.slimrepo.core.internal.interfaces.TransactionProvider;
+import com.slimgears.slimrepo.core.internal.interfaces.*;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommandExecutor;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlDatabaseScheme;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlOrmServiceProvider;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlSchemeProvider;
 import com.slimgears.slimrepo.core.internal.sql.sqlite.AbstractSqliteOrmServiceProvider;
 import com.slimgears.slimrepo.core.prototype.UserRepository;
-import com.slimgears.slimrepo.core.prototype.generated.AccountStatus;
-import com.slimgears.slimrepo.core.prototype.generated.GeneratedUserRepository;
-import com.slimgears.slimrepo.core.prototype.generated.GeneratedUserRepositoryService;
-import com.slimgears.slimrepo.core.prototype.generated.RoleEntity;
-import com.slimgears.slimrepo.core.prototype.generated.UserEntity;
+import com.slimgears.slimrepo.core.prototype.generated.*;
 import com.slimgears.slimrepo.core.utilities.Dates;
 import com.slimgears.slimrepo.core.utilities.Joiner;
-
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -43,15 +33,10 @@ import org.mockito.stubbing.Answer;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
-import static com.slimgears.slimrepo.core.interfaces.conditions.Conditions.and;
-import static com.slimgears.slimrepo.core.interfaces.conditions.Conditions.or;
 import static com.slimgears.slimrepo.core.utilities.Dates.addDays;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
@@ -83,7 +68,7 @@ public class PrototypeTest {
         }
 
         @Override
-        public T answer(InvocationOnMock invocation) throws Throwable {
+        public T answer(InvocationOnMock invocation) {
             String sql = (String)invocation.getArguments()[0];
             Stream<Object> params = Stream.of(invocation.getArguments()).skip(1);
             String sqlWithParams = sql + "\n{Params: [" + params.map(Object::toString).collect(Collectors.joining(", ")) + "]}";
@@ -135,14 +120,14 @@ public class PrototypeTest {
             }
         };
 
-        when(executorMock.select(Matchers.any(String.class), Matchers.<String>anyVararg()))
+        when(executorMock.select(any(String.class), any()))
                 .thenAnswer(answer(rowsMock(10)));
-        when(executorMock.count(Matchers.any(String.class), Matchers.<String>anyVararg()))
+        when(executorMock.count(any(String.class), any()))
                 .thenAnswer(answer(0L));
 
         doAnswer(answer(null))
                 .when(executorMock)
-                .execute(Matchers.any(String.class), Matchers.<String>anyVararg());
+                .execute(any(String.class), any());
     }
 
     @Test
@@ -153,13 +138,13 @@ public class PrototypeTest {
                 .limit(10)
                 .prepare()
                 .count());
-        Mockito.verify(executorMock).count(Matchers.any(String.class), Matchers.<String>anyVararg());
+        Mockito.verify(executorMock).count(any(String.class), any());
         assertSqlEquals("query-count-users.sql");
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void queryWhereStringFieldContains() throws IOException {
-        //noinspection unchecked
         testQuery(repository -> repository.users().query()
                 .where(
                         Conditions.or(
@@ -174,7 +159,7 @@ public class PrototypeTest {
                 .limit(10)
                 .prepare()
                 .toArray());
-        Mockito.verify(executorMock).select(Matchers.any(String.class), Matchers.<String>anyVararg());
+        Mockito.verify(executorMock).select(any(String.class), any());
         assertSqlEquals("query-users.sql");
     }
 
@@ -184,7 +169,7 @@ public class PrototypeTest {
                 .where(UserEntity.Role.is(RoleEntity.RoleDescription.in("Admin")))
                 .prepare()
                 .count());
-        Mockito.verify(executorMock).count(Matchers.any(String.class), Matchers.<String>anyVararg());
+        Mockito.verify(executorMock).count(any(String.class), any());
         assertSqlEquals("query-count-related-field.sql");
     }
 
@@ -203,7 +188,7 @@ public class PrototypeTest {
                 .where(UserEntity.Role.is(RoleEntity.RoleDescription.in("Admin")))
                 .prepare()
                 .toArray());
-        Mockito.verify(executorMock).select(Matchers.any(String.class), Matchers.<String>anyVararg());
+        Mockito.verify(executorMock).select(any(String.class), any());
         assertSqlEquals("query-related-field.sql");
     }
 
@@ -212,7 +197,7 @@ public class PrototypeTest {
         testQuery(repository -> repository.users().query()
                 .where(UserEntity.UserFirstName.in("John", "Jake"))
                 .selectToMap(UserEntity.UserFirstName, UserEntity.UserLastName));
-        Mockito.verify(executorMock).select(Matchers.any(String.class), Matchers.<String>anyVararg());
+        Mockito.verify(executorMock).select(any(String.class), any());
         assertSqlEquals("query-selected-to-map.sql");
     }
 
@@ -223,7 +208,7 @@ public class PrototypeTest {
                 .set(UserEntity.UserLastName, "Doe")
                 .prepare()
                 .execute());
-        Mockito.verify(executorMock).execute(Matchers.any(String.class), Matchers.<String>anyVararg());
+        Mockito.verify(executorMock).execute(any(String.class), any());
         assertSqlEquals("update-fields.sql");
     }
 
@@ -292,7 +277,7 @@ public class PrototypeTest {
             users.findAllWhere(UserEntity.UserFirstName.notContains("C"));
             return users;
         });
-        Mockito.verify(executorMock, times(19)).select(Matchers.any(String.class), Matchers.<String>anyVararg());
+        Mockito.verify(executorMock, times(19)).select(any(String.class), any());
         assertSqlEquals("query-predicates.sql");
     }
 

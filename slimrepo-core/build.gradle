@@ -1,8 +1,5 @@
-apply plugin: 'java-lib-aio'
-apply plugin: 'publishing-aio'
-
 configurations {
-    testOutput.extendsFrom (testCompile)
+    testOutput.extendsFrom (testImplementation)
 }
 
 task testJar(type: Jar, dependsOn: testClasses) {
@@ -14,8 +11,16 @@ artifacts {
     testOutput testJar
 }
 
+project.afterEvaluate {
+    project.publishing.publications {
+        mainMaven {
+            artifact project.tasks.testJar
+        }
+    }
+}
+
 dependencies {
-    compile "com.annimon:stream:$annimonStreamVersion"
-    compile "javax.annotation:jsr250-api:$jsr250ApiVersion"
-    testCompile "commons-io:commons-io:$appacheCommonsIoVersion"
+    implementation libs.annimon
+    implementation libs.jsr250Api
+    testImplementation libs.commonsIo
 }

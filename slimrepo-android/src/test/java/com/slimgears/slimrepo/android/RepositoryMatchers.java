@@ -8,7 +8,6 @@ import com.slimgears.slimrepo.core.interfaces.queries.EntitySelectQuery;
 import com.slimgears.slimrepo.core.internal.sql.SqlPredicateBuilder;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommand;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlStatementBuilder;
-
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -57,10 +56,10 @@ public class RepositoryMatchers {
     }
 
     abstract static class EntityQueryMatcherBase<TEntity> extends BaseMatcher<EntitySelectQuery.Builder<TEntity>> implements EntityQueryMatcher<TEntity> {
+        @SuppressWarnings("unchecked")
         @Override
         public boolean matches(Object item) {
             try {
-                //noinspection unchecked
                 return matches((EntitySelectQuery.Builder<TEntity>)item);
             } catch (IOException e) {
                 throw new RuntimeException(e);

@@ -1,26 +1,18 @@
 buildscript {
+    apply from: "$projectDir/gradle/buildscript.gradle", to: it
     repositories {
-        jcenter()
-        maven { url "https://plugins.gradle.org/m2/" }
-        maven { url "https://jitpack.io" }
+        google()
     }
-
     dependencies {
-        classpath 'com.slimgears.gradle-aio:gradle-aio:0.4.13'
+        classpath 'com.android.tools.build:gradle:3.1.4'
     }
 }
 
-apply from: "$rootProject.projectDir/versions.gradle"
-apply plugin: 'root-project-aio'
+apply from: "$projectDir/gradle/root.gradle"
+apply from: "$scriptsDir/android-sdk.gradle"
 
-aioConfig {
-    publishingAio {
-        githubOrg = 'slim-gears'
-    }
+rootProject.applyScripts(
+        ["$scriptsDir/java.gradle",
+         "$scriptsDir/bintray.gradle"],
+        ['slimrepo-core', 'slimrepo-apt'])
 
-    androidAio {
-        targetSdkVersion = 23
-        compileSdkVersion = 23
-        minSdkVersion = 4
-    }
-}

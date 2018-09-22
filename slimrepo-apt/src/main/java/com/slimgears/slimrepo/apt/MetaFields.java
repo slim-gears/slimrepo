@@ -7,39 +7,17 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.slimgears.slimapt.PropertyInfo;
 import com.slimgears.slimapt.TypeUtils;
-import com.slimgears.slimrepo.core.annotations.BlobSemantics;
-import com.slimgears.slimrepo.core.annotations.ComparableSemantics;
-import com.slimgears.slimrepo.core.annotations.Entity;
-import com.slimgears.slimrepo.core.annotations.GenerateEntity;
-import com.slimgears.slimrepo.core.annotations.Key;
-import com.slimgears.slimrepo.core.annotations.ValueSemantics;
-import com.slimgears.slimrepo.core.interfaces.fields.BlobField;
-import com.slimgears.slimrepo.core.interfaces.fields.ComparableField;
-import com.slimgears.slimrepo.core.interfaces.fields.RelationalField;
-import com.slimgears.slimrepo.core.interfaces.fields.StringField;
-import com.slimgears.slimrepo.core.interfaces.fields.ValueField;
-import com.slimgears.slimrepo.core.interfaces.fields.ValueGetter;
-import com.slimgears.slimrepo.core.interfaces.fields.ValueSetter;
+import com.slimgears.slimrepo.core.annotations.*;
+import com.slimgears.slimrepo.core.interfaces.fields.*;
 import com.slimgears.slimrepo.core.internal.AbstractEntityType;
 import com.slimgears.slimrepo.core.internal.Fields;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterizedTypeName;
-import com.squareup.javapoet.TypeName;
-import com.squareup.javapoet.TypeSpec;
-
-import java.lang.annotation.Annotation;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import com.squareup.javapoet.*;
 
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import java.lang.annotation.Annotation;
+import java.util.*;
 
 /**
  * Created by ditskovi on 12/24/2015.
@@ -135,8 +113,8 @@ public class MetaFields {
         return Iterables.find(fields, field -> nameSet.contains(field.getName()), null);
     }
 
-    private static <P extends PropertyInfo> P findAnnotatedField(Iterable<? extends P> fields, final Class annotationClass) {
-        return (P)Iterables.find(fields, input -> input.getAnnotation(annotationClass) != null, null);
+    private static <P extends PropertyInfo> P findAnnotatedField(Iterable<? extends P> fields, final Class<? extends Annotation> annotationClass) {
+        return Iterables.find(fields, input -> input.getAnnotation(annotationClass) != null, null);
     }
 
     private static boolean isEnumField(PropertyInfo prop) {

@@ -1,16 +1,13 @@
 import org.gradle.internal.jvm.Jvm
 
-apply plugin: 'java-lib-aio'
-apply plugin: 'publishing-aio'
-
 dependencies {
-    compile "com.github.slim-gears:slimapt:$slimAptVersion"
-    compile project(':slimrepo-core')
-    
-    testCompile project(path: ':slimrepo-core', configuration: 'testOutput')
-    testCompile "com.google.testing.compile:compile-testing:$googleCompileTestingVersion"
-    testCompile "com.google.truth:truth:$googleTruthVersion"
-    testCompile "com.github.slim-gears:slimapt:$slimAptVersion:tests"
+    implementation project(':slimrepo-core')
+
+    implementation libs.slimApt
+    testImplementation project(path: ':slimrepo-core', configuration: 'testOutput')
+    testImplementation libs.googleCompileTesting
+    testImplementation libs.googleTruth
+    testImplementation libs.slimAptTests
 
     testCompile files(Jvm.current().getToolsJar())
 }

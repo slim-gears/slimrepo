@@ -1,54 +1,10 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:1.5.0'
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
-        classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.0'
-    }
-}
+apply from: "$scriptsDir/android-app.gradle"
 
-apply plugin: 'com.android.application'
-apply plugin: 'com.neenbedankt.android-apt'
-
-configurations {
-    apt
-}
-
-android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.1"
-
-    lintOptions {
-        checkReleaseBuilds false
-        abortOnError false
-    }
-
-    defaultConfig {
-        applicationId "com.slimgears.slimrepo.example"
-        minSdkVersion 10
-        targetSdkVersion 23
-        versionCode 1
-        versionName version
-    }
-    
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
-}
+android.defaultConfig.applicationId 'com.slimgears.slimrepo.example'
 
 dependencies {
-    compile 'com.slimgears.slimrepo:slimrepo-android:0.9.16'
-    apt 'com.slimgears.slimrepo:slimrepo-apt:0.9.16'
-//    compile project(':slimrepo-android')
-//    apt project(':slimrepo-apt')
-
-
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:2.0.42-beta'
-    testCompile 'org.robolectric:robolectric:3.0'
+    implementation project(':slimrepo-android')
+    implementation project(':slimrepo-core')
+    annotationProcessor project(':slimrepo-apt')
+    compileOnly libs.jsr250Api
 }
