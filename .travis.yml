@@ -1,3 +1,6 @@
 language: android
-
 jdk: oraclejdk8
+env:
+  global:
+  - secure: XPSa8HWZl4pR6FUcFfSfpTUIajhKmkJyphy0Yad7ykpzzVxdfIrc9eqkWsS2Bm14SC8qTvNV8l4eVlEraS/iLs2mWiFmepFVf9RXR2DA9rkKE33iLeFvoTpr42SzQaAxhQcxL8QUDikj2qM8nuzT4ma5pWY/VdfH6szAn14lLxk=
+  - secure: Ldo8j013LGAItOdgnRi3hrWRvZpbvHRcvn16sJefpWesSAkfTMUZxbtqbKa6Mu6558qMIQlAgRWBnysC3krCczpRgpRUO6t3OVaYKub2y0Oyv2JkSrolTsBXi8R7NnYirYi5zaSG8UGTKoarDbg5TZe3JGyVQRh+eJ3LqQUVOBA=
