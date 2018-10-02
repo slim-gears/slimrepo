@@ -10,7 +10,6 @@ import com.slimgears.slimrepo.core.internal.interfaces.*;
 import com.slimgears.slimrepo.core.utilities.HashMapLoadingCache;
 import com.slimgears.slimrepo.core.utilities.LoadingCache;
 
-import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -43,7 +42,7 @@ public abstract class AbstractRepositoryService<TRepository extends Repository> 
     }
 
     @Override
-    public void update(UpdateAction<TRepository> action) throws IOException {
+    public void update(UpdateAction<TRepository> action) throws Exception {
         try (TRepository repo = open()) {
             action.execute(repo);
             repo.saveChanges();
@@ -51,7 +50,7 @@ public abstract class AbstractRepositoryService<TRepository extends Repository> 
     }
 
     @Override
-    public <TResult> TResult query(QueryAction<TRepository, TResult> action) throws IOException {
+    public <TResult> TResult query(QueryAction<TRepository, TResult> action) throws Exception {
         try (TRepository repo = open()) {
             return action.execute(repo);
         }

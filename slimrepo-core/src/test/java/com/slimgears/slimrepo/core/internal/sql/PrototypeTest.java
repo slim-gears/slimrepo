@@ -31,9 +31,10 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.slimgears.slimrepo.core.utilities.Dates.addDays;
 import static org.mockito.ArgumentMatchers.any;
@@ -47,6 +48,11 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
  */
 @RunWith(JUnit4.class)
 public class PrototypeTest {
+    private final static String wildcardPrefix = "@wildcard(";
+    private final static String wildcardSuffix = ")";
+    private final static String regexPrefix = "@regex(";
+    private final static String regexSuffix = ")";
+
     @Mock private TransactionProvider transactionProviderMock;
     @Mock private SqlCommandExecutor executorMock;
 
@@ -83,7 +89,7 @@ public class PrototypeTest {
     }
 
     @Before
-    public void setup() throws IOException {
+    public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
 
         sqlStatements = new ArrayList<>();
@@ -101,7 +107,7 @@ public class PrototypeTest {
         schemeProviderMock = Mockito.mock(SqlSchemeProvider.class);
 
         when(schemeProviderMock.getModelScheme(repositoryModel)).thenReturn(repositorySchemeMock);
-        when(schemeProviderMock.getDatabaseScheme()).thenReturn(databaseSchemeMock);
+        when(schemeProviderMock.getDatabaseScheme(any())).thenReturn(databaseSchemeMock);
 
         sessionServiceProviderMock = new AbstractSqlSessionServiceProvider(ormServiceProviderMock) {
             @Override
@@ -131,7 +137,20 @@ public class PrototypeTest {
     }
 
     @Test
-    public void queryCountWhereStringFieldContains() throws IOException {
+    public void insertRows() throws Exception {
+        testUpdate(repository -> repository.users().add(UserEntity
+                .builder()
+                .userFirstName("John")
+                .userLastName("Doe")
+                .age(5)
+                .role(RoleEntity.builder().roleDescription("user").build())
+                .build()));
+        Mockito.verify(executorMock).execute(any(String.class), any());
+        assertSqlEquals("insert-user.sql");
+    }
+
+    @Test
+    public void queryCountWhereStringFieldContains() throws Exception {
         testQuery(repository -> repository.users().query()
                 .where(UserEntity.UserFirstName.contains("John"))
                 .skip(2)
@@ -144,7 +163,7 @@ public class PrototypeTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void queryWhereStringFieldContains() throws IOException {
+    public void queryWhereStringFieldContains() throws Exception {
         testQuery(repository -> repository.users().query()
                 .where(
                         Conditions.or(
@@ -164,7 +183,7 @@ public class PrototypeTest {
     }
 
     @Test
-    public void queryCountWithRelationalCondition() throws IOException {
+    public void queryCountWithRelationalCondition() throws Exception {
         testQuery(repository -> repository.users().query()
                 .where(UserEntity.Role.is(RoleEntity.RoleDescription.in("Admin")))
                 .prepare()
@@ -174,7 +193,7 @@ public class PrototypeTest {
     }
 
     @Test
-    public void repositoryCreation() throws IOException {
+    public void repositoryCreation() throws Exception {
         RepositoryCreator creator = ormServiceProviderMock
                 .createSessionServiceProvider(repositoryModel)
                 .getRepositoryCreator();
@@ -183,7 +202,7 @@ public class PrototypeTest {
     }
 
     @Test
-    public void queryWithRelationalCondition() throws IOException {
+    public void queryWithRelationalCondition() throws Exception {
         testQuery(repository -> repository.users().query()
                 .where(UserEntity.Role.is(RoleEntity.RoleDescription.in("Admin")))
                 .prepare()
@@ -193,7 +212,7 @@ public class PrototypeTest {
     }
 
     @Test
-    public void querySelectedFieldsToMap() throws IOException {
+    public void querySelectedFieldsToMap() throws Exception {
         testQuery(repository -> repository.users().query()
                 .where(UserEntity.UserFirstName.in("John", "Jake"))
                 .selectToMap(UserEntity.UserFirstName, UserEntity.UserLastName));
@@ -202,7 +221,7 @@ public class PrototypeTest {
     }
 
     @Test
-    public void updateWithWhereTranslatedToSql() throws IOException {
+    public void updateWithWhereTranslatedToSql() throws Exception {
         testUpdate(repository -> repository.users().updateQuery()
                 .where(UserEntity.UserFirstName.eq("John"))
                 .set(UserEntity.UserLastName, "Doe")
@@ -213,36 +232,36 @@ public class PrototypeTest {
     }
 
     @Test
-    public void repositoryUpgradeWhenFieldAdded() throws IOException {
+    public void repositoryUpgradeWhenFieldAdded() throws Exception {
         databaseSchemeMock.hideFields(UserEntity.EntityMetaType, UserEntity.Comments);
         assertUpgrade("upgrade-field-added.sql");
     }
 
     @Test
-    public void repositoryUpgradeWhenNonNullableFieldAdded() throws IOException {
+    public void repositoryUpgradeWhenNonNullableFieldAdded() throws Exception {
         databaseSchemeMock.hideFields(UserEntity.EntityMetaType, UserEntity.Age);
         assertUpgrade("upgrade-non-nullable-field-added.sql");
     }
 
     @Test
-    public void repositoryUpgradeWhenFieldDeleted() throws IOException {
+    public void repositoryUpgradeWhenFieldDeleted() throws Exception {
         repositorySchemeMock.hideFields(UserEntity.EntityMetaType, UserEntity.Comments);
         assertUpgrade("upgrade-field-deleted.sql");
     }
 
     @Test
-    public void repositoryUpgradeWhenTableAdded() throws IOException {
+    public void repositoryUpgradeWhenTableAdded() throws Exception {
         databaseSchemeMock.hideTables(UserEntity.EntityMetaType);
         assertUpgrade("upgrade-table-added.sql");
     }
 
     @Test
-    public void repositoryUpgradeWhenTableDeleted() throws IOException {
+    public void repositoryUpgradeWhenTableDeleted() throws Exception {
         repositorySchemeMock.hideTables(UserEntity.EntityMetaType);
         assertUpgrade("upgrade-table-deleted.sql");
     }
 
-    private void assertUpgrade(String sqlScriptName) throws IOException {
+    private void assertUpgrade(String sqlScriptName) throws Exception {
         RepositoryCreator creator = ormServiceProviderMock
                 .createSessionServiceProvider(repositoryModel)
                 .getRepositoryCreator();
@@ -251,7 +270,7 @@ public class PrototypeTest {
     }
 
     @Test
-    public void queryPredicatesTranslatedToSql() throws IOException {
+    public void queryPredicatesTranslatedToSql() throws Exception {
         final Date fromDate = Dates.fromDate(2000, 1, 1);
         final Date toDate = addDays(fromDate, 1);
         testQuery(repository -> {
@@ -281,12 +300,12 @@ public class PrototypeTest {
         assertSqlEquals("query-predicates.sql");
     }
 
-    private void testUpdate(RepositoryService.UpdateAction<UserRepository> updateAction) throws IOException {
+    private void testUpdate(RepositoryService.UpdateAction<UserRepository> updateAction) throws Exception {
         RepositoryService<UserRepository> repo = new GeneratedUserRepositoryService(ormServiceProviderMock);
         repo.update(updateAction);
     }
 
-    private <T> T testQuery(RepositoryService.QueryAction<UserRepository, T> queryAction) throws IOException {
+    private <T> T testQuery(RepositoryService.QueryAction<UserRepository, T> queryAction) throws Exception {
         RepositoryService<UserRepository> repo = new GeneratedUserRepositoryService(ormServiceProviderMock);
         T result = repo.query(queryAction);
         Assert.assertNotNull(result);
@@ -312,7 +331,7 @@ public class PrototypeTest {
         final Iterator<T> iterator = Arrays.asList(entries).iterator();
         return new CloseableIterator<T>() {
             @Override
-            public void close() throws IOException {
+            public void close() {
 
             }
 
@@ -333,7 +352,7 @@ public class PrototypeTest {
         };
     }
 
-    private void assertSqlEquals(String resourceId) throws IOException {
+    private void assertSqlEquals(String resourceId) throws Exception {
         Assert.assertNotNull(sqlStatements);
         Assert.assertNotEquals(0, sqlStatements.size());
         String actualSql = Joiner.on("\n").join(sqlStatements);
@@ -342,15 +361,58 @@ public class PrototypeTest {
             List<String> expectedLines = IOUtils.readLines(stream);
             Assert.assertEquals(expectedLines.size(), actualLines.length);
             for (int i = 0; i < expectedLines.size(); ++i) {
-                Assert.assertEquals("Line mismatch", expectedLines.get(i), actualLines[i]);
+                assertLinesMatch(expectedLines.get(i), actualLines[i]);
             }
         }
+    }
+
+    private void assertLinesMatch(String expected, String actual) {
+        Pattern pattern = Optional.of(expected)
+                .flatMap(this::asWildcard)
+                .orElseGet(() -> asRegex(expected).orElse(null));
+        if (pattern != null) {
+            matchLine(pattern, actual);
+        } else {
+            Assert.assertEquals("Line mismatch", expected, actual);
+        }
+    }
+
+    private Optional<Pattern> asWildcard(String maybeWildcard) {
+        return maybeWildcard.startsWith(wildcardPrefix) && maybeWildcard.endsWith(wildcardSuffix)
+                ? Optional.of(fromWildcard(maybeWildcard.substring(wildcardPrefix.length(), maybeWildcard.length() - wildcardSuffix.length())))
+                : Optional.empty();
+    }
+
+    private Optional<Pattern> asRegex(String maybeWildcard) {
+        return maybeWildcard.startsWith(wildcardPrefix) && maybeWildcard.endsWith(wildcardSuffix)
+                ? Optional.of(Pattern.compile(maybeWildcard.substring(wildcardPrefix.length(), maybeWildcard.length() - wildcardSuffix.length())))
+                : Optional.empty();
+    }
+
+    private Pattern fromWildcard(String wildcard) {
+        String regex = "^" + wildcard
+                .replace("{", "\\{")
+                .replace("}", "\\}")
+                .replace("(", "\\(")
+                .replace(")", "\\)")
+                .replace("[", "\\[")
+                .replace("]", "\\]")
+                .replace(" ", "\\s")
+                .replace(".", "\\.")
+                .replace("*", ".*")
+                .replace("?", ".") + "$";
+        return Pattern.compile(regex);
+    }
+
+    private void matchLine(Pattern regex, String line) {
+        Matcher matcher = regex.matcher(line);
+        Assert.assertTrue("Lines mismatch: " + line + ", expected pattern: " + regex.toString(), matcher.matches());
     }
 
     private SqlDatabaseScheme getDatabaseScheme(RepositoryModel model) {
         SqlSchemeProvider provider = new AbstractSqlSchemeProvider(ormServiceProviderMock.getSyntaxProvider()) {
             @Override
-            public SqlDatabaseScheme getDatabaseScheme() {
+            public SqlDatabaseScheme getDatabaseScheme(String catalog) {
                 return null;
             }
         };

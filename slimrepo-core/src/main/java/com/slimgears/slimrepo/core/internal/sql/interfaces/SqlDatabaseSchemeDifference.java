@@ -20,4 +20,6 @@ public interface SqlDatabaseSchemeDifference {
     Map<String, SqlDatabaseScheme.TableScheme> getAddedTables();
     Map<String, SqlDatabaseScheme.TableScheme> getDeletedTables();
     Map<String, TableSchemeDifference> getModifiedTables();
+
+    boolean isEmpty();
 }

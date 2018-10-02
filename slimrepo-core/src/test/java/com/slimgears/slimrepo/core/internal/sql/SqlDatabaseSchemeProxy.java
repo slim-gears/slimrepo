@@ -1,5 +1,7 @@
 package com.slimgears.slimrepo.core.internal.sql;
 
+import com.annimon.stream.Collectors;
+import com.annimon.stream.Stream;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlDatabaseScheme;
@@ -8,8 +10,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import com.annimon.stream.Collectors;
-import com.annimon.stream.Stream;
 
 /**
  * Created by Denis on 25-May-15.
@@ -74,6 +74,11 @@ class SqlDatabaseSchemeProxy implements SqlDatabaseScheme {
                     fieldSchemeMap.put(field.getName(), new TableScheme.FieldScheme(field));
                 }
             }
+        }
+
+        @Override
+        public String getCatalog() {
+            return tableScheme.getCatalog();
         }
 
         @Override

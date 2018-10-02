@@ -4,7 +4,7 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.4'
+        classpath 'com.android.tools.build:gradle:3.2.0'
     }
 }
 
@@ -14,5 +14,4 @@ apply from: "$scriptsDir/android-sdk.gradle"
 rootProject.applyScripts(
         ["$scriptsDir/java.gradle",
          "$scriptsDir/bintray.gradle"],
-        ['slimrepo-core', 'slimrepo-apt'])
-
+        ['slimrepo-core', 'slimrepo-apt', 'slimrepo-jdbc', 'slimrepo-mongo'])

@@ -5,8 +5,6 @@ package com.slimgears.slimrepo.core.internal.query;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.queries.EntityDeleteQuery;
 
-import java.io.IOException;
-
 /**
  * Created by Denis on 07-Apr-15
  *
@@ -35,7 +33,7 @@ public class DefaultEntityDeleteQuery<TKey, TEntity>
     }
 
     @Override
-    public void execute() throws IOException {
+    public void execute() throws Exception {
         preparedDeleteQuery.execute();
     }
 

@@ -6,8 +6,6 @@ import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.internal.interfaces.OrmServiceProvider;
 import com.slimgears.slimrepo.core.internal.interfaces.RepositoryModel;
 
-import java.io.IOException;
-
 /**
  * Created by Denis on 02-May-15.
  */
@@ -22,7 +20,7 @@ public class AutoEntitySet<TKey, TEntity, TRepository extends Repository> extend
     }
 
     @Override
-    public void addAll(Iterable<TEntity> entities) throws IOException {
+    public void addAll(Iterable<TEntity> entities) throws Exception {
         try (TRepository repository = repositoryService.open()) {
             repository.entities(entityType).addAll(entities);
             repository.saveChanges();
@@ -30,7 +28,7 @@ public class AutoEntitySet<TKey, TEntity, TRepository extends Repository> extend
     }
 
     @Override
-    public void removeAll(Iterable<TEntity> entities) throws IOException {
+    public void removeAll(Iterable<TEntity> entities) throws Exception {
         try (TRepository repository = repositoryService.open()) {
             repository.entities(entityType).removeAll(entities);
             repository.saveChanges();
@@ -38,7 +36,7 @@ public class AutoEntitySet<TKey, TEntity, TRepository extends Repository> extend
     }
 
     @Override
-    public void mergeAll(Iterable<TEntity> entities) throws IOException {
+    public void mergeAll(Iterable<TEntity> entities) throws Exception {
         try (TRepository repository = repositoryService.open()) {
             repository.entities(entityType).mergeAll(entities);
             repository.saveChanges();

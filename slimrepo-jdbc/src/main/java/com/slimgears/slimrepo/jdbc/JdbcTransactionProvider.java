@@ -1,6 +1,6 @@
 // Copyright 2015 Denis Itskovich
 // Refer to LICENSE.txt for license details
-package com.slimgears.slimrepo.sqlite;
+package com.slimgears.slimrepo.jdbc;
 
 import com.slimgears.slimrepo.core.internal.interfaces.TransactionProvider;
 

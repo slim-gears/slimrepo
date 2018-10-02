@@ -2,18 +2,14 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.prototype.generated;
 
-import com.slimgears.slimrepo.core.interfaces.fields.BlobField;
-import com.slimgears.slimrepo.core.interfaces.fields.RelationalField;
-import com.slimgears.slimrepo.core.interfaces.fields.ValueGetter;
-import com.slimgears.slimrepo.core.interfaces.fields.ValueSetter;
-import com.slimgears.slimrepo.core.prototype.AbstractUserEntity;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
-import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
-import com.slimgears.slimrepo.core.interfaces.entities.FieldValueMap;
-import com.slimgears.slimrepo.core.internal.Fields;
+import com.slimgears.slimrepo.core.interfaces.fields.BlobField;
 import com.slimgears.slimrepo.core.interfaces.fields.ComparableField;
+import com.slimgears.slimrepo.core.interfaces.fields.RelationalField;
 import com.slimgears.slimrepo.core.interfaces.fields.StringField;
 import com.slimgears.slimrepo.core.internal.AbstractEntityType;
+import com.slimgears.slimrepo.core.internal.Fields;
+import com.slimgears.slimrepo.core.prototype.AbstractUserEntity;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -82,7 +78,7 @@ public class UserEntity extends AbstractUserEntity {
 
     }
 
-    public UserEntity(String userId, String userFirstName, String userLastName, Date lastVisitDate, RoleEntity role, AccountStatus accountStatus, ArrayList comments, int age) {
+    public UserEntity(String userId, String userFirstName, String userLastName, Date lastVisitDate, RoleEntity role, AccountStatus accountStatus, ArrayList<String> comments, int age) {
         this.userId = userId;
         this.userFirstName = userFirstName;
         this.userLastName = userLastName;
@@ -203,7 +199,7 @@ public class UserEntity extends AbstractUserEntity {
         return this;
     }
 
-    public ArrayList getComments() {
+    public ArrayList<String> getComments() {
         return this.comments;
     }
 

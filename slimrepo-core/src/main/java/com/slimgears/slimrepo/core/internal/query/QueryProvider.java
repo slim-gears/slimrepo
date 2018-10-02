@@ -16,5 +16,5 @@ public interface QueryProvider<TKey, TEntity> {
     PreparedQuery<Long> prepareCount(SelectQueryParams<TKey, TEntity> query);
     PreparedQuery<Void> prepareUpdate(UpdateQueryParams<TKey, TEntity> query);
     PreparedQuery<Void> prepareDelete(DeleteQueryParams<TKey, TEntity> query);
-    PreparedQuery<Void> prepareInsert(Collection<TEntity> entities);
+    PreparedQuery<CloseableIterator<TKey>> prepareInsert(Collection<TEntity> entities);
 }

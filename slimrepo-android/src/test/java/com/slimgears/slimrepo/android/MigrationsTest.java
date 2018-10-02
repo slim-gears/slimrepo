@@ -3,7 +3,6 @@ package com.slimgears.slimrepo.android;
 import android.annotation.SuppressLint;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-
 import com.slimgears.slimrepo.android.core.SqliteOrmServiceProvider;
 import com.slimgears.slimrepo.android.core.SqliteSchemeProvider;
 import com.slimgears.slimrepo.core.interfaces.Repository;
@@ -11,13 +10,8 @@ import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.internal.interfaces.RepositoryModel;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlDatabaseScheme;
 import com.slimgears.slimrepo.core.prototype.UserRepository;
-import com.slimgears.slimrepo.core.prototype.generated.GeneratedUserRepository;
-import com.slimgears.slimrepo.core.prototype.generated.GeneratedUserRepositoryService;
-import com.slimgears.slimrepo.core.prototype.generated.RoleEntity;
-import com.slimgears.slimrepo.core.prototype.generated.UserEntity;
-import com.slimgears.slimrepo.core.prototype.generated.UserRepositoryService;
+import com.slimgears.slimrepo.core.prototype.generated.*;
 import com.slimgears.slimrepo.core.utilities.Joiner;
-
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.Matcher;
 import org.junit.Assert;
@@ -32,9 +26,7 @@ import org.robolectric.shadows.ShadowLog;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static com.slimgears.slimrepo.android.RepositoryMatchers.all;
-import static com.slimgears.slimrepo.android.RepositoryMatchers.countEquals;
-import static com.slimgears.slimrepo.android.RepositoryMatchers.isEmpty;
+import static com.slimgears.slimrepo.android.RepositoryMatchers.*;
 import static com.slimgears.slimrepo.android.SchemeMatchers.matchTableFieldNames;
 import static com.slimgears.slimrepo.android.SchemeMatchers.matchTableNames;
 
@@ -43,7 +35,7 @@ import static com.slimgears.slimrepo.android.SchemeMatchers.matchTableNames;
  *
  */
 @RunWith(RobolectricTestRunner.class)
-@Config(sdk = 18, manifest=Config.NONE)
+@Config(sdk = 21, manifest=Config.NONE)
 public class MigrationsTest {
     private static final RepositoryModel EMPTY_MODEL = new RepositoryModel() {
         @Override

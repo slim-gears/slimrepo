@@ -1,4 +1,4 @@
-package com.slimgears.slimrepo.sqlite;
+package com.slimgears.slimrepo.jdbc;
 
 import com.slimgears.slimrepo.core.internal.sql.AbstractSqlSchemeProvider;
 import com.slimgears.slimrepo.core.internal.sql.SimpleSqlDatabaseScheme;
@@ -9,18 +9,19 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.slimgears.slimrepo.sqlite.JdbcHelper.*;
+import static com.slimgears.slimrepo.jdbc.JdbcHelper.*;
 
 /**
  * Created by Denis on 21-May-15.
  *
  */
 public class JdbcSchemeProvider extends AbstractSqlSchemeProvider {
-    //private final static Set<String> IGNORED_TABLES = new HashSet<>(Collections.singletonList("android_metadata"));
-    //private final static Map<String, Object> DEFAULT_VALUES = new HashMap<>();
+    private final static int DB_SCHEME_TABLE_CATALOG = 1;
+    private final static int DB_SCHEME_TABLE_NAME = 3;
 
     private final static int TABLE_SCHEME_FIELD_NAME = 4;
     private final static int TABLE_SCHEME_FIELD_TYPE = 6;
@@ -28,11 +29,11 @@ public class JdbcSchemeProvider extends AbstractSqlSchemeProvider {
     private final static int TABLE_SCHEME_FIELD_DEF_VALUE = 13;
     private final static int PRIMARY_KEYS_COLUMN_NAME = 4;
 
-    private final static int FOREIGN_KEY_TABLE_NAME = 2;
-    private final static int FOREIGN_KEY_FROM_FIELD = 3;
-    private final static int FOREIGN_KEY_TO_FIELD = 4;
+    private final static int FOREIGN_KEY_PK_CATALOG = 1;
+    private final static int FOREIGN_KEY_PK_TABLE = 3;
+    private final static int FOREIGN_KEY_PK_COLUMN = 4;
+    private final static int FOREIGN_KEY_FK_COLUMN = 8;
 
-    private final Connection connection;
     private final DatabaseMetaData metaData;
     private final Map<String, SqlDatabaseScheme.TableScheme> tableSchemeMap = new HashMap<>();
 
@@ -44,19 +45,18 @@ public class JdbcSchemeProvider extends AbstractSqlSchemeProvider {
 
     public JdbcSchemeProvider(SqlStatementBuilder.SyntaxProvider syntaxProvider, Connection connection) {
         super(syntaxProvider);
-        this.connection = connection;
         this.metaData = JdbcHelper.execute(connection::getMetaData);
     }
 
-    private SqlDatabaseScheme.TableScheme[] getTables() throws SQLException {
-        return toStream(metaData.getTables(null, null, null, null))
+    private SqlDatabaseScheme.TableScheme[] getTables(String catalog) throws SQLException {
+        return toStream(metaData.getTables(catalog, null, null, null))
                 .map(fromFunction(this::toTableScheme))
                 .toArray(SqlDatabaseScheme.TableScheme[]::new);
     }
 
     private SqlDatabaseScheme.TableScheme toTableScheme(ResultSet resultSet) throws SQLException {
-        String catalog = resultSet.getString(1);
-        String tableName = resultSet.getString(3);
+        String catalog = resultSet.getString(DB_SCHEME_TABLE_CATALOG);
+        String tableName = resultSet.getString(DB_SCHEME_TABLE_NAME);
         return getTableScheme(catalog, tableName);
     }
 
@@ -72,13 +72,13 @@ public class JdbcSchemeProvider extends AbstractSqlSchemeProvider {
         String fieldName = resultSet.getString(TABLE_SCHEME_FIELD_NAME);
         String fieldType = resultSet.getString(TABLE_SCHEME_FIELD_TYPE);
         String defValue = resultSet.getString(TABLE_SCHEME_FIELD_DEF_VALUE);
-        boolean notNull = resultSet.getInt(TABLE_SCHEME_FIELD_NULLABLE) != 0;
+        boolean nullable = resultSet.getInt(TABLE_SCHEME_FIELD_NULLABLE) == 1;
         boolean isPrimaryKey = fieldName.equals(keyColumn);
         return new SimpleSqlDatabaseScheme.SimpleFieldScheme(
                 tableScheme,
                 fieldName,
                 fieldType,
-                notNull,
+                nullable,
                 isPrimaryKey,
                 foreignKeys.get(fieldName),
                 defValue);
@@ -97,49 +97,24 @@ public class JdbcSchemeProvider extends AbstractSqlSchemeProvider {
         Map<String, SqlDatabaseScheme.FieldScheme> foreignKeys =
                 toStream(metaData.getImportedKeys(catalogName, null, tableName))
                 .collect(Collectors.toMap(
-                        fromFunction(rs -> rs.getString(4)),
+                        fromFunction(rs -> rs.getString(FOREIGN_KEY_FK_COLUMN)),
                         fromFunction(rs -> {
-                            String foreignCatalog = rs.getString(5);
-                            String foreignTable = rs.getString(7);
-                            String foreignColumn = rs.getString(8);
+                            String foreignCatalog = rs.getString(FOREIGN_KEY_PK_CATALOG);
+                            String foreignTable = rs.getString(FOREIGN_KEY_PK_TABLE);
+                            String foreignColumn = rs.getString(FOREIGN_KEY_PK_COLUMN);
                             return getFieldScheme(foreignCatalog, foreignTable, foreignColumn);
                         })));
 
         toStream(metaData.getColumns(catalogName, null, tableName, null))
                 .map(fromFunction(rs -> toFieldScheme(tableScheme, rs, keyColumn, foreignKeys)))
                 .forEach(tableScheme::addField);
-    }
 
-    private Map<String, SqlDatabaseScheme.FieldScheme> getForeignFields(Map<String, SqlDatabaseScheme.TableScheme> tableSchemeMap, String tableName) {
-        Cursor cursor = database.rawQuery(String.format(SQL_GET_FOREIGN_KEY_LIST, tableName), null);
-
-        try {
-            cursor.moveToFirst();
-            Map<String, SqlDatabaseScheme.FieldScheme> foreignFields = new LinkedHashMap<>();
-
-            while (!cursor.isAfterLast()) {
-                String foreignTableName = cursor.getString(FOREIGN_KEY_TABLE_NAME);
-                String fromFieldName = cursor.getString(FOREIGN_KEY_FROM_FIELD);
-                String toFieldName = cursor.getString(FOREIGN_KEY_TO_FIELD);
-
-                SqlDatabaseScheme.TableScheme foreignTable = getTableScheme(tableSchemeMap, foreignTableName);
-                SqlDatabaseScheme.FieldScheme toField = foreignTable.getField(toFieldName);
-
-                foreignFields.put(fromFieldName, toField);
-
-                cursor.moveToNext();
-            }
-
-            return foreignFields;
-        } finally {
-            cursor.close();
-        }
+        return tableScheme;
     }
 
     @Override
-    public SqlDatabaseScheme getDatabaseScheme() {
-        String dbName = execute(() -> connection.getMetaData().getDatabaseProductName());
-        return new SimpleSqlDatabaseScheme(dbName, getTables());
+    public SqlDatabaseScheme getDatabaseScheme(String catalog) {
+        return new SimpleSqlDatabaseScheme(catalog, execute(() -> getTables(catalog)));
     }
 
     private String fullTableName(String catalog, String table) {

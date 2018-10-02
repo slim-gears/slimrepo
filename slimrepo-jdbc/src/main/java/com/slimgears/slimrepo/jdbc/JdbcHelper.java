@@ -1,7 +1,8 @@
-package com.slimgears.slimrepo.sqlite;
+package com.slimgears.slimrepo.jdbc;
 
 import java.sql.*;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -9,9 +10,14 @@ import java.util.stream.StreamSupport;
 
 public class JdbcHelper {
     private final static Map<Integer, ParamSetter<String>> paramSetters = new HashMap<>();
+    private final static Map<Integer, ColumnGetter<?>> columnGetters = new HashMap<>();
 
     interface ParamSetter<T> {
         void setParam(PreparedStatement preparedStatement, int index, T val) throws SQLException;
+    }
+
+    interface ColumnGetter<T> {
+        T getValue(ResultSet resultSet, int columnIndex) throws SQLException;
     }
 
     public interface SqlFunction<T, R> {
@@ -27,22 +33,26 @@ public class JdbcHelper {
     }
 
     static {
-        registerSetter(Types.INTEGER, Integer::valueOf, PreparedStatement::setInt);
-        registerSetter(Types.BIGINT, Long::valueOf, PreparedStatement::setLong);
-        registerSetter(Types.DOUBLE , Double::valueOf, PreparedStatement::setDouble);
-        registerSetter(Types.FLOAT, Float::valueOf, PreparedStatement::setFloat);
-        registerSetter(Types.REAL, Float::valueOf, PreparedStatement::setFloat);
-        registerSetter(Types.SMALLINT, Short::valueOf, PreparedStatement::setShort);
-        registerSetter(Types.TINYINT, Byte::valueOf, PreparedStatement::setByte);
-        registerSetter(Types.NVARCHAR, String::valueOf, PreparedStatement::setString);
-        registerSetter(Types.VARCHAR, String::valueOf, PreparedStatement::setString);
-        registerSetter(Types.NCHAR, String::valueOf, PreparedStatement::setString);
-        registerSetter(Types.CHAR, String::valueOf, PreparedStatement::setString);
+        registerType(Types.INTEGER, Integer::valueOf, PreparedStatement::setInt, ResultSet::getInt);
+        registerType(Types.BIGINT, Long::valueOf, PreparedStatement::setLong, ResultSet::getLong);
+        registerType(Types.DOUBLE , Double::valueOf, PreparedStatement::setDouble, ResultSet::getDouble);
+        registerType(Types.FLOAT, Float::valueOf, PreparedStatement::setFloat, ResultSet::getFloat);
+        registerType(Types.REAL, Float::valueOf, PreparedStatement::setFloat, ResultSet::getFloat);
+        registerType(Types.SMALLINT, Short::valueOf, PreparedStatement::setShort, ResultSet::getShort);
+        registerType(Types.TINYINT, Byte::valueOf, PreparedStatement::setByte, ResultSet::getByte);
+        registerType(Types.NVARCHAR, String::valueOf, PreparedStatement::setString, ResultSet::getString);
+        registerType(Types.VARCHAR, String::valueOf, PreparedStatement::setString, ResultSet::getString);
+        registerType(Types.NCHAR, String::valueOf, PreparedStatement::setString, ResultSet::getString);
+        registerType(Types.CHAR, String::valueOf, PreparedStatement::setString, ResultSet::getString);
     }
 
     public static PreparedStatement prepareStatement(Connection connection, String statement, String... params) {
+        return prepareStatement(() -> connection.prepareStatement(statement), params);
+    }
+
+    public static PreparedStatement prepareStatement(SqlCallable<PreparedStatement> supplier, String... params) {
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement(statement);
+            PreparedStatement preparedStatement = supplier.call();
             setParams(preparedStatement, params);
             return preparedStatement;
         } catch (SQLException e) {
@@ -50,8 +60,9 @@ public class JdbcHelper {
         }
     }
 
-    private static <T> void registerSetter(int type, Function<String, T> converter, ParamSetter<T> setter) {
+    private static <T> void registerType(int type, Function<String, T> converter, ParamSetter<T> setter, ColumnGetter<T> getter) {
         paramSetters.put(type, (stat, index, str) -> setter.setParam(stat, index, converter.apply(str)));
+        columnGetters.put(type, getter);
     }
 
     private static void setParams(PreparedStatement preparedStatement, String... params) throws SQLException {
@@ -66,7 +77,7 @@ public class JdbcHelper {
             ParamSetter<String> setter = Optional
                     .ofNullable(paramSetters.get(paramType))
                     .orElseThrow(() -> new RuntimeException("Type is not supported: " + paramType));
-            setter.setParam(preparedStatement, i, param);
+            setter.setParam(preparedStatement, i + 1, param);
         }
     }
 
@@ -83,26 +94,41 @@ public class JdbcHelper {
     }
 
     public static Stream<ResultSet> toStream(ResultSet resultSet) {
-        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(new ResultSetIterator(resultSet), 0), false);
+        return StreamSupport.stream(new ResultSetSpliterator(resultSet), false);
     }
 
-    static class ResultSetIterator implements Iterator<ResultSet> {
+    public static Iterator<ResultSet> toIterator(ResultSet resultSet) {
+        return Spliterators.iterator(new ResultSetSpliterator(resultSet));
+    }
+
+    static class ResultSetSpliterator extends Spliterators.AbstractSpliterator<ResultSet> {
         private final ResultSet resultSet;
 
-        ResultSetIterator(ResultSet resultSet) {
+        protected ResultSetSpliterator(ResultSet resultSet) {
+            super(Long.MAX_VALUE, 0);
             this.resultSet = resultSet;
         }
 
         @Override
-        public boolean hasNext() {
-            return execute(() -> !resultSet.isAfterLast());
+        public boolean tryAdvance(Consumer<? super ResultSet> action) {
+            try {
+                if (resultSet.next()) {
+                    action.accept(resultSet);
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (SQLException e) {
+                return false;
+            }
         }
+    }
 
-        @Override
-        public ResultSet next() {
-            execute(resultSet::next);
-            return resultSet;
-        }
+    public static <T> T getColumnValue(ResultSet resultSet, int columnType, int columnIndex) throws SQLException {
+        //noinspection unchecked
+        return (T)Optional.ofNullable(columnGetters.get(columnType))
+                .orElseThrow(() -> new RuntimeException("Not supported type: " + columnType))
+                .getValue(resultSet, columnIndex);
     }
 
     public static <T> Supplier<T> fromCallable(SqlCallable<T> callable) {

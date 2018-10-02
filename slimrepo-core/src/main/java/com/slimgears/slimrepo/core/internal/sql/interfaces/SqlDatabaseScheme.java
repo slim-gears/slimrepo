@@ -20,6 +20,7 @@ public interface SqlDatabaseScheme {
     }
 
     interface TableScheme {
+        String getCatalog();
         String getName();
         Map<String, FieldScheme> getFields();
         FieldScheme getField(String name);

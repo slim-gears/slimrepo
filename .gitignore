@@ -4,6 +4,7 @@
 /.idea
 *.iml
 .DS_Store
-**/build
-**/gen
+build/
+gen/
+tmp/
 /local.properties

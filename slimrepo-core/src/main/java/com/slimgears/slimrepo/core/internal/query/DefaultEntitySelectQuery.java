@@ -63,7 +63,7 @@ public class DefaultEntitySelectQuery<TKey, TEntity>
         }
 
         @Override
-        public S firstOrDefault() throws IOException {
+        public S firstOrDefault() throws Exception {
             SelectQueryParams<TKey, TEntity> queryParams = DefaultEntitySelectQuery.this.queryParams.fork();
             queryParams.pagination.limit = 1;
             try (CloseableIterator<FieldValueLookup<TEntity>> iterator = queryProvider.prepareSelect(queryParams).execute()) {
@@ -75,12 +75,12 @@ public class DefaultEntitySelectQuery<TKey, TEntity>
         }
 
         @Override
-        public List<S> toList() throws IOException {
+        public List<S> toList() throws Exception {
             return Arrays.asList(toArray());
         }
 
         @Override
-        public S[] toArray() throws IOException {
+        public S[] toArray() throws Exception {
             try (CloseableIterator<S> values = iterator()) {
                 return Iterators.toArray(values, field.metaInfo().getValueType());
             } catch (RuntimeException e) {
@@ -90,7 +90,7 @@ public class DefaultEntitySelectQuery<TKey, TEntity>
         }
 
         @Override
-        public long count() throws IOException {
+        public long count() throws Exception {
             return DefaultEntitySelectQuery.this.count();
         }
 
@@ -98,7 +98,7 @@ public class DefaultEntitySelectQuery<TKey, TEntity>
         public CloseableIterator<S> iterator() {
             try {
                 return new EntityFieldIterator<>(field, getPreparedQuery().execute());
-            } catch (IOException e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
@@ -148,7 +148,7 @@ public class DefaultEntitySelectQuery<TKey, TEntity>
     public CloseableIterator<TEntity> iterator() {
         try {
             return toEntityIterator(getPreparedSelectQuery().execute());
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -173,7 +173,7 @@ public class DefaultEntitySelectQuery<TKey, TEntity>
     }
 
     @Override
-    public <K, V> Map<K, V> selectToMap(final Field<TEntity, K> keyField, final Field<TEntity, V> valueField) throws IOException {
+    public <K, V> Map<K, V> selectToMap(final Field<TEntity, K> keyField, final Field<TEntity, V> valueField) throws Exception {
         final Map<K, V> map = new HashMap<>();
         SelectQueryParams<TKey, TEntity> queryParams = this.queryParams.fork();
         queryParams.fields = Arrays.asList(keyField, valueField);
@@ -186,7 +186,7 @@ public class DefaultEntitySelectQuery<TKey, TEntity>
     }
 
     @Override
-    public TEntity firstOrDefault() throws IOException {
+    public TEntity firstOrDefault() throws Exception {
         SelectQueryParams<TKey, TEntity> queryParams = this.queryParams.fork();
         if (queryParams.pagination == null) queryParams.pagination = new QueryPagination();
         queryParams.pagination.limit = 1;
@@ -200,12 +200,12 @@ public class DefaultEntitySelectQuery<TKey, TEntity>
     }
 
     @Override
-    public List<TEntity> toList() throws IOException {
+    public List<TEntity> toList() throws Exception {
         return Arrays.asList(toArray());
     }
 
     @Override
-    public <K> Map<K, TEntity> toMap(final Field<TEntity, K> keyField) throws IOException {
+    public <K> Map<K, TEntity> toMap(final Field<TEntity, K> keyField) throws Exception {
         final Map<K, TEntity> map = new HashMap<>();
         iterateRows(getPreparedSelectQuery(), row -> {
             map.put(row.getValue(keyField), toEntity(row));
@@ -215,7 +215,7 @@ public class DefaultEntitySelectQuery<TKey, TEntity>
     }
 
     @Override
-    public TEntity[] toArray() throws IOException {
+    public TEntity[] toArray() throws Exception {
         try (CloseableIterator<TEntity> entities = iterator()) {
             return Iterators.toArray(entities, entityType.getEntityClass());
         } catch (RuntimeException e) {
@@ -225,7 +225,7 @@ public class DefaultEntitySelectQuery<TKey, TEntity>
     }
 
     @Override
-    public long count() throws IOException {
+    public long count() throws Exception {
         return getPreparedCountQuery().execute();
     }
 
@@ -242,12 +242,12 @@ public class DefaultEntitySelectQuery<TKey, TEntity>
         return this;
     }
 
-    private PreparedQuery<CloseableIterator<FieldValueLookup<TEntity>>> getPreparedSelectQuery() throws IOException {
+    private PreparedQuery<CloseableIterator<FieldValueLookup<TEntity>>> getPreparedSelectQuery() throws Exception {
         if (preparedSelectQuery != null) return preparedSelectQuery;
         return preparedSelectQuery = queryProvider.prepareSelect(queryParams);
     }
 
-    private PreparedQuery<Long> getPreparedCountQuery() throws IOException {
+    private PreparedQuery<Long> getPreparedCountQuery() throws Exception {
         if (preparedCountQuery != null) return preparedCountQuery;
         return preparedCountQuery = queryProvider.prepareCount(queryParams);
     }
@@ -256,7 +256,7 @@ public class DefaultEntitySelectQuery<TKey, TEntity>
         return new EntityIterator(rowIterator);
     }
 
-    private void iterateRows(PreparedQuery<CloseableIterator<FieldValueLookup<TEntity>>> query, Function<FieldValueLookup<TEntity>, Void> rowCallback) throws IOException {
+    private void iterateRows(PreparedQuery<CloseableIterator<FieldValueLookup<TEntity>>> query, Function<FieldValueLookup<TEntity>, Void> rowCallback) throws Exception {
         try (CloseableIterator<FieldValueLookup<TEntity>> iterator = query.execute()) {
             while (iterator.hasNext()) {
                 rowCallback.apply(iterator.next());

@@ -2,19 +2,12 @@ package com.slimgears.slimrepo.android.core;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-
 import com.slimgears.slimrepo.core.internal.sql.AbstractSqlSchemeProvider;
 import com.slimgears.slimrepo.core.internal.sql.SimpleSqlDatabaseScheme;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlDatabaseScheme;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlStatementBuilder;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by Denis on 21-May-15.
@@ -78,7 +71,7 @@ public class SqliteSchemeProvider extends AbstractSqlSchemeProvider {
             return tableSchemeMap.get(tableName);
         }
 
-        SimpleSqlDatabaseScheme.SimpleTableScheme tableScheme = new SimpleSqlDatabaseScheme.SimpleTableScheme(tableName);
+        SimpleSqlDatabaseScheme.SimpleTableScheme tableScheme = new SimpleSqlDatabaseScheme.SimpleTableScheme("", tableName);
         Cursor cursor = database.rawQuery(String.format(SQL_GET_TABLE_SCHEME, tableName), null);
 
         try {
@@ -131,7 +124,7 @@ public class SqliteSchemeProvider extends AbstractSqlSchemeProvider {
     }
 
     @Override
-    public SqlDatabaseScheme getDatabaseScheme() {
+    public SqlDatabaseScheme getDatabaseScheme(String catalog) {
         return new SimpleSqlDatabaseScheme(database.getPath(), getTables());
     }
 }

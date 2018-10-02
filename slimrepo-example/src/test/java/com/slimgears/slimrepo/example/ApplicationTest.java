@@ -1,15 +1,9 @@
 package com.slimgears.slimrepo.example;
 
 import android.os.Bundle;
-
 import com.slimgears.slimrepo.core.interfaces.RepositoryService;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
-import com.slimgears.slimrepo.example.repository.CountryEntity;
-import com.slimgears.slimrepo.example.repository.GeneratedUserRepositoryService;
-import com.slimgears.slimrepo.example.repository.UserEntity;
-import com.slimgears.slimrepo.example.repository.UserRepository;
-import com.slimgears.slimrepo.example.repository.UserRepositoryService;
-
+import com.slimgears.slimrepo.example.repository.*;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,13 +11,11 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
-import java.io.IOException;
-
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 18, manifest=Config.NONE)
 public class ApplicationTest {
     @Test
-    public void repositorySanityCheck() throws IOException {
+    public void repositorySanityCheck() throws Exception {
         Assert.assertNotNull(UserEntity.Id);
         Assert.assertNotNull(UserEntity.FirstName);
         Assert.assertNotNull(UserEntity.LastName);
@@ -36,7 +28,7 @@ public class ApplicationTest {
         UserRepositoryService repoService = new GeneratedUserRepositoryService(RuntimeEnvironment.application);
         repoService.update(new RepositoryService.UpdateAction<UserRepository>() {
             @Override
-            public void execute(UserRepository repository) throws IOException {
+            public void execute(UserRepository repository) throws Exception {
                 EntitySet<CountryEntity> countries = repository.countries();
                 CountryEntity countryUs = countries.add(CountryEntity.builder().name("United States").build());
                 CountryEntity countryUk = countries.add(CountryEntity.builder().name("United Kingdom").build());

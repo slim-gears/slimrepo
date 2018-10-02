@@ -43,7 +43,7 @@ public class SqliteOrmServiceProvider extends AbstractSqliteOrmServiceProvider {
                         .getRepositoryCreator()
                         .createRepository(model);
                 serviceProvider.close();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
@@ -57,7 +57,7 @@ public class SqliteOrmServiceProvider extends AbstractSqliteOrmServiceProvider {
                         .getRepositoryCreator()
                         .upgradeRepository(model);
                 serviceProvider.close();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }

@@ -113,12 +113,19 @@ public class SimpleSqlDatabaseScheme implements SqlDatabaseScheme {
      * Created by Denis on 21-May-15.
      */
     public static class SimpleTableScheme implements TableScheme {
+        private final String catalog;
         private final String name;
         private final Map<String, FieldScheme> fields = new LinkedHashMap<>();
         private FieldScheme keyField;
 
-        public SimpleTableScheme(String name) {
+        public SimpleTableScheme(String catalog, String name) {
+            this.catalog = catalog;
             this.name = name;
+        }
+
+        @Override
+        public String getCatalog() {
+            return catalog;
         }
 
         @Override
@@ -141,6 +148,12 @@ public class SimpleSqlDatabaseScheme implements SqlDatabaseScheme {
             return keyField;
         }
 
+        public FieldScheme addField(FieldScheme field) {
+            fields.put(field.getName(), field);
+            if (field.isPrimaryKey()) keyField = field;
+            return field;
+        }
+
         public FieldScheme addField(
                 String name,
                 String type,
@@ -148,10 +161,7 @@ public class SimpleSqlDatabaseScheme implements SqlDatabaseScheme {
                 boolean primaryKey,
                 FieldScheme foreignField,
                 Object defaultValue) {
-            FieldScheme field = new SimpleFieldScheme(this, name, type, nullable, primaryKey, foreignField, defaultValue);
-            fields.put(name, field);
-            if (field.isPrimaryKey()) keyField = field;
-            return field;
+            return addField(new SimpleFieldScheme(this, name, type, nullable, primaryKey, foreignField, defaultValue));
         }
     }
 }

@@ -104,6 +104,11 @@ public class SqliteCommandExecutor implements SqlCommandExecutor {
     }
 
     @Override
+    public <K> CloseableIterator<K> insert(String statement, String... parameters) throws Exception {
+        throw new IllegalStateException("Not implemented");
+    }
+
+    @Override
     public void execute(String statement, String... params) throws IOException {
         database.execSQL(statement, params);
     }

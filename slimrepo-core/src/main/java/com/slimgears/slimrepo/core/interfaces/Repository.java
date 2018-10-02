@@ -6,7 +6,6 @@ import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 
 import java.io.Closeable;
-import java.io.IOException;
 
 /**
 * Created by Denis on 09-Apr-15
@@ -14,6 +13,6 @@ import java.io.IOException;
 */
 public interface Repository extends Closeable {
     <TKey, TEntity> EntitySet<TEntity> entities(EntityType<TKey, TEntity> entityType);
-    void saveChanges() throws IOException;
+    void saveChanges() throws Exception;
     void discardChanges();
 }

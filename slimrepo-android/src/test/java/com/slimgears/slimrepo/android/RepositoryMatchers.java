@@ -13,7 +13,6 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.robolectric.RuntimeEnvironment;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
@@ -61,12 +60,12 @@ public class RepositoryMatchers {
         public boolean matches(Object item) {
             try {
                 return matches((EntitySelectQuery.Builder<TEntity>)item);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
 
-        protected abstract boolean matches(EntitySelectQuery.Builder<TEntity> queryBuilder) throws IOException;
+        protected abstract boolean matches(EntitySelectQuery.Builder<TEntity> queryBuilder) throws Exception;
     }
 
     static class EntityQueryRepositoryMatcherAdapter<TKey, TEntity> extends BaseMatcher<Repository> {
@@ -152,7 +151,7 @@ public class RepositoryMatchers {
             private long actualCount;
 
             @Override
-            protected boolean matches(EntitySelectQuery.Builder<TEntity> queryBuilder) throws IOException {
+            protected boolean matches(EntitySelectQuery.Builder<TEntity> queryBuilder) throws Exception {
                 if (condition != null) queryBuilder = queryBuilder.where(condition);
                 actualCount = queryBuilder.prepare().count();
                 return actualCount == expectedCount;

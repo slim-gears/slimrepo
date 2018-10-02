@@ -4,8 +4,6 @@ package com.slimgears.slimrepo.core.interfaces.queries;
 
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
 
-import java.io.IOException;
-
 /**
  * Created by Denis on 07-Apr-15
  *
@@ -17,5 +15,5 @@ public interface EntityUpdateQuery {
         <V> Builder<T> exclude(Field<T, V> field);
     }
 
-    void execute() throws IOException;
+    void execute() throws Exception;
 }

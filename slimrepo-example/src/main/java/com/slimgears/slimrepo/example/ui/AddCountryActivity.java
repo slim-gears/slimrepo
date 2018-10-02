@@ -14,8 +14,6 @@ import com.slimgears.slimrepo.example.repository.CountryEntity;
 import com.slimgears.slimrepo.example.repository.GeneratedUserRepositoryService;
 import com.slimgears.slimrepo.example.repository.UserRepositoryService;
 
-import java.io.IOException;
-
 /**
  * Created by Denis on 23-Apr-15
  *
@@ -40,7 +38,7 @@ public class AddCountryActivity extends Activity {
             public void onClick(View v) {
                 try {
                     onProceed();
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -60,7 +58,7 @@ public class AddCountryActivity extends Activity {
         context.startActivity(new Intent(context, AddCountryActivity.class));
     }
 
-    private void onProceed() throws IOException {
+    private void onProceed() throws Exception {
         mUserRepositoryService.countries().add(CountryEntity
                         .create()
                         .setName(mViewName.getText().toString()));

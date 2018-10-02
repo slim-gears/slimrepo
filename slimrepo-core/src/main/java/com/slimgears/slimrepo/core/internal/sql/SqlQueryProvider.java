@@ -29,13 +29,10 @@ public class SqlQueryProvider<TKey, TEntity> implements QueryProvider<TKey, TEnt
     }
 
     @Override
-    public PreparedQuery<Void> prepareInsert(final Collection<TEntity> entities) {
+    public PreparedQuery<CloseableIterator<TKey>> prepareInsert(final Collection<TEntity> entities) {
         final SqlCommand command = new SqlLazyCommand(getBuilder(), (sqlBuilder1, parameters) ->
                 sqlBuilder1.insertStatement(new InsertQueryParams<>(entityType, entities), parameters));
-        return () -> {
-            getExecutor().execute(command.getStatement(), command.getParameters().getValues());
-            return null;
-        };
+        return () -> getExecutor().insert(command.getStatement(), command.getParameters().getValues());
     }
 
     @Override

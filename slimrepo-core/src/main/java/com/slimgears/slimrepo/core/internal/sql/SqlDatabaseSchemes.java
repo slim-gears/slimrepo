@@ -1,6 +1,7 @@
 package com.slimgears.slimrepo.core.internal.sql;
 
 import com.annimon.stream.Collectors;
+import com.annimon.stream.Objects;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Function;
 import com.annimon.stream.function.Predicate;
@@ -10,7 +11,6 @@ import com.slimgears.slimrepo.core.utilities.Maps;
 import com.slimgears.slimrepo.core.utilities.Sets;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -79,6 +79,11 @@ public class SqlDatabaseSchemes {
         @Override
         public Map<String, TableSchemeDifference> getModifiedTables() {
             return modifiedTablesMap;
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return getAddedTables().isEmpty() && getDeletedTables().isEmpty() && getModifiedTables().isEmpty();
         }
     }
 

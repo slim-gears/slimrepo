@@ -2,17 +2,9 @@ package com.slimgears.slimrepo.core.internal;
 
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
-import com.slimgears.slimrepo.core.internal.interfaces.CloseableIterator;
-import com.slimgears.slimrepo.core.internal.interfaces.OrmServiceProvider;
-import com.slimgears.slimrepo.core.internal.interfaces.RepositoryModel;
-import com.slimgears.slimrepo.core.internal.interfaces.SessionServiceProvider;
-import com.slimgears.slimrepo.core.internal.query.DeleteQueryParams;
-import com.slimgears.slimrepo.core.internal.query.PreparedQuery;
-import com.slimgears.slimrepo.core.internal.query.QueryProvider;
-import com.slimgears.slimrepo.core.internal.query.SelectQueryParams;
-import com.slimgears.slimrepo.core.internal.query.UpdateQueryParams;
+import com.slimgears.slimrepo.core.internal.interfaces.*;
+import com.slimgears.slimrepo.core.internal.query.*;
 
-import java.io.IOException;
 import java.util.Collection;
 
 /**
@@ -44,19 +36,39 @@ public class AutoSessionEntityServiceProvider<TKey, TEntity>
         }
 
         @Override
-        public T execute() throws IOException {
+        public T execute() throws Exception {
             SessionServiceProvider sessionServiceProvider = ormServiceProvider.createSessionServiceProvider(repositoryModel);
             try {
-                QueryProvider<TKey, TEntity> queryProvider = sessionServiceProvider.getEntityServiceProvider(entityType).getQueryProvider();
-                return delegator.prepare(queryProvider).execute();
+                return execute(sessionServiceProvider);
             } finally {
                 sessionServiceProvider.close();
             }
+        }
+
+        protected T execute(SessionServiceProvider sessionServiceProvider) throws Exception {
+            QueryProvider<TKey, TEntity> queryProvider = sessionServiceProvider.getEntityServiceProvider(entityType).getQueryProvider();
+            return delegator.prepare(queryProvider).execute();
+        }
+    }
+
+    class AutoIteratorPreparedQuery<T> extends AutoPreparedQuery<CloseableIterator<T>> {
+        AutoIteratorPreparedQuery(QueryDelegator<CloseableIterator<T>> delegator) {
+            super(delegator);
+        }
+
+        @Override
+        public CloseableIterator<T> execute() throws Exception {
+            SessionServiceProvider sessionServiceProvider = ormServiceProvider.createSessionServiceProvider(repositoryModel);
+            return CloseableIterators.addCloseable(execute(sessionServiceProvider), sessionServiceProvider);
         }
     }
 
     private <T> PreparedQuery<T> delegate(QueryDelegator<T> delegator) {
         return new AutoPreparedQuery<>(delegator);
+    }
+
+    private <T> PreparedQuery<CloseableIterator<T>> delegateIterator(QueryDelegator<CloseableIterator<T>> delegator) {
+        return new AutoIteratorPreparedQuery<>(delegator);
     }
 
     @Override
@@ -66,14 +78,12 @@ public class AutoSessionEntityServiceProvider<TKey, TEntity>
 
     @Override
     public PreparedQuery<CloseableIterator<FieldValueLookup<TEntity>>> prepareSelect(final SelectQueryParams<TKey, TEntity> query) {
-        return new PreparedQuery<CloseableIterator<FieldValueLookup<TEntity>>>() {
+        return delegateIterator(new QueryDelegator<CloseableIterator<FieldValueLookup<TEntity>>>() {
             @Override
-            public CloseableIterator<FieldValueLookup<TEntity>> execute() throws IOException {
-                SessionServiceProvider sessionServiceProvider = ormServiceProvider.createSessionServiceProvider(repositoryModel);
-                QueryProvider<TKey, TEntity> queryProvider = sessionServiceProvider.getEntityServiceProvider(entityType).getQueryProvider();
-                return queryProvider.prepareSelect(query).execute();
+            PreparedQuery<CloseableIterator<FieldValueLookup<TEntity>>> prepare(QueryProvider<TKey, TEntity> queryProvider) {
+                return queryProvider.prepareSelect(query);
             }
-        };
+        });
     }
 
     @Override
@@ -107,10 +117,10 @@ public class AutoSessionEntityServiceProvider<TKey, TEntity>
     }
 
     @Override
-    public PreparedQuery<Void> prepareInsert(final Collection<TEntity> entities) {
-        return delegate(new QueryDelegator<Void>() {
+    public PreparedQuery<CloseableIterator<TKey>> prepareInsert(final Collection<TEntity> entities) {
+        return delegateIterator(new QueryDelegator<CloseableIterator<TKey>>() {
             @Override
-            PreparedQuery<Void> prepare(QueryProvider<TKey, TEntity> queryProvider) {
+            PreparedQuery<CloseableIterator<TKey>> prepare(QueryProvider<TKey, TEntity> queryProvider) {
                 return queryProvider.prepareInsert(entities);
             }
         });

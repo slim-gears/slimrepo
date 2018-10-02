@@ -83,7 +83,7 @@ class SqliteStatementBuilder implements SqlStatementBuilder {
 
     @Override
     public <TKey, TEntity> String insertStatement(InsertQueryParams<TKey, TEntity> params, SqlCommand.Parameters sqlParams) {
-        Stream<Field> fields = fieldsToInsert(params.entityType);
+        Collection<Field<TEntity, ?>> fields = fieldsToInsert(params.entityType);
         return
                 insertClause(params.entityType, fields) +
                 valuesClause(fields, sqlParams, entitiesToRows(params.entityType, Stream.of(params.entities)));
@@ -100,7 +100,7 @@ class SqliteStatementBuilder implements SqlStatementBuilder {
                 .map(field -> fieldNameSet.contains(field) ? syntaxProvider.simpleFieldName(field) : toTable.getField(field).getDefaultValue().toString());
 
         return
-                insertClause(toTable.getName(), Stream.of(toFields)) +
+                insertClause(toTable.getName(), toFields) +
                 selectFromClause(fromTable, fromFields);
     }
 
@@ -121,31 +121,33 @@ class SqliteStatementBuilder implements SqlStatementBuilder {
         return "DROP TABLE IF EXISTS " + syntaxProvider.tableName(name);
     }
 
-    protected String insertClause(EntityType entityType, Stream<Field> fields) {
+    protected <T> String insertClause(EntityType<?, T> entityType, Iterable<Field<T, ?>> fields) {
         return "INSERT INTO " +
                 syntaxProvider.tableName(entityType) +
-                " (" + fields.map(this::fieldName).collect(Collectors.joining(", ")) + ")\n";
+                " (" + Stream.of(fields).map(this::fieldName).collect(Collectors.joining(", ")) + ")\n";
     }
 
-    protected String insertClause(String tableName, Stream<String> fieldNames) {
+    protected String insertClause(String tableName, Iterable<String> fieldNames) {
         return "INSERT INTO " +
                 syntaxProvider.tableName(tableName) +
-                " (" + fieldNames.map(syntaxProvider::simpleFieldName).collect(Collectors.joining(", ")) + ")\n";
+                " (" + Stream.of(fieldNames).map(syntaxProvider::simpleFieldName).collect(Collectors.joining(", ")) + ")\n";
     }
 
-    protected String valuesClause(final Stream<Field> fields, final SqlCommand.Parameters parameters, Stream<FieldValueLookup> rows) {
+    protected <TEntity> String valuesClause(final Iterable<Field<TEntity, ?>> fields, final SqlCommand.Parameters parameters, Iterable<FieldValueLookup> rows) {
         //noinspection unchecked
         return "VALUES " +
-                rows
-                        .map(row -> "(" + fields
-                                .map(field -> substituteParameter(parameters, field, row.getValue(field)))
+                Stream.of(rows)
+                        .map(row -> "(" + Stream.of(fields)
+                                .map(field -> substituteParameter(parameters, (Field<TEntity, Object>)field, row.getValue(field)))
                                 .collect(Collectors.joining(", ")) + ")")
                         .collect(Collectors.joining(", "));
     }
 
-    private Stream<Field> fieldsToInsert(final EntityType entityType) {
-        //noinspection unchecked
-        return Stream.of(entityType.getFields()).filter(field -> !isAutoIncremented(entityType, (Field)field));
+    private <TEntity> Collection<Field<TEntity, ?>> fieldsToInsert(final EntityType<?, TEntity> entityType) {
+        return Stream
+                .of(entityType.getFields())
+                .filter(field -> !isAutoIncremented(entityType, field))
+                .collect(Collectors.toList());
     }
 
     private String limitClause(QueryPagination pagination) {
@@ -156,7 +158,7 @@ class SqliteStatementBuilder implements SqlStatementBuilder {
                 : limitClause + " OFFSET " + pagination.offset + "\n";
     }
 
-    private String whereClause(Condition condition, SqlCommand.Parameters parameters) {
+    private <TEntity> String whereClause(Condition<TEntity> condition, SqlCommand.Parameters parameters) {
         if (condition == null) return "";
         String strPredicate = predicateBuilder.build(condition, parameters);
         return "WHERE " + strPredicate + "\n";
@@ -247,8 +249,8 @@ class SqliteStatementBuilder implements SqlStatementBuilder {
         return syntaxProvider.simpleFieldName(field);
     }
 
-    private <TKey, TEntity> Stream<FieldValueLookup> entitiesToRows(final EntityType<TKey, TEntity> entityType, Stream<TEntity> entities) {
-        return entities.map(entity -> new EntityFieldValueMap<>(entityType, entity));
+    private <TKey, TEntity> Collection<FieldValueLookup> entitiesToRows(final EntityType<TKey, TEntity> entityType, Stream<TEntity> entities) {
+        return entities.map(entity -> new EntityFieldValueMap<>(entityType, entity)).collect(Collectors.toList());
     }
 
     private String columnDefinitions(final SqlDatabaseScheme.TableScheme tableScheme) {
@@ -256,8 +258,8 @@ class SqliteStatementBuilder implements SqlStatementBuilder {
     }
 
     private String columnConstraints(SqlDatabaseScheme.FieldScheme field) {
-        if (field.isAutoIncremented()) return "PRIMARY KEY ASC";
-        if (field.isPrimaryKey()) return "PRIMARY KEY";
+        if (field.isAutoIncremented()) return "PRIMARY KEY ASC NOT NULL";
+        if (field.isPrimaryKey()) return "PRIMARY KEY NOT NULL";
         if (field.isForeignKey()) return foreignKeyConstraint(field);
         if (field.isNotNull()) return "NOT NULL";
         return "";
@@ -270,11 +272,11 @@ class SqliteStatementBuilder implements SqlStatementBuilder {
         return "REFERENCES " + syntaxProvider.tableName(relatedTableName) + " (" + syntaxProvider.simpleFieldName(relatedKeyFieldName) + ")";
     }
 
-    private boolean isAutoIncremented(EntityType entityType, Field field) {
+    private <TEntity> boolean isAutoIncremented(EntityType<?, TEntity> entityType, Field<TEntity, ?> field) {
         return entityType.getKeyField() == field && field instanceof ComparableField;
     }
 
-    private <T> String substituteParameter(SqlCommand.Parameters parameters, Field<?, T> field, T value) {
+    private <TEntity, T> String substituteParameter(SqlCommand.Parameters parameters, Field<TEntity, T> field, T value) {
         return syntaxProvider.substituteParameter(parameters, field, value);
     }
 

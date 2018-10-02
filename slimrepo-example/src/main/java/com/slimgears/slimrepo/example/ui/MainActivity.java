@@ -16,7 +16,6 @@ import com.slimgears.slimrepo.example.repository.UserEntity;
 import com.slimgears.slimrepo.example.repository.UserRepository;
 import com.slimgears.slimrepo.example.repository.UserRepositoryService;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -101,7 +100,7 @@ public class MainActivity extends Activity {
             } finally {
                 repo.close();
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

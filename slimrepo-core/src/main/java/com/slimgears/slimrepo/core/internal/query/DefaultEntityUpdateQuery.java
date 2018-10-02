@@ -10,7 +10,6 @@ import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.interfaces.queries.EntityUpdateQuery;
 import com.slimgears.slimrepo.core.internal.UpdateFieldInfo;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -82,7 +81,7 @@ public class DefaultEntityUpdateQuery<TKey, TEntity>
     }
 
     @Override
-    public void execute() throws IOException {
+    public void execute() throws Exception {
         preparedUpdateQuery.execute();
     }
 }

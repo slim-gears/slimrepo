@@ -29,7 +29,7 @@ public class AbstractRepository implements Repository {
     }
 
     @Override
-    public void saveChanges() throws IOException {
+    public void saveChanges() throws Exception {
         transactionProvider.beginTransaction();
         try {
             sessionServiceProvider.onSavingChanges(this);

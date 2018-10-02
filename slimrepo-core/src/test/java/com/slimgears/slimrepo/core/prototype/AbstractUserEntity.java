@@ -18,6 +18,6 @@ public class AbstractUserEntity {
     protected Date lastVisitDate;
     protected AbstractRoleEntity role;
     protected AccountStatus accountStatus;
-    protected ArrayList comments;
+    protected ArrayList<String> comments;
     protected int age;
 }

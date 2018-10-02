@@ -11,12 +11,12 @@ import com.slimgears.slimrepo.core.annotations.GenerateEntity;
  */
 @GenerateEntity
 public class AbstractUserEntity {
-    protected int id;
-    protected String firstName;
-    protected String lastName;
-    protected int age;
-    protected AbstractCountryEntity country;
-    protected Bundle status;
+    int id;
+    String firstName;
+    String lastName;
+    int age;
+    AbstractCountryEntity country;
+    Bundle status;
 
     public String getFullName() {
         return lastName + ", " + firstName;

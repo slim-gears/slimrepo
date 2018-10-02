@@ -6,6 +6,6 @@ import com.slimgears.slimrepo.core.internal.interfaces.RepositoryModel;
  * Created by Denis on 19-May-15.
  */
 public interface SqlSchemeProvider {
-    SqlDatabaseScheme getDatabaseScheme();
+    SqlDatabaseScheme getDatabaseScheme(String catalog);
     SqlDatabaseScheme getModelScheme(RepositoryModel model);
 }

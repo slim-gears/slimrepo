@@ -4,10 +4,12 @@ package com.slimgears.slimrepo.android.core;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
+import com.annimon.stream.Stream;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueMap;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
-import com.slimgears.slimrepo.core.internal.interfaces.EntityCache;
+import com.slimgears.slimrepo.core.internal.interfaces.CloseableIterator;
+import com.slimgears.slimrepo.core.internal.interfaces.CloseableIterators;
 import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMapper;
 import com.slimgears.slimrepo.core.internal.query.PreparedQuery;
 import com.slimgears.slimrepo.core.internal.sql.SqlQueryProvider;
@@ -22,7 +24,7 @@ import java.util.Collection;
  */
 public class SqliteQueryProvider<TKey, TEntity> extends SqlQueryProvider<TKey, TEntity> {
     private final SQLiteDatabase database;
-    private final Class keyType;
+    private final Class<TKey> keyType;
     private final FieldTypeMapper fieldTypeMapper;
     private final SqlSessionEntityServiceProvider<TKey, TEntity> entityServiceProvider;
 
@@ -72,22 +74,25 @@ public class SqliteQueryProvider<TKey, TEntity> extends SqlQueryProvider<TKey, T
 
     @SuppressWarnings("unchecked")
     @Override
-    public PreparedQuery<Void> prepareInsert(final Collection<TEntity> entitites) {
+    public PreparedQuery<CloseableIterator<TKey>> prepareInsert(final Collection<TEntity> entities) {
         return () -> {
             String tableName = serviceProvider.getOrmServiceProvider().getSyntaxProvider().tableName(entityType);
-            EntityCache<TKey, TEntity> cache = entityServiceProvider.getEntityCache();
-            for (TEntity entity : entitites) {
-                long id = insertEntity(tableName, entity);
-                if (keyType == Integer.class) entityType.setKey(entity, (TKey)(Integer)(int)id);
-                else if (keyType == Long.class) entityType.setKey(entity, (TKey)(Long)id);
-                cache.put(entity);
-            }
-            return null;
+            return CloseableIterators
+                    .fromIterator(Stream.of(entities).map(entity -> insertEntity(tableName, entity)).getIterator());
         };
     }
 
-    private long insertEntity(String tableName, TEntity entity) {
-        return database.insert(tableName, null, entityToContentValues(entity));
+    private TKey insertEntity(String tableName, TEntity entity) {
+        long key = database.insert(tableName, null, entityToContentValues(entity));
+        if (keyType == Integer.class) {
+            //noinspection unchecked
+            return (TKey)(Integer)(int)key;
+        } else if (keyType == Long.class) {
+            //noinspection unchecked
+            return (TKey)(Object)key;
+        } else {
+            return entityType.getKey(entity);
+        }
     }
 
     private ContentValues entityToContentValues(TEntity entity) {

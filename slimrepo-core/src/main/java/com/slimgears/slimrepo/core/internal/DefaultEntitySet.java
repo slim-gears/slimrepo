@@ -16,8 +16,8 @@ import com.slimgears.slimrepo.core.internal.query.DefaultEntitySelectQuery;
 import com.slimgears.slimrepo.core.internal.query.DefaultEntityUpdateQuery;
 import com.slimgears.slimrepo.core.internal.query.QueryProvider;
 
-import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 
 
 /**
@@ -74,14 +74,14 @@ public class DefaultEntitySet<TKey, TEntity> extends AbstractEntitySet<TKey, TEn
     }
 
     @Override
-    public void addAll(Iterable<TEntity> entities) throws IOException {
+    public void addAll(Iterable<TEntity> entities) throws Exception {
         for (TEntity entity : entities) {
             getStateTracker().entityAdded(entity);
         }
     }
 
     @Override
-    public void removeAll(Iterable<TEntity> entities) throws IOException {
+    public void removeAll(Iterable<TEntity> entities) throws Exception {
         for (TEntity entity : entities) {
             getCache().invalidate(entityType.getKey(entity));
             getStateTracker().entityDeleted(entity);
@@ -89,7 +89,7 @@ public class DefaultEntitySet<TKey, TEntity> extends AbstractEntitySet<TKey, TEn
     }
 
     @Override
-    public void onSavingChanges(Repository session) throws IOException {
+    public void onSavingChanges(Repository session) throws Exception {
         EntityStateTracker<TEntity> tracker = getStateTracker();
         insert(tracker.getAddedEntities());
         delete(tracker.getDeletedEntities());
@@ -118,12 +118,27 @@ public class DefaultEntitySet<TKey, TEntity> extends AbstractEntitySet<TKey, TEn
     public void onClosing(Repository session) {
     }
 
-    private void insert(Collection<TEntity> entities) throws IOException {
-        if (entities.isEmpty()) return;
-        getQueryProvider().prepareInsert(entities).execute();
+    private void insert(Collection<TEntity> entities) throws Exception {
+        for (TEntity entity : entities) {
+            insertEntity(entity);
+        }
     }
 
-    private void delete(Collection<TEntity> entities) throws IOException {
+    private void insertEntity(TEntity entity) throws Exception {
+        CloseableIterator<TKey> keysIterator = getQueryProvider()
+                .prepareInsert(Collections.singletonList(entity))
+                .execute();
+        try {
+            if (entityType.getKeyField().metaInfo().isAutoIncremented()) {
+                entityType.setKey(entity, keysIterator.next());
+            }
+        } finally {
+            keysIterator.close();
+        }
+        getCache().put(entity);
+    }
+
+    private void delete(Collection<TEntity> entities) throws Exception {
         if (entities.isEmpty()) return;
         deleteQuery()
                 .where(entityType.getKeyField().in(Stream.of(entities)
@@ -133,7 +148,7 @@ public class DefaultEntitySet<TKey, TEntity> extends AbstractEntitySet<TKey, TEn
                 .execute();
     }
 
-    private void update(Collection<TEntity> entities) throws IOException {
+    private void update(Collection<TEntity> entities) throws Exception {
         if (entities.isEmpty()) return;
         for (TEntity entity : entities) {
             updateQuery()

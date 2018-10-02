@@ -27,7 +27,6 @@ class RepositorySqlDatabaseScheme implements SqlDatabaseScheme {
         DEFAULT_VALUES.put(Integer.class, 0);
         DEFAULT_VALUES.put(float.class, 0.0);
         DEFAULT_VALUES.put(Float.class, 0.0);
-        DEFAULT_VALUES.put(Float.class, 0.0);
         DEFAULT_VALUES.put(double.class, 0.0);
         DEFAULT_VALUES.put(Double.class, 0.0);
         DEFAULT_VALUES.put(long.class, 0L);
@@ -109,6 +108,11 @@ class RepositorySqlDatabaseScheme implements SqlDatabaseScheme {
                 fieldSchemeMap.put(field, fieldScheme);
                 nameToFieldSchemeMap.put(fieldScheme.getName(), fieldScheme);
             }
+        }
+
+        @Override
+        public String getCatalog() {
+            return null;
         }
 
         @Override

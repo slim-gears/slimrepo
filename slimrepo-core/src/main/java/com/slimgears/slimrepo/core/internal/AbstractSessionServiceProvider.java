@@ -9,7 +9,6 @@ import com.slimgears.slimrepo.core.internal.interfaces.*;
 import com.slimgears.slimrepo.core.utilities.HashMapLoadingCache;
 import com.slimgears.slimrepo.core.utilities.LoadingCache;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -23,23 +22,11 @@ public abstract class AbstractSessionServiceProvider implements SessionServicePr
     private RepositoryCreator repositoryCreator;
     private EntitySessionNotifier entitySessionNotifier;
 
-    private final LoadingCache<EntityType, SessionEntityServiceProvider> entityServiceProviderCache = HashMapLoadingCache.newCache(
-            new LoadingCache.Loader<EntityType, SessionEntityServiceProvider>() {
-                @SuppressWarnings("NullableProblems")
-                @Override
-                public SessionEntityServiceProvider load(EntityType key) throws Exception {
-                    return createEntityServiceProvider(key);
-                }
-            });
+    private final LoadingCache<EntityType<?, ?>, SessionEntityServiceProvider<?, ?>> entityServiceProviderCache = HashMapLoadingCache
+            .newCache(this::createEntityServiceProvider);
 
-    private final LoadingCache<EntityType, EntitySet.Provider> entitySetProviderCache = HashMapLoadingCache.newCache(
-            new LoadingCache.Loader<EntityType, EntitySet.Provider>() {
-                @SuppressWarnings("NullableProblems")
-                @Override
-                public EntitySet.Provider load(EntityType key) throws Exception {
-                    return createEntitySetProvider(key);
-                }
-            });
+    private final LoadingCache<EntityType<?, ?>, EntitySet.Provider<?>> entitySetProviderCache = HashMapLoadingCache
+            .newCache(this::createEntitySetProvider);
 
     protected abstract <TKey, TEntity> SessionEntityServiceProvider<TKey, TEntity> createEntityServiceProvider(EntityType<TKey, TEntity> entityType);
     protected abstract RepositoryCreator createRepositoryCreator();
@@ -52,7 +39,7 @@ public abstract class AbstractSessionServiceProvider implements SessionServicePr
     public <TKey, TEntity> SessionEntityServiceProvider<TKey, TEntity> getEntityServiceProvider(EntityType<TKey, TEntity> entityType) {
         try {
             //noinspection unchecked
-            return entityServiceProviderCache.get(entityType);
+            return (SessionEntityServiceProvider<TKey, TEntity>)entityServiceProviderCache.get(entityType);
         } catch (ExecutionException e) {
             throw new RuntimeException(e);
         }
@@ -62,7 +49,7 @@ public abstract class AbstractSessionServiceProvider implements SessionServicePr
     public <TKey, TEntity> EntitySet.Provider<TEntity> getEntitySetProvider(EntityType<TKey, TEntity> entityType) {
         try {
             //noinspection unchecked
-            return entitySetProviderCache.get(entityType);
+            return (EntitySet.Provider<TEntity>)entitySetProviderCache.get(entityType);
         } catch (ExecutionException e) {
             throw new RuntimeException(e);
         }
@@ -93,7 +80,7 @@ public abstract class AbstractSessionServiceProvider implements SessionServicePr
     }
 
     @Override
-    public void onSavingChanges(Repository session) throws IOException {
+    public void onSavingChanges(Repository session) throws Exception {
         for (RepositorySessionNotifier.Listener listener : sessionListeners) {
             listener.onSavingChanges(session);
         }

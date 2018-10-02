@@ -1,18 +1,12 @@
 package com.slimgears.slimrepo.android;
 
 import com.slimgears.slimrepo.android.core.SqliteOrmServiceProvider;
-import com.slimgears.slimrepo.core.interfaces.RepositoryService;
 import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
 import com.slimgears.slimrepo.core.interfaces.conditions.Conditions;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.core.internal.interfaces.OrmServiceProvider;
 import com.slimgears.slimrepo.core.prototype.UserRepository;
-import com.slimgears.slimrepo.core.prototype.generated.AccountStatus;
-import com.slimgears.slimrepo.core.prototype.generated.GeneratedUserRepositoryService;
-import com.slimgears.slimrepo.core.prototype.generated.RoleEntity;
-import com.slimgears.slimrepo.core.prototype.generated.UserEntity;
-import com.slimgears.slimrepo.core.prototype.generated.UserRepositoryService;
-
+import com.slimgears.slimrepo.core.prototype.generated.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +15,6 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
@@ -41,7 +34,7 @@ public class RepositoryServicePrototypeTest {
     }
 
     @Test
-    public void addEntitiesThenQuery() throws IOException {
+    public void addEntitiesThenQuery() throws Exception {
         repositoryService.update(repository -> {
             UserEntity userJohnDoe = repository.users().add(UserEntity.builder()
                     .userId("id-1")
@@ -88,7 +81,7 @@ public class RepositoryServicePrototypeTest {
     }
 
     @Test
-    public void queryWithWhere() throws IOException {
+    public void queryWithWhere() throws Exception {
         repositoryService.users().add(
                 UserEntity.builder().userId("id-1").userFirstName("John").userLastName("Doe").build(),
                 UserEntity.builder().userId("id-2").userFirstName("Jake").userLastName("Smith").build(),
@@ -116,7 +109,7 @@ public class RepositoryServicePrototypeTest {
     }
 
     @Test
-    public void queryByDate() throws IOException {
+    public void queryByDate() throws Exception {
         Date date = fromDate(1999, 12, 31);
         addUsers(
                 UserEntity.builder().lastVisitDate(addDays(date, -1)).userFirstName("John").userLastName("Doe").build(),
@@ -137,7 +130,7 @@ public class RepositoryServicePrototypeTest {
     }
 
     @Test
-    public void queryReturnsRelatedEntities() throws IOException {
+    public void queryReturnsRelatedEntities() throws Exception {
         RoleEntity[] roles = addRoles(
                 RoleEntity.builder().roleDescription("Admin").build(),
                 RoleEntity.builder().roleDescription("User").build());
@@ -156,7 +149,7 @@ public class RepositoryServicePrototypeTest {
     }
 
     @Test
-    public void enumStoredAndRestored() throws IOException {
+    public void enumStoredAndRestored() throws Exception {
         addUsers(
                 UserEntity.builder().userFirstName("John").accountStatus(AccountStatus.ACTIVE).build(),
                 UserEntity.builder().userFirstName("Bob").accountStatus(AccountStatus.DISABLED).build(),
@@ -168,7 +161,7 @@ public class RepositoryServicePrototypeTest {
     }
 
     @Test
-    public void querySelectSingleField() throws IOException {
+    public void querySelectSingleField() throws Exception {
         repositoryService.users().add(
                 UserEntity.builder().userFirstName("John").userLastName("Doe").build(),
                 UserEntity.builder().userFirstName("Jake").userLastName("Smith").build(),
@@ -190,7 +183,7 @@ public class RepositoryServicePrototypeTest {
     }
 
     @Test
-    public void bulkUpdateThenQuery() throws IOException {
+    public void bulkUpdateThenQuery() throws Exception {
         repositoryService.users().add(
                 UserEntity.builder().userFirstName("John").userLastName("Doe").build(),
                 UserEntity.builder().userFirstName("Jake").userLastName("Smith").build(),
@@ -218,7 +211,7 @@ public class RepositoryServicePrototypeTest {
     }
 
     @Test
-    public void relatedChangesSavedInProperOrder() throws IOException {
+    public void relatedChangesSavedInProperOrder() throws Exception {
         UserRepository repo = repositoryService.open();
         try {
             EntitySet<UserEntity> users = repo.users();
@@ -236,7 +229,7 @@ public class RepositoryServicePrototypeTest {
     }
 
     @Test
-    public void querySelectToMap() throws IOException {
+    public void querySelectToMap() throws Exception {
         repositoryService.users().add(
                 UserEntity.builder().userFirstName("John").userLastName("Doe").build(),
                 UserEntity.builder().userFirstName("Jake").userLastName("Smith").build(),
@@ -250,7 +243,7 @@ public class RepositoryServicePrototypeTest {
     }
 
     @Test
-    public void serializableStoredAndRestored() throws IOException {
+    public void serializableStoredAndRestored() throws Exception {
         ArrayList<String> comments = new ArrayList<>();
         comments.add("one");
         comments.add("two");
@@ -263,15 +256,15 @@ public class RepositoryServicePrototypeTest {
         Assert.assertEquals("three", user.getComments().get(2));
     }
 
-    private UserEntity[] addUsers(final UserEntity... users) throws IOException {
+    private UserEntity[] addUsers(final UserEntity... users) throws Exception {
         return repositoryService.users().add(users);
     }
 
-    private RoleEntity[] addRoles(final RoleEntity... roles) throws IOException {
+    private RoleEntity[] addRoles(final RoleEntity... roles) throws Exception {
         return repositoryService.roles().add(roles);
     }
 
-    private long queryUsersCountWhere(final Condition<UserEntity> condition) throws IOException {
+    private long queryUsersCountWhere(final Condition<UserEntity> condition) throws Exception {
         return repositoryService.query(repository -> repository.users()
                 .query()
                 .where(condition)
@@ -279,7 +272,7 @@ public class RepositoryServicePrototypeTest {
                 .count());
     }
 
-    private UserEntity[] queryUsersWhere(final Condition<UserEntity> condition) throws IOException {
+    private UserEntity[] queryUsersWhere(final Condition<UserEntity> condition) throws Exception {
         return repositoryService.query(repository -> repository.users()
                 .query()
                 .where(condition)

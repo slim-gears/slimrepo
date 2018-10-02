@@ -13,8 +13,6 @@ import com.slimgears.slimrepo.core.interfaces.RepositoryService;
 import com.slimgears.slimrepo.example.R;
 import com.slimgears.slimrepo.example.repository.*;
 
-import java.io.IOException;
-
 /**
  * Created by Denis on 23-Apr-15
  *
@@ -31,10 +29,10 @@ public class AddUserActivity extends Activity {
     class CountriesAdapter extends BaseAdapter {
         private final CountryEntity[] mCountries;
 
-        CountriesAdapter(final UserRepositoryService repoService) throws IOException {
+        CountriesAdapter(final UserRepositoryService repoService) throws Exception {
             mCountries = repoService.query(new RepositoryService.QueryAction<UserRepository, CountryEntity[]>() {
                 @Override
-                public CountryEntity[] execute(UserRepository repository) throws IOException {
+                public CountryEntity[] execute(UserRepository repository) throws Exception {
                     return repository.countries().toArray();
                 }
             });
@@ -87,7 +85,7 @@ public class AddUserActivity extends Activity {
             public void onClick(View v) {
                 try {
                     onProceed();
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -104,7 +102,7 @@ public class AddUserActivity extends Activity {
 
         try {
             mViewCountry.setAdapter(new CountriesAdapter(mUserRepositoryService));
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -113,7 +111,7 @@ public class AddUserActivity extends Activity {
         context.startActivity(new Intent(context, AddUserActivity.class));
     }
 
-    private void onProceed() throws IOException {
+    private void onProceed() throws Exception {
         mUserRepositoryService.users().add(UserEntity.builder()
                 .firstName(mViewFirstName.getText().toString())
                 .lastName(mViewLastName.getText().toString())

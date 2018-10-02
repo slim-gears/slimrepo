@@ -9,7 +9,6 @@ import com.slimgears.slimrepo.core.interfaces.queries.EntityDeleteQuery;
 import com.slimgears.slimrepo.core.interfaces.queries.EntitySelectQuery;
 import com.slimgears.slimrepo.core.interfaces.queries.EntityUpdateQuery;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -31,25 +30,25 @@ public interface EntitySet<TEntity> {
     EntityDeleteQuery.Builder<TEntity> deleteQuery();
     EntityUpdateQuery.Builder<TEntity> updateQuery();
 
-    long countAll() throws IOException;
-    long countAllWhere(Condition<TEntity> predicate) throws IOException;
+    long countAll() throws Exception;
+    long countAllWhere(Condition<TEntity> predicate) throws Exception;
 
-    <T> TEntity findFirst(ValueField<TEntity, T> field, T value) throws IOException;
-    TEntity findFirstWhere(Condition<TEntity> predicate) throws IOException;
-    <T> TEntity[] findAllBy(ValueField<TEntity, T> field, T value) throws IOException;
-    TEntity[] findAllWhere(Condition<TEntity> predicate) throws IOException;
+    <T> TEntity findFirst(ValueField<TEntity, T> field, T value) throws Exception;
+    TEntity findFirstWhere(Condition<TEntity> predicate) throws Exception;
+    <T> TEntity[] findAllBy(ValueField<TEntity, T> field, T value) throws Exception;
+    TEntity[] findAllWhere(Condition<TEntity> predicate) throws Exception;
 
-    TEntity[] toArray() throws IOException;
-    List<TEntity> toList() throws IOException;
-    <T> Map<T, TEntity> toMap(Field<TEntity, T> keyField) throws IOException;
-    <K, V> Map<K, V> toMap(Field<TEntity, K> keyField, Field<TEntity, V> valueField) throws IOException;
-    <T> Collection<T> map(Transformer<TEntity, T> mapper) throws IOException;
+    TEntity[] toArray() throws Exception;
+    List<TEntity> toList() throws Exception;
+    <T> Map<T, TEntity> toMap(Field<TEntity, T> keyField) throws Exception;
+    <K, V> Map<K, V> toMap(Field<TEntity, K> keyField, Field<TEntity, V> valueField) throws Exception;
+    <T> Collection<T> map(Transformer<TEntity, T> mapper) throws Exception;
 
     @SuppressWarnings("unchecked")
-    TEntity[] add(TEntity... entities) throws IOException;
-    TEntity add(TEntity entity) throws IOException;
-    void addAll(Iterable<TEntity> entities) throws IOException;
-    void mergeAll(Iterable<TEntity> entities) throws IOException;
-    void remove(TEntity entity) throws IOException;
-    void removeAll(Iterable<TEntity> entities) throws IOException;
+    TEntity[] add(TEntity... entities) throws Exception;
+    TEntity add(TEntity entity) throws Exception;
+    void addAll(Iterable<TEntity> entities) throws Exception;
+    void mergeAll(Iterable<TEntity> entities) throws Exception;
+    void remove(TEntity entity) throws Exception;
+    void removeAll(Iterable<TEntity> entities) throws Exception;
 }
