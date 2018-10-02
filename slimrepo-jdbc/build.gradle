@@ -1,0 +1,6 @@
+dependencies {
+    implementation project(':slimrepo-core')
+    testImplementation project(path: ':slimrepo-core', configuration: 'testOutput')
+    testImplementation files('libs/ojdbc7.jar')
+    testImplementation libs.sqliteJdbc
+}
