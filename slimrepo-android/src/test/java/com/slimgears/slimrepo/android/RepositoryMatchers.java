@@ -1,5 +1,6 @@
 package com.slimgears.slimrepo.android;
 
+import com.annimon.stream.function.Function;
 import com.slimgears.slimrepo.android.core.SqliteOrmServiceProvider;
 import com.slimgears.slimrepo.core.interfaces.Repository;
 import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
@@ -15,7 +16,6 @@ import org.robolectric.RuntimeEnvironment;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 
 /**
  * Created by Denis on 02-Jun-15.
@@ -23,25 +23,40 @@ import java.util.Map;
 public class RepositoryMatchers {
     private final static SqliteOrmServiceProvider SQLITE_ORM_SERVICE_PROVIDER = new SqliteOrmServiceProvider(RuntimeEnvironment.application);
     private final static SqlStatementBuilder.PredicateBuilder PREDICATE_BUILDER;
-    private final static SqlCommand.Parameters EMPTY_PARAMETERS = new SqlCommand.Parameters() {
+    private final static SqlCommand.Builder EMPTY_BUILDER = new SqlCommand.Builder() {
         @Override
-        public String add(String parameter) {
-            return parameter;
+        public SqlCommand.Builder append(String statement) {
+            return this;
         }
 
         @Override
-        public int getCount() {
+        public SqlCommand.Builder append(Function<SqlCommand.Builder, String> statement) {
+            return this;
+        }
+
+        @Override
+        public <T> int addParam(Class<T> type, T value) {
             return 0;
         }
 
         @Override
-        public Map<String, String> getMap() {
+        public <T> int addParam(T value) {
+            return 0;
+        }
+
+        @Override
+        public <T> SqlCommand.Builder param(Class<T> type, T value) {
+            return this;
+        }
+
+        @Override
+        public <T> SqlCommand.Builder param(T value) {
             return null;
         }
 
         @Override
-        public String[] getValues() {
-            return new String[0];
+        public SqlCommand build() {
+            return null;
         }
     };
 
@@ -163,7 +178,7 @@ public class RepositoryMatchers {
             }
 
             private String conditionString() {
-                return condition != null ? PREDICATE_BUILDER.build(condition, EMPTY_PARAMETERS) : String.format("any %s", entityType.getName());
+                return condition != null ? PREDICATE_BUILDER.build(condition, EMPTY_BUILDER) : String.format("any %s", entityType.getName());
             }
         });
     }

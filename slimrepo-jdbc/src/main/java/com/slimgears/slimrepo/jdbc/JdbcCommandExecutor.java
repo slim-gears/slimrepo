@@ -7,22 +7,15 @@ import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.internal.interfaces.CloseableIterator;
 import com.slimgears.slimrepo.core.internal.interfaces.CloseableIterators;
 import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMapper;
-import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommandExecutor;
-import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlOrmServiceProvider;
-import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlSessionServiceProvider;
-import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlStatementBuilder;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.*;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Created by Denis on 10-Apr-15
@@ -110,23 +103,25 @@ public class JdbcCommandExecutor implements SqlCommandExecutor {
     }
 
     @Override
-    public long count(String statement, String... params) throws Exception {
-        PreparedStatement preparedStatement = JdbcHelper.prepareStatement(connection, statement, params);
+    public long count(SqlCommand command) throws Exception {
+        PreparedStatement preparedStatement = JdbcHelper.prepareStatement(connection, command);
         ResultSet resultSet = preparedStatement.executeQuery();
         resultSet.next();
         return resultSet.getInt(1);
     }
 
     @Override
-    public <T> CloseableIterator<FieldValueLookup<T>> select(final String statement, final String... params) throws Exception {
-        return new ResultSetAdapter<>(JdbcHelper.prepareStatement(connection, statement, params).executeQuery());
+    public <T> CloseableIterator<FieldValueLookup<T>> select(SqlCommand command) throws Exception {
+        return new ResultSetAdapter<>(JdbcHelper.prepareStatement(connection, command).executeQuery());
     }
 
     @Override
-    public <K> CloseableIterator<K> insert(String statement, String... parameters) throws Exception {
-        PreparedStatement preparedStatement = JdbcHelper.prepareStatement(() -> connection.prepareStatement(statement, new int[]{1}), parameters);
+    public <K> CloseableIterator<K> insert(SqlCommand command) throws Exception {
+        PreparedStatement preparedStatement = JdbcHelper.prepareStatement(() -> connection.prepareStatement(command.getStatement(), Statement.RETURN_GENERATED_KEYS), command.getParameters());
+        logStatement(command);
         preparedStatement.executeUpdate();
-        log.log(Level.INFO, "Executing: " + statement + "\n" + Stream.of(parameters).collect(Collectors.joining(", ")));
+
+        //noinspection unchecked
         return CloseableIterators.fromIterator(JdbcHelper
                 .toStream(preparedStatement.getGeneratedKeys())
                 .map(JdbcHelper.fromFunction(rs -> JdbcHelper.<K>getColumnValue(rs, rs.getMetaData().getColumnType(1), 1)))
@@ -134,8 +129,17 @@ public class JdbcCommandExecutor implements SqlCommandExecutor {
     }
 
     @Override
-    public void execute(String statement, String... params) throws Exception {
-        log.log(Level.INFO, "Executing: " + statement + "\n" + Stream.of(params).collect(Collectors.joining(", ")));
-        JdbcHelper.prepareStatement(connection, statement, params).execute();
+    public void execute(SqlCommand command) throws Exception {
+        logStatement(command);
+        JdbcHelper.prepareStatement(connection, command).execute();
+    }
+
+    private void logStatement(SqlCommand command) {
+        log.log(Level.INFO, "Executing: " + command.getStatement() + "\n" +
+                command.getParameters()
+                        .stream()
+                        .map(SqlCommand.Parameter::value)
+                        .map(obj -> obj != null ? obj.toString() : "null")
+                        .collect(Collectors.joining(", ")));
     }
 }

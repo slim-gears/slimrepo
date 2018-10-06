@@ -2,7 +2,9 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal.sql.interfaces;
 
-import java.util.Map;
+import com.annimon.stream.function.Function;
+
+import java.util.List;
 
 /**
 * Created by Denis on 08-Apr-15
@@ -10,12 +12,21 @@ import java.util.Map;
 */
 public interface SqlCommand {
     String getStatement();
-    Parameters getParameters();
+    List<Parameter<?>> getParameters();
 
-    interface Parameters {
-        String add(String parameter);
-        int getCount();
-        Map<String, String> getMap();
-        String[] getValues();
+    interface Parameter<T> {
+        Class<T> type();
+        T value();
+    }
+
+    interface Builder {
+        Builder append(String statement);
+        Builder append(Function<Builder, String> statement);
+        <T> int addParam(Class<T> type, T value);
+        <T> int addParam(T value);
+
+        <T> Builder param(Class<T> type, T value);
+        <T> Builder param(T value);
+        SqlCommand build();
     }
 }

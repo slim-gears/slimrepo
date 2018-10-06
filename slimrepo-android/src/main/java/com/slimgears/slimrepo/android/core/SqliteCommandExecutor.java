@@ -6,14 +6,12 @@ import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
+import com.annimon.stream.Stream;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimrepo.core.interfaces.fields.Field;
 import com.slimgears.slimrepo.core.internal.interfaces.CloseableIterator;
 import com.slimgears.slimrepo.core.internal.interfaces.FieldTypeMapper;
-import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommandExecutor;
-import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlOrmServiceProvider;
-import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlSessionServiceProvider;
-import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlStatementBuilder;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.*;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -93,23 +91,30 @@ public class SqliteCommandExecutor implements SqlCommandExecutor {
     }
 
     @Override
-    public long count(String statement, String... params) throws IOException {
-        return DatabaseUtils.longForQuery(database, statement, params);
+    public long count(SqlCommand command) throws IOException {
+        return DatabaseUtils.longForQuery(database, command.getStatement(), getParams(command));
     }
 
     @Override
-    public <T> CloseableIterator<FieldValueLookup<T>> select(final String statement, final String... params) throws IOException {
-        @SuppressLint("Recycle") Cursor cursor = database.rawQuery(statement, params);
+    public <T> CloseableIterator<FieldValueLookup<T>> select(SqlCommand command) throws IOException {
+        @SuppressLint("Recycle") Cursor cursor = database.rawQuery(command.getStatement(), getParams(command));
         return new CursorIteratorAdapter<>(cursor);
     }
 
     @Override
-    public <K> CloseableIterator<K> insert(String statement, String... parameters) throws Exception {
+    public <K> CloseableIterator<K> insert(SqlCommand command) throws Exception {
         throw new IllegalStateException("Not implemented");
     }
 
     @Override
-    public void execute(String statement, String... params) throws IOException {
-        database.execSQL(statement, params);
+    public void execute(SqlCommand command) throws IOException {
+        database.execSQL(command.getStatement(), getParams(command));
+    }
+
+    private String[] getParams(SqlCommand command) {
+        return Stream.of(command.getParameters())
+                .map(SqlCommand.Parameter::value)
+                .map(val -> val != null ? val.toString() : "NULL")
+                .toArray(String[]::new);
     }
 }

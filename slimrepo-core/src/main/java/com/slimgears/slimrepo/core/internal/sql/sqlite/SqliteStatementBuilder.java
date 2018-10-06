@@ -16,6 +16,7 @@ import com.slimgears.slimrepo.core.internal.OrderFieldInfo;
 import com.slimgears.slimrepo.core.internal.PredicateVisitor;
 import com.slimgears.slimrepo.core.internal.UpdateFieldInfo;
 import com.slimgears.slimrepo.core.internal.query.*;
+import com.slimgears.slimrepo.core.internal.sql.SqlCommands;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommand;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlDatabaseScheme;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlStatementBuilder;
@@ -37,18 +38,19 @@ class SqliteStatementBuilder implements SqlStatementBuilder {
     }
 
     @Override
-    public <TKey, TEntity> String countStatement(SelectQueryParams<TKey, TEntity> params, SqlCommand.Parameters sqlParams) {
+    public <TKey, TEntity> SqlCommand countStatement(SelectQueryParams<TKey, TEntity> params) {
         Iterable<RelationalField> relationalFields = findRelationalFieldsInCondition(params.condition);
-        return
-                selectCountClause() +
-                fromClause(params.entityType) +
-                joinClauses(relationalFields) +
-                whereClause(params.condition, sqlParams) +
-                limitClause(params.pagination);
+        return SqlCommands.builder()
+                .append(selectCountClause())
+                .append(fromClause(params.entityType))
+                .append(joinClauses(relationalFields))
+                .append(b -> whereClause(params.condition, b))
+                .append(limitClause(params.pagination))
+                .build();
     }
 
     @Override
-    public <TKey, TEntity> String selectStatement(SelectQueryParams<TKey, TEntity> params, SqlCommand.Parameters sqlParams) {
+    public <TKey, TEntity> SqlCommand selectStatement(SelectQueryParams<TKey, TEntity> params) {
         Iterable<RelationalField> relationalFields = (params.fields != null)
                 ? findRelationalFields(params.fields)
                 : getAllRelationalFields(params.entityType);
@@ -56,41 +58,46 @@ class SqliteStatementBuilder implements SqlStatementBuilder {
                 ? params.fields
                 : params.entityType.getFields();
 
-        return
-                selectClause(params.entityType, fields) +
-                fromClause(params.entityType) +
-                joinClauses(relationalFields) +
-                whereClause(params.condition, sqlParams) +
-                orderByClause(params.order) +
-                limitClause(params.pagination);
+        return SqlCommands.builder()
+                .append(selectClause(params.entityType, fields))
+                .append(fromClause(params.entityType))
+                .append(joinClauses(relationalFields))
+                .append(builder -> whereClause(params.condition, builder))
+                .append(orderByClause(params.order))
+                .append(limitClause(params.pagination))
+                .build();
     }
 
     @Override
-    public <TKey, TEntity> String updateStatement(UpdateQueryParams<TKey, TEntity> params, SqlCommand.Parameters sqlParams) {
-        return
-                updateClause(params.entityType) +
-                setClause(params.updates, sqlParams) +
-                whereClause(params.condition, sqlParams) +
-                limitClause(params.pagination);
+    public <TKey, TEntity> SqlCommand updateStatement(UpdateQueryParams<TKey, TEntity> params) {
+        return SqlCommands.builder()
+                .append(updateClause(params.entityType))
+                .append(b -> setClause(params.updates, b))
+                .append(b -> whereClause(params.condition, b))
+                .append(limitClause(params.pagination))
+                .build();
     }
 
     @Override
-    public <TKey, TEntity> String deleteStatement(DeleteQueryParams<TKey, TEntity> params, SqlCommand.Parameters sqlParams) {
-        return "DELETE " + fromClause(params.entityType) +
-                whereClause(params.condition, sqlParams) +
-                limitClause(params.pagination);
+    public <TKey, TEntity> SqlCommand deleteStatement(DeleteQueryParams<TKey, TEntity> params) {
+        return SqlCommands.builder()
+                .append("DELETE " + fromClause(params.entityType))
+                .append(b -> whereClause(params.condition, b))
+                .append(limitClause(params.pagination))
+                .build();
     }
 
     @Override
-    public <TKey, TEntity> String insertStatement(InsertQueryParams<TKey, TEntity> params, SqlCommand.Parameters sqlParams) {
+    public <TKey, TEntity> SqlCommand insertStatement(InsertQueryParams<TKey, TEntity> params) {
         Collection<Field<TEntity, ?>> fields = fieldsToInsert(params.entityType);
-        return
-                insertClause(params.entityType, fields) +
-                valuesClause(fields, sqlParams, entitiesToRows(params.entityType, Stream.of(params.entities)));
+        return SqlCommands.builder()
+                .append(insertClause(params.entityType, fields))
+                .append(b -> valuesClause(fields, b, entitiesToRows(params.entityType, Stream.of(params.entities))))
+                .build();
     }
 
     @Override
-    public String copyData(String fromTable, SqlDatabaseScheme.TableScheme toTable, Iterable<String> fieldNames) {
+    public SqlCommand copyData(String fromTable, SqlDatabaseScheme.TableScheme toTable, Iterable<String> fieldNames) {
         Set<String> fieldNameSet = Stream.of(fieldNames).collect(Collectors.toSet());
         Collection<String> toFields = Stream.of(toTable.getFields().values())
                 .map(SqlDatabaseScheme.FieldScheme::getName)
@@ -99,46 +106,67 @@ class SqliteStatementBuilder implements SqlStatementBuilder {
         Stream<String> fromFields = Stream.of(toFields)
                 .map(field -> fieldNameSet.contains(field) ? syntaxProvider.simpleFieldName(field) : toTable.getField(field).getDefaultValue().toString());
 
-        return
-                insertClause(toTable.getName(), toFields) +
-                selectFromClause(fromTable, fromFields);
+        return SqlCommands.builder()
+                .append(insertClause(toTable.getName(), toFields))
+                .append(selectFromClause(fromTable, fromFields))
+                .build();
     }
 
     @Override
-    public String cloneTableStatement(String existingTableName, String newTableName) {
-        return "CREATE TABLE " + syntaxProvider.tableName(newTableName) + " AS SELECT * FROM " + syntaxProvider.tableName(existingTableName);
+    public SqlCommand cloneTableStatement(String existingTableName, String newTableName) {
+        return SqlCommands.builder()
+                .append("CREATE TABLE ")
+                .append(syntaxProvider.tableName(newTableName))
+                .append(" AS SELECT * FROM ")
+                .append(syntaxProvider.tableName(existingTableName))
+                .build();
     }
 
     @Override
-    public String createTableStatement(SqlDatabaseScheme.TableScheme tableScheme) {
-        return
-                "CREATE TABLE IF NOT EXISTS " + syntaxProvider.tableName(tableScheme.getName()) + " (\n    " +
-                        columnDefinitions(tableScheme) + ")";
+    public SqlCommand createTableStatement(SqlDatabaseScheme.TableScheme tableScheme) {
+        return SqlCommands.builder()
+                .append("CREATE TABLE IF NOT EXISTS ")
+                .append(syntaxProvider.tableName(tableScheme.getName()))
+                .append(" (\n    ")
+                .append(columnDefinitions(tableScheme))
+                .append(")")
+                .build();
     }
 
     @Override
-    public String dropTableStatement(String name) {
-        return "DROP TABLE IF EXISTS " + syntaxProvider.tableName(name);
+    public SqlCommand dropTableStatement(String name) {
+        return SqlCommands.builder()
+                .append("DROP TABLE IF EXISTS ")
+                .append(syntaxProvider.tableName(name))
+                .build();
     }
 
     protected <T> String insertClause(EntityType<?, T> entityType, Iterable<Field<T, ?>> fields) {
-        return "INSERT INTO " +
-                syntaxProvider.tableName(entityType) +
-                " (" + Stream.of(fields).map(this::fieldName).collect(Collectors.joining(", ")) + ")\n";
+        return SqlCommands.builder()
+                .append("INSERT INTO ")
+                .append(syntaxProvider.tableName(entityType))
+                .append(" (")
+                .append(Stream.of(fields).map(this::fieldName).collect(Collectors.joining(", ")))
+                .append(")\n")
+                .build().getStatement();
     }
 
     protected String insertClause(String tableName, Iterable<String> fieldNames) {
-        return "INSERT INTO " +
-                syntaxProvider.tableName(tableName) +
-                " (" + Stream.of(fieldNames).map(syntaxProvider::simpleFieldName).collect(Collectors.joining(", ")) + ")\n";
+        return SqlCommands.builder()
+                .append("INSERT INTO ")
+                .append(syntaxProvider.tableName(tableName))
+                .append(" (")
+                .append(Stream.of(fieldNames).map(syntaxProvider::simpleFieldName).collect(Collectors.joining(", ")))
+                .append(")\n")
+                .build().getStatement();
     }
 
-    protected <TEntity> String valuesClause(final Iterable<Field<TEntity, ?>> fields, final SqlCommand.Parameters parameters, Iterable<FieldValueLookup> rows) {
+    protected <TEntity> String valuesClause(final Iterable<Field<TEntity, ?>> fields, final SqlCommand.Builder sqlBuilder, Iterable<FieldValueLookup> rows) {
         //noinspection unchecked
         return "VALUES " +
                 Stream.of(rows)
                         .map(row -> "(" + Stream.of(fields)
-                                .map(field -> substituteParameter(parameters, (Field<TEntity, Object>)field, row.getValue(field)))
+                                .map(field -> substituteParameter(sqlBuilder, (Field<TEntity, Object>)field, row.getValue(field)))
                                 .collect(Collectors.joining(", ")) + ")")
                         .collect(Collectors.joining(", "));
     }
@@ -158,9 +186,9 @@ class SqliteStatementBuilder implements SqlStatementBuilder {
                 : limitClause + " OFFSET " + pagination.offset + "\n";
     }
 
-    private <TEntity> String whereClause(Condition<TEntity> condition, SqlCommand.Parameters parameters) {
+    private <TEntity> String whereClause(Condition<TEntity> condition, SqlCommand.Builder sqlBuilder) {
         if (condition == null) return "";
-        String strPredicate = predicateBuilder.build(condition, parameters);
+        String strPredicate = predicateBuilder.build(condition, sqlBuilder);
         return "WHERE " + strPredicate + "\n";
     }
 
@@ -220,12 +248,12 @@ class SqliteStatementBuilder implements SqlStatementBuilder {
                 .collect(Collectors.joining(", ")) + "\n";
     }
 
-    private String setClause(final Collection<UpdateFieldInfo> updateFields, final SqlCommand.Parameters parameters) {
+    private String setClause(final Collection<UpdateFieldInfo> updateFields, final SqlCommand.Builder sqlBuilder) {
         if (updateFields == null || updateFields.isEmpty()) return "";
         //noinspection unchecked
         return "SET " + Stream
                 .of(updateFields)
-                .map(updateField -> fieldName(updateField.field) + " = " + substituteParameter(parameters, updateField.field, updateField.value))
+                .map(updateField -> fieldName(updateField.field) + " = " + substituteParameter(sqlBuilder, updateField.field, updateField.value))
                 .collect(Collectors.joining(", ")) + "\n";
     }
 
@@ -276,8 +304,8 @@ class SqliteStatementBuilder implements SqlStatementBuilder {
         return entityType.getKeyField() == field && field instanceof ComparableField;
     }
 
-    private <TEntity, T> String substituteParameter(SqlCommand.Parameters parameters, Field<TEntity, T> field, T value) {
-        return syntaxProvider.substituteParameter(parameters, field, value);
+    private <TEntity, T> String substituteParameter(SqlCommand.Builder sqlBuilder, Field<TEntity, T> field, T value) {
+        return syntaxProvider.substituteParameter(sqlBuilder, field, value);
     }
 
     private String qualifiedFieldName(Field<?, ?> field) {

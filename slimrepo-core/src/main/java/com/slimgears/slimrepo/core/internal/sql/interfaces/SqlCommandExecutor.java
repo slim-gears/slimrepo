@@ -10,8 +10,8 @@ import com.slimgears.slimrepo.core.internal.interfaces.CloseableIterator;
  *
  */
 public interface SqlCommandExecutor {
-    long count(String statement, String... parameters) throws Exception;
-    <T> CloseableIterator<FieldValueLookup<T>> select(String statement, String... parameters) throws Exception;
-    <K> CloseableIterator<K> insert(String statement, String... parameters) throws Exception;
-    void execute(String statement, String... parameters) throws Exception;
+    long count(SqlCommand command) throws Exception;
+    <T> CloseableIterator<FieldValueLookup<T>> select(SqlCommand command) throws Exception;
+    <K> CloseableIterator<K> insert(SqlCommand command) throws Exception;
+    void execute(SqlCommand command) throws Exception;
 }

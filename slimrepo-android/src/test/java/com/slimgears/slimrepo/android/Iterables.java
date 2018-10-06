@@ -3,7 +3,6 @@
 package com.slimgears.slimrepo.android;
 
 import android.annotation.SuppressLint;
-
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 
@@ -22,7 +21,7 @@ public class Iterables {
         if (firstCollection.size() != secondCollection.size()) return false;
 
         return Stream
-                .ofRange(0, firstCollection.size())
+                .range(0, firstCollection.size())
                 .allMatch(i -> Objects.equals(firstCollection.get(i), secondCollection.get(i)));
     }
 }

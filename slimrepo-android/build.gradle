@@ -3,5 +3,6 @@ apply from: "$scriptsDir/bintray.gradle"
 
 dependencies {
     implementation project(':slimrepo-core')
+    implementation libs.annimon
     testImplementation project(path: ':slimrepo-core', configuration: 'testOutput')
 }

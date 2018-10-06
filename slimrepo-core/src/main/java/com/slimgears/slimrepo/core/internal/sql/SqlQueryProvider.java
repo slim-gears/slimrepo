@@ -2,6 +2,8 @@
 // Refer to LICENSE.txt for license details
 package com.slimgears.slimrepo.core.internal.sql;
 
+import com.annimon.stream.function.Function;
+import com.annimon.stream.function.Supplier;
 import com.slimgears.slimrepo.core.interfaces.entities.EntityType;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimrepo.core.internal.interfaces.CloseableIterator;
@@ -10,6 +12,7 @@ import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommand;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommandExecutor;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlSessionServiceProvider;
 import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlStatementBuilder;
+import com.slimgears.slimrepo.core.utilities.Lazy;
 
 import java.util.Collection;
 
@@ -28,44 +31,42 @@ public class SqlQueryProvider<TKey, TEntity> implements QueryProvider<TKey, TEnt
         this.serviceProvider = serviceProvider;
     }
 
+    interface QueryExecutor<T> {
+        T execute(SqlCommandExecutor executor, SqlCommand command) throws Exception;
+    }
+
+    private <T> PreparedQuery<T> prepare(Function<SqlStatementBuilder, SqlCommand> supplier, QueryExecutor<T> querySupplier) {
+        Supplier<SqlCommand> lazyCommand = Lazy.of(() -> supplier.apply(getBuilder()));
+        return () -> querySupplier.execute(getExecutor(), lazyCommand.get());
+    }
+
     @Override
     public PreparedQuery<CloseableIterator<TKey>> prepareInsert(final Collection<TEntity> entities) {
-        final SqlCommand command = new SqlLazyCommand(getBuilder(), (sqlBuilder1, parameters) ->
-                sqlBuilder1.insertStatement(new InsertQueryParams<>(entityType, entities), parameters));
-        return () -> getExecutor().insert(command.getStatement(), command.getParameters().getValues());
+        return prepare(builder -> builder.insertStatement(new InsertQueryParams<>(entityType, entities)), SqlCommandExecutor::insert);
     }
 
     @Override
     public PreparedQuery<CloseableIterator<FieldValueLookup<TEntity>>> prepareSelect(final SelectQueryParams<TKey, TEntity> query) {
-        final SqlCommand command = new SqlLazyCommand(getBuilder(), (sqlBuilder1, parameters) ->
-                sqlBuilder1.selectStatement(query, parameters));
-        return () -> getExecutor().select(command.getStatement(), command.getParameters().getValues());
+        return prepare(builder -> builder.selectStatement(query), SqlCommandExecutor::select);
     }
 
     @Override
     public PreparedQuery<Long> prepareCount(final SelectQueryParams<TKey, TEntity> query) {
-        final SqlCommand command = new SqlLazyCommand(getBuilder(), (sqlBuilder1, parameters) ->
-                sqlBuilder1.countStatement(query, parameters));
-        return () -> getExecutor().count(command.getStatement(), command.getParameters().getValues());
+        return prepare(builder -> builder.countStatement(query), SqlCommandExecutor::count);
     }
 
     @Override
     public PreparedQuery<Void> prepareUpdate(final UpdateQueryParams<TKey, TEntity> query) {
-        final SqlCommand command = new SqlLazyCommand(getBuilder(), (sqlBuilder1, parameters) -> sqlBuilder1.updateStatement(query, parameters));
-        return () -> {
-            getExecutor().execute(command.getStatement(), command.getParameters().getValues());
-            return null;
-        };
+        return prepare(
+                builder -> builder.updateStatement(query),
+                (executor, command) -> { executor.execute(command); return null; });
     }
 
     @Override
     public PreparedQuery<Void> prepareDelete(final DeleteQueryParams<TKey, TEntity> query) {
-        final SqlCommand command = new SqlLazyCommand(getBuilder(), (sqlBuilder1, parameters) ->
-                sqlBuilder1.deleteStatement(query, parameters));
-        return () -> {
-            getExecutor().execute(command.getStatement(), command.getParameters().getValues());
-            return null;
-        };
+        return prepare(
+                builder -> builder.deleteStatement(query),
+                (executor, command) -> { executor.execute(command); return null; });
     }
 
     private SqlCommandExecutor getExecutor() {

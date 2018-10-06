@@ -142,7 +142,7 @@ public class MigrationsTest {
     @SafeVarargs
     private final void assertScheme(SQLiteDatabase database, Matcher<SqlDatabaseScheme>... sqlDatabaseSchemeMatchers) {
         SqliteSchemeProvider schemeProvider = new SqliteSchemeProvider(ormServiceProvider.getSyntaxProvider(), database);
-        SqlDatabaseScheme scheme = schemeProvider.getDatabaseScheme();
+        SqlDatabaseScheme scheme = schemeProvider.getDatabaseScheme("");
         Assert.assertThat(scheme, all(sqlDatabaseSchemeMatchers));
     }
 

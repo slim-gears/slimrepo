@@ -10,10 +10,7 @@ import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.core.interfaces.entities.FieldValueLookup;
 import com.slimgears.slimrepo.core.internal.EntityFieldValueMap;
 import com.slimgears.slimrepo.core.internal.interfaces.*;
-import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlCommandExecutor;
-import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlDatabaseScheme;
-import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlOrmServiceProvider;
-import com.slimgears.slimrepo.core.internal.sql.interfaces.SqlSchemeProvider;
+import com.slimgears.slimrepo.core.internal.sql.interfaces.*;
 import com.slimgears.slimrepo.core.internal.sql.sqlite.AbstractSqliteOrmServiceProvider;
 import com.slimgears.slimrepo.core.prototype.UserRepository;
 import com.slimgears.slimrepo.core.prototype.generated.*;
@@ -75,9 +72,13 @@ public class PrototypeTest {
 
         @Override
         public T answer(InvocationOnMock invocation) {
-            String sql = (String)invocation.getArguments()[0];
-            Stream<Object> params = Stream.of(invocation.getArguments()).skip(1);
-            String sqlWithParams = sql + "\n{Params: [" + params.map(Object::toString).collect(Collectors.joining(", ")) + "]}";
+            SqlCommand sqlCommand = (SqlCommand)invocation.getArguments()[0];
+            Stream<String> params = Stream
+                    .of(sqlCommand.getParameters())
+                    .map(SqlCommand.Parameter::value)
+                    .map(val -> val != null ? val.toString(): "NULL");
+
+            String sqlWithParams = sqlCommand.getStatement() + "\n{Params: [" + params.collect(Collectors.joining(", ")) + "]}";
             sqlStatements.add(sqlWithParams);
             System.out.println(sqlWithParams);
             return answer;
@@ -126,14 +127,17 @@ public class PrototypeTest {
             }
         };
 
-        when(executorMock.select(any(String.class), any()))
+        when(executorMock.select(any()))
                 .thenAnswer(answer(rowsMock(10)));
-        when(executorMock.count(any(String.class), any()))
+        when(executorMock.count(any()))
                 .thenAnswer(answer(0L));
+
+        when(executorMock.insert(any()))
+                .thenAnswer(answer(rowsMock(1)));
 
         doAnswer(answer(null))
                 .when(executorMock)
-                .execute(any(String.class), any());
+                .execute(any());
     }
 
     @Test
@@ -145,7 +149,7 @@ public class PrototypeTest {
                 .age(5)
                 .role(RoleEntity.builder().roleDescription("user").build())
                 .build()));
-        Mockito.verify(executorMock).execute(any(String.class), any());
+        Mockito.verify(executorMock).insert(any());
         assertSqlEquals("insert-user.sql");
     }
 
@@ -157,7 +161,7 @@ public class PrototypeTest {
                 .limit(10)
                 .prepare()
                 .count());
-        Mockito.verify(executorMock).count(any(String.class), any());
+        Mockito.verify(executorMock).count(any());
         assertSqlEquals("query-count-users.sql");
     }
 
@@ -178,7 +182,7 @@ public class PrototypeTest {
                 .limit(10)
                 .prepare()
                 .toArray());
-        Mockito.verify(executorMock).select(any(String.class), any());
+        Mockito.verify(executorMock).select(any());
         assertSqlEquals("query-users.sql");
     }
 
@@ -188,7 +192,7 @@ public class PrototypeTest {
                 .where(UserEntity.Role.is(RoleEntity.RoleDescription.in("Admin")))
                 .prepare()
                 .count());
-        Mockito.verify(executorMock).count(any(String.class), any());
+        Mockito.verify(executorMock).count(any());
         assertSqlEquals("query-count-related-field.sql");
     }
 
@@ -207,7 +211,7 @@ public class PrototypeTest {
                 .where(UserEntity.Role.is(RoleEntity.RoleDescription.in("Admin")))
                 .prepare()
                 .toArray());
-        Mockito.verify(executorMock).select(any(String.class), any());
+        Mockito.verify(executorMock).select(any());
         assertSqlEquals("query-related-field.sql");
     }
 
@@ -216,7 +220,7 @@ public class PrototypeTest {
         testQuery(repository -> repository.users().query()
                 .where(UserEntity.UserFirstName.in("John", "Jake"))
                 .selectToMap(UserEntity.UserFirstName, UserEntity.UserLastName));
-        Mockito.verify(executorMock).select(any(String.class), any());
+        Mockito.verify(executorMock).select(any());
         assertSqlEquals("query-selected-to-map.sql");
     }
 
@@ -227,7 +231,7 @@ public class PrototypeTest {
                 .set(UserEntity.UserLastName, "Doe")
                 .prepare()
                 .execute());
-        Mockito.verify(executorMock).execute(any(String.class), any());
+        Mockito.verify(executorMock).execute(any());
         assertSqlEquals("update-fields.sql");
     }
 
@@ -296,7 +300,7 @@ public class PrototypeTest {
             users.findAllWhere(UserEntity.UserFirstName.notContains("C"));
             return users;
         });
-        Mockito.verify(executorMock, times(19)).select(any(String.class), any());
+        Mockito.verify(executorMock, times(19)).select(any());
         assertSqlEquals("query-predicates.sql");
     }
 

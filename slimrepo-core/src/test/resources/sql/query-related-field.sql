@@ -4,11 +4,11 @@ SELECT
     `UserEntity`.`userLastName` AS `UserEntity_userLastName`,
     `UserEntity`.`lastVisitDate` AS `UserEntity_lastVisitDate`,
     `UserEntity`.`role` AS `UserEntity_role`,
+    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
+    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`,
     `UserEntity`.`accountStatus` AS `UserEntity_accountStatus`,
     `UserEntity`.`comments` AS `UserEntity_comments`,
-    `UserEntity`.`age` AS `UserEntity_age`,
-    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
-    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`
+    `UserEntity`.`age` AS `UserEntity_age`
 FROM `UserEntity`
 LEFT JOIN `RoleEntity` ON `UserEntity`.`role` = `RoleEntity`.`roleId`
 WHERE `RoleEntity`.`roleDescription` IN (?)

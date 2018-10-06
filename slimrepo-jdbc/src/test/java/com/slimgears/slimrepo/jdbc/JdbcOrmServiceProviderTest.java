@@ -4,7 +4,8 @@ import com.slimgears.slimrepo.core.interfaces.conditions.Condition;
 import com.slimgears.slimrepo.core.interfaces.conditions.Conditions;
 import com.slimgears.slimrepo.core.interfaces.entities.EntitySet;
 import com.slimgears.slimrepo.core.internal.interfaces.OrmServiceProvider;
-import com.slimgears.slimrepo.core.prototype.UserRepository;
+import com.slimgears.slimrepo.core.prototype.generated.*;
+import com.slimgears.slimrepo.core.prototype.*;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -13,7 +14,6 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -24,23 +24,7 @@ import java.util.Random;
 import static com.slimgears.slimrepo.core.utilities.Dates.addDays;
 import static com.slimgears.slimrepo.core.utilities.Dates.fromDate;
 
-public class JdbcOrmServiceProviderTest {
-    private UserRepositoryService repositoryService;
-    private Path dbPath;
-
-    @Before
-    public void setUp() throws IOException {
-        new File("tmp").mkdirs();
-        dbPath = getTempPath(Paths.get("tmp"), "temp-", ".db");
-        String url = "jdbc:sqlite:" + dbPath;
-        OrmServiceProvider orm = new JdbcOrmServiceProvider(url);
-        repositoryService = new GeneratedUserRepositoryService(orm);
-    }
-
-    @After
-    public void tearDown() throws IOException {
-        Files.deleteIfExists(dbPath);
-    }
+public class JdbcOrmServiceProviderTest extends AbstractJdbcOrmServiceProviderTest {
 
     @Test
     public void addEntitiesThenQuery() throws Exception {
@@ -292,8 +276,4 @@ public class JdbcOrmServiceProviderTest {
                 .toArray());
     }
 
-    private static Path getTempPath(Path parentDir, String prefix, String suffix) {
-        String filename = prefix + new BigInteger(64, new Random()).toString(32) + suffix;
-        return parentDir.resolve(filename);
-    }
 }

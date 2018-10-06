@@ -50,9 +50,10 @@ public abstract class AbstractSqlSyntaxProvider implements SqlStatementBuilder.S
     }
 
     @Override
-    public <T> String substituteParameter(SqlCommand.Parameters params, Field<?, T> field, T value) {
-        int index = params.getCount();
-        return parameterReference(index, params.add(valueToString(field, value)));
+    public <T> String substituteParameter(SqlCommand.Builder sqlBuilder, Field<?, T> field, T value) {
+        //noinspection unchecked
+        int index = sqlBuilder.addParam(fieldTypeMapper.getOutboundType(field), fieldTypeMapper.fromFieldType(field, value));
+        return parameterReference(index);
     }
 
     @Override

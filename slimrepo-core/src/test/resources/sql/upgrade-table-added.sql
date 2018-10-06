@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS `UserEntity` (
-    `userId` TEXT PRIMARY KEY,
+    `userId` TEXT PRIMARY KEY NOT NULL,
     `userFirstName` TEXT,
     `userLastName` TEXT,
     `lastVisitDate` INTEGER,

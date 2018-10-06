@@ -129,8 +129,11 @@ public class DefaultEntitySet<TKey, TEntity> extends AbstractEntitySet<TKey, TEn
                 .prepareInsert(Collections.singletonList(entity))
                 .execute();
         try {
-            if (entityType.getKeyField().metaInfo().isAutoIncremented()) {
-                entityType.setKey(entity, keysIterator.next());
+            if (keysIterator.hasNext()) {
+                TKey key = keysIterator.next();
+                if (key.getClass() == entityType.getKeyField().metaInfo().getValueType()) {
+                    entityType.setKey(entity, key);
+                }
             }
         } finally {
             keysIterator.close();

@@ -5,7 +5,7 @@ CREATE TABLE `UserEntity_Backup` AS SELECT * FROM `UserEntity`
 DROP TABLE IF EXISTS `UserEntity`
 {Params: []}
 CREATE TABLE IF NOT EXISTS `UserEntity` (
-    `userId` TEXT PRIMARY KEY,
+    `userId` TEXT PRIMARY KEY NOT NULL,
     `userFirstName` TEXT,
     `userLastName` TEXT,
     `lastVisitDate` INTEGER,

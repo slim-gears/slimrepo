@@ -32,7 +32,7 @@ public class SqliteSyntaxProvider extends AbstractSqlSyntaxProvider {
     }
 
     @Override
-    public String parameterReference(int index, String name) {
+    public String parameterReference(int index) {
         return "?";
     }
 

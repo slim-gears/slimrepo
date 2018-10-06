@@ -24,25 +24,25 @@ public interface SqlStatementBuilder {
         String tableName(EntityType<?, ?> entityType);
         String tableName(String name);
         String databaseName(RepositoryModel repositoryModel);
-        String parameterReference(int index, String name);
+        String parameterReference(int index);
         <T> String valueToString(Field<?, T> field, T value);
-        <T> String substituteParameter(SqlCommand.Parameters params, Field<?, T> field, T value);
+        <T> String substituteParameter(SqlCommand.Builder params, Field<?, T> field, T value);
         String fieldAlias(Field<?, ?> field);
         String rawFieldAlias(Field<?, ?> field);
     }
 
     interface PredicateBuilder {
-        <TEntity> String build(Condition<TEntity> condition, SqlCommand.Parameters parameters);
+        <TEntity> String build(Condition<TEntity> condition, SqlCommand.Builder sqlCommandBuilder);
     }
 
-    <TKey, TEntity> String countStatement(SelectQueryParams<TKey, TEntity> params, SqlCommand.Parameters sqlParams);
-    <TKey, TEntity> String selectStatement(SelectQueryParams<TKey, TEntity> params, SqlCommand.Parameters sqlParams);
-    <TKey, TEntity> String updateStatement(UpdateQueryParams<TKey, TEntity> params, SqlCommand.Parameters sqlParams);
-    <TKey, TEntity> String deleteStatement(DeleteQueryParams<TKey, TEntity> params, SqlCommand.Parameters sqlParams);
-    <TKey, TEntity> String insertStatement(InsertQueryParams<TKey, TEntity> params, SqlCommand.Parameters sqlParams);
+    <TKey, TEntity> SqlCommand countStatement(SelectQueryParams<TKey, TEntity> params);
+    <TKey, TEntity> SqlCommand selectStatement(SelectQueryParams<TKey, TEntity> params);
+    <TKey, TEntity> SqlCommand updateStatement(UpdateQueryParams<TKey, TEntity> params);
+    <TKey, TEntity> SqlCommand deleteStatement(DeleteQueryParams<TKey, TEntity> params);
+    <TKey, TEntity> SqlCommand insertStatement(InsertQueryParams<TKey, TEntity> params);
 
-    String copyData(String fromTable, SqlDatabaseScheme.TableScheme toTable, Iterable<String> fieldNames);
-    String cloneTableStatement(String existingTableName, String newTableName);
-    String createTableStatement(SqlDatabaseScheme.TableScheme tableScheme);
-    String dropTableStatement(String tableName);
+    SqlCommand copyData(String fromTable, SqlDatabaseScheme.TableScheme toTable, Iterable<String> fieldNames);
+    SqlCommand cloneTableStatement(String existingTableName, String newTableName);
+    SqlCommand createTableStatement(SqlDatabaseScheme.TableScheme tableScheme);
+    SqlCommand dropTableStatement(String tableName);
 }

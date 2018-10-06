@@ -78,7 +78,9 @@ public class SqliteQueryProvider<TKey, TEntity> extends SqlQueryProvider<TKey, T
         return () -> {
             String tableName = serviceProvider.getOrmServiceProvider().getSyntaxProvider().tableName(entityType);
             return CloseableIterators
-                    .fromIterator(Stream.of(entities).map(entity -> insertEntity(tableName, entity)).getIterator());
+                    .fromIterator(Stream.of(entities)
+                            .map(entity -> insertEntity(tableName, entity))
+                            .iterator());
         };
     }
 

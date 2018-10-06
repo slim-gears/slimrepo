@@ -65,14 +65,14 @@ public class SqlPredicateBuilder implements SqlStatementBuilder.PredicateBuilder
     }
 
     class BuilderVisitor<T> extends PredicateVisitor<T, String>  {
-        private final SqlCommand.Parameters parameters;
+        private final SqlCommand.Builder sqlBuilder;
 
-        BuilderVisitor(SqlCommand.Parameters parameters) {
-            this.parameters = parameters;
+        BuilderVisitor(SqlCommand.Builder sqlBuilder) {
+            this.sqlBuilder = sqlBuilder;
         }
 
         private <V> String substituteArg(FieldCondition<T, V> condition, V value) {
-            return SqlPredicateBuilder.this.substituteArg(parameters, condition, value);
+            return SqlPredicateBuilder.this.substituteArg(sqlBuilder, condition, value);
         }
 
         @SafeVarargs
@@ -121,7 +121,7 @@ public class SqlPredicateBuilder implements SqlStatementBuilder.PredicateBuilder
 
         @Override
         protected <V> String visitRelational(RelationalCondition<T, V> condition) {
-            return build(condition.getCondition(), parameters);
+            return build(condition.getCondition(), sqlBuilder);
         }
 
         private String combine(PredicateType type, Iterator<Condition<T>> predicateIterator) {
@@ -133,13 +133,13 @@ public class SqlPredicateBuilder implements SqlStatementBuilder.PredicateBuilder
     }
 
     @Override
-    public <T> String build(Condition<T> condition, SqlCommand.Parameters parameters) {
-        BuilderVisitor<T> visitor = new BuilderVisitor<>(parameters);
+    public <T> String build(Condition<T> condition, SqlCommand.Builder sqlBuilder) {
+        BuilderVisitor<T> visitor = new BuilderVisitor<>(sqlBuilder);
         return visitor.visit(condition);
     }
 
-    protected <T, V> String substituteArg(SqlCommand.Parameters params, FieldCondition<T, V> condition, V value) {
-        return syntaxProvider.parameterReference(params.getCount(), params.add(valueToString(condition, value)));
+    protected <T, V> String substituteArg(SqlCommand.Builder sqlBuilder, FieldCondition<T, V> condition, V value) {
+        return syntaxProvider.parameterReference(sqlBuilder.addParam(valueToString(condition, value)));
     }
 
     protected String fieldName(Field field) {

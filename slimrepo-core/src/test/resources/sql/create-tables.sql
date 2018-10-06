@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS `RoleEntity` (
-    `roleId` INTEGER PRIMARY KEY ASC,
+    `roleId` INTEGER PRIMARY KEY ASC NOT NULL,
     `roleDescription` TEXT)
 {Params: []}
 CREATE TABLE IF NOT EXISTS `UserEntity` (
-    `userId` TEXT PRIMARY KEY,
+    `userId` TEXT PRIMARY KEY NOT NULL,
     `userFirstName` TEXT,
     `userLastName` TEXT,
     `lastVisitDate` INTEGER,

@@ -4,11 +4,11 @@ SELECT
     `UserEntity`.`userLastName` AS `UserEntity_userLastName`,
     `UserEntity`.`lastVisitDate` AS `UserEntity_lastVisitDate`,
     `UserEntity`.`role` AS `UserEntity_role`,
+    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
+    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`,
     `UserEntity`.`accountStatus` AS `UserEntity_accountStatus`,
     `UserEntity`.`comments` AS `UserEntity_comments`,
-    `UserEntity`.`age` AS `UserEntity_age`,
-    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
-    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`
+    `UserEntity`.`age` AS `UserEntity_age`
 FROM `UserEntity`
 LEFT JOIN `RoleEntity` ON `UserEntity`.`role` = `RoleEntity`.`roleId`
 WHERE `UserEntity`.`userLastName` IS NULL
@@ -20,11 +20,11 @@ SELECT
     `UserEntity`.`userLastName` AS `UserEntity_userLastName`,
     `UserEntity`.`lastVisitDate` AS `UserEntity_lastVisitDate`,
     `UserEntity`.`role` AS `UserEntity_role`,
+    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
+    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`,
     `UserEntity`.`accountStatus` AS `UserEntity_accountStatus`,
     `UserEntity`.`comments` AS `UserEntity_comments`,
-    `UserEntity`.`age` AS `UserEntity_age`,
-    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
-    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`
+    `UserEntity`.`age` AS `UserEntity_age`
 FROM `UserEntity`
 LEFT JOIN `RoleEntity` ON `UserEntity`.`role` = `RoleEntity`.`roleId`
 WHERE `UserEntity`.`userFirstName` IS NOT NULL
@@ -36,11 +36,11 @@ SELECT
     `UserEntity`.`userLastName` AS `UserEntity_userLastName`,
     `UserEntity`.`lastVisitDate` AS `UserEntity_lastVisitDate`,
     `UserEntity`.`role` AS `UserEntity_role`,
+    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
+    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`,
     `UserEntity`.`accountStatus` AS `UserEntity_accountStatus`,
     `UserEntity`.`comments` AS `UserEntity_comments`,
-    `UserEntity`.`age` AS `UserEntity_age`,
-    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
-    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`
+    `UserEntity`.`age` AS `UserEntity_age`
 FROM `UserEntity`
 LEFT JOIN `RoleEntity` ON `UserEntity`.`role` = `RoleEntity`.`roleId`
 WHERE `UserEntity`.`accountStatus` = ?
@@ -52,11 +52,11 @@ SELECT
     `UserEntity`.`userLastName` AS `UserEntity_userLastName`,
     `UserEntity`.`lastVisitDate` AS `UserEntity_lastVisitDate`,
     `UserEntity`.`role` AS `UserEntity_role`,
+    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
+    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`,
     `UserEntity`.`accountStatus` AS `UserEntity_accountStatus`,
     `UserEntity`.`comments` AS `UserEntity_comments`,
-    `UserEntity`.`age` AS `UserEntity_age`,
-    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
-    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`
+    `UserEntity`.`age` AS `UserEntity_age`
 FROM `UserEntity`
 LEFT JOIN `RoleEntity` ON `UserEntity`.`role` = `RoleEntity`.`roleId`
 WHERE `UserEntity`.`accountStatus` <> ?
@@ -68,11 +68,11 @@ SELECT
     `UserEntity`.`userLastName` AS `UserEntity_userLastName`,
     `UserEntity`.`lastVisitDate` AS `UserEntity_lastVisitDate`,
     `UserEntity`.`role` AS `UserEntity_role`,
+    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
+    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`,
     `UserEntity`.`accountStatus` AS `UserEntity_accountStatus`,
     `UserEntity`.`comments` AS `UserEntity_comments`,
-    `UserEntity`.`age` AS `UserEntity_age`,
-    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
-    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`
+    `UserEntity`.`age` AS `UserEntity_age`
 FROM `UserEntity`
 LEFT JOIN `RoleEntity` ON `UserEntity`.`role` = `RoleEntity`.`roleId`
 WHERE `UserEntity`.`accountStatus` IN (?, ?)
@@ -84,11 +84,11 @@ SELECT
     `UserEntity`.`userLastName` AS `UserEntity_userLastName`,
     `UserEntity`.`lastVisitDate` AS `UserEntity_lastVisitDate`,
     `UserEntity`.`role` AS `UserEntity_role`,
+    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
+    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`,
     `UserEntity`.`accountStatus` AS `UserEntity_accountStatus`,
     `UserEntity`.`comments` AS `UserEntity_comments`,
-    `UserEntity`.`age` AS `UserEntity_age`,
-    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
-    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`
+    `UserEntity`.`age` AS `UserEntity_age`
 FROM `UserEntity`
 LEFT JOIN `RoleEntity` ON `UserEntity`.`role` = `RoleEntity`.`roleId`
 WHERE `UserEntity`.`accountStatus` IN (?, ?)
@@ -100,11 +100,11 @@ SELECT
     `UserEntity`.`userLastName` AS `UserEntity_userLastName`,
     `UserEntity`.`lastVisitDate` AS `UserEntity_lastVisitDate`,
     `UserEntity`.`role` AS `UserEntity_role`,
+    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
+    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`,
     `UserEntity`.`accountStatus` AS `UserEntity_accountStatus`,
     `UserEntity`.`comments` AS `UserEntity_comments`,
-    `UserEntity`.`age` AS `UserEntity_age`,
-    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
-    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`
+    `UserEntity`.`age` AS `UserEntity_age`
 FROM `UserEntity`
 LEFT JOIN `RoleEntity` ON `UserEntity`.`role` = `RoleEntity`.`roleId`
 WHERE `UserEntity`.`accountStatus` NOT IN (?, ?)
@@ -116,11 +116,11 @@ SELECT
     `UserEntity`.`userLastName` AS `UserEntity_userLastName`,
     `UserEntity`.`lastVisitDate` AS `UserEntity_lastVisitDate`,
     `UserEntity`.`role` AS `UserEntity_role`,
+    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
+    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`,
     `UserEntity`.`accountStatus` AS `UserEntity_accountStatus`,
     `UserEntity`.`comments` AS `UserEntity_comments`,
-    `UserEntity`.`age` AS `UserEntity_age`,
-    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
-    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`
+    `UserEntity`.`age` AS `UserEntity_age`
 FROM `UserEntity`
 LEFT JOIN `RoleEntity` ON `UserEntity`.`role` = `RoleEntity`.`roleId`
 WHERE `UserEntity`.`accountStatus` NOT IN (?, ?)
@@ -132,11 +132,11 @@ SELECT
     `UserEntity`.`userLastName` AS `UserEntity_userLastName`,
     `UserEntity`.`lastVisitDate` AS `UserEntity_lastVisitDate`,
     `UserEntity`.`role` AS `UserEntity_role`,
+    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
+    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`,
     `UserEntity`.`accountStatus` AS `UserEntity_accountStatus`,
     `UserEntity`.`comments` AS `UserEntity_comments`,
-    `UserEntity`.`age` AS `UserEntity_age`,
-    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
-    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`
+    `UserEntity`.`age` AS `UserEntity_age`
 FROM `UserEntity`
 LEFT JOIN `RoleEntity` ON `UserEntity`.`role` = `RoleEntity`.`roleId`
 WHERE `UserEntity`.`lastVisitDate` BETWEEN ? AND ?
@@ -148,11 +148,11 @@ SELECT
     `UserEntity`.`userLastName` AS `UserEntity_userLastName`,
     `UserEntity`.`lastVisitDate` AS `UserEntity_lastVisitDate`,
     `UserEntity`.`role` AS `UserEntity_role`,
+    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
+    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`,
     `UserEntity`.`accountStatus` AS `UserEntity_accountStatus`,
     `UserEntity`.`comments` AS `UserEntity_comments`,
-    `UserEntity`.`age` AS `UserEntity_age`,
-    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
-    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`
+    `UserEntity`.`age` AS `UserEntity_age`
 FROM `UserEntity`
 LEFT JOIN `RoleEntity` ON `UserEntity`.`role` = `RoleEntity`.`roleId`
 WHERE `UserEntity`.`lastVisitDate` >= ?
@@ -164,11 +164,11 @@ SELECT
     `UserEntity`.`userLastName` AS `UserEntity_userLastName`,
     `UserEntity`.`lastVisitDate` AS `UserEntity_lastVisitDate`,
     `UserEntity`.`role` AS `UserEntity_role`,
+    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
+    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`,
     `UserEntity`.`accountStatus` AS `UserEntity_accountStatus`,
     `UserEntity`.`comments` AS `UserEntity_comments`,
-    `UserEntity`.`age` AS `UserEntity_age`,
-    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
-    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`
+    `UserEntity`.`age` AS `UserEntity_age`
 FROM `UserEntity`
 LEFT JOIN `RoleEntity` ON `UserEntity`.`role` = `RoleEntity`.`roleId`
 WHERE `UserEntity`.`lastVisitDate` <= ?
@@ -180,11 +180,11 @@ SELECT
     `UserEntity`.`userLastName` AS `UserEntity_userLastName`,
     `UserEntity`.`lastVisitDate` AS `UserEntity_lastVisitDate`,
     `UserEntity`.`role` AS `UserEntity_role`,
+    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
+    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`,
     `UserEntity`.`accountStatus` AS `UserEntity_accountStatus`,
     `UserEntity`.`comments` AS `UserEntity_comments`,
-    `UserEntity`.`age` AS `UserEntity_age`,
-    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
-    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`
+    `UserEntity`.`age` AS `UserEntity_age`
 FROM `UserEntity`
 LEFT JOIN `RoleEntity` ON `UserEntity`.`role` = `RoleEntity`.`roleId`
 WHERE `UserEntity`.`lastVisitDate` > ?
@@ -196,11 +196,11 @@ SELECT
     `UserEntity`.`userLastName` AS `UserEntity_userLastName`,
     `UserEntity`.`lastVisitDate` AS `UserEntity_lastVisitDate`,
     `UserEntity`.`role` AS `UserEntity_role`,
+    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
+    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`,
     `UserEntity`.`accountStatus` AS `UserEntity_accountStatus`,
     `UserEntity`.`comments` AS `UserEntity_comments`,
-    `UserEntity`.`age` AS `UserEntity_age`,
-    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
-    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`
+    `UserEntity`.`age` AS `UserEntity_age`
 FROM `UserEntity`
 LEFT JOIN `RoleEntity` ON `UserEntity`.`role` = `RoleEntity`.`roleId`
 WHERE `UserEntity`.`lastVisitDate` < ?
@@ -212,11 +212,11 @@ SELECT
     `UserEntity`.`userLastName` AS `UserEntity_userLastName`,
     `UserEntity`.`lastVisitDate` AS `UserEntity_lastVisitDate`,
     `UserEntity`.`role` AS `UserEntity_role`,
+    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
+    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`,
     `UserEntity`.`accountStatus` AS `UserEntity_accountStatus`,
     `UserEntity`.`comments` AS `UserEntity_comments`,
-    `UserEntity`.`age` AS `UserEntity_age`,
-    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
-    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`
+    `UserEntity`.`age` AS `UserEntity_age`
 FROM `UserEntity`
 LEFT JOIN `RoleEntity` ON `UserEntity`.`role` = `RoleEntity`.`roleId`
 WHERE `RoleEntity`.`roleDescription` LIKE ?
@@ -228,11 +228,11 @@ SELECT
     `UserEntity`.`userLastName` AS `UserEntity_userLastName`,
     `UserEntity`.`lastVisitDate` AS `UserEntity_lastVisitDate`,
     `UserEntity`.`role` AS `UserEntity_role`,
+    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
+    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`,
     `UserEntity`.`accountStatus` AS `UserEntity_accountStatus`,
     `UserEntity`.`comments` AS `UserEntity_comments`,
-    `UserEntity`.`age` AS `UserEntity_age`,
-    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
-    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`
+    `UserEntity`.`age` AS `UserEntity_age`
 FROM `UserEntity`
 LEFT JOIN `RoleEntity` ON `UserEntity`.`role` = `RoleEntity`.`roleId`
 WHERE `RoleEntity`.`roleDescription` LIKE ?
@@ -244,11 +244,11 @@ SELECT
     `UserEntity`.`userLastName` AS `UserEntity_userLastName`,
     `UserEntity`.`lastVisitDate` AS `UserEntity_lastVisitDate`,
     `UserEntity`.`role` AS `UserEntity_role`,
+    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
+    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`,
     `UserEntity`.`accountStatus` AS `UserEntity_accountStatus`,
     `UserEntity`.`comments` AS `UserEntity_comments`,
-    `UserEntity`.`age` AS `UserEntity_age`,
-    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
-    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`
+    `UserEntity`.`age` AS `UserEntity_age`
 FROM `UserEntity`
 LEFT JOIN `RoleEntity` ON `UserEntity`.`role` = `RoleEntity`.`roleId`
 WHERE `RoleEntity`.`roleDescription` LIKE ?
@@ -260,11 +260,11 @@ SELECT
     `UserEntity`.`userLastName` AS `UserEntity_userLastName`,
     `UserEntity`.`lastVisitDate` AS `UserEntity_lastVisitDate`,
     `UserEntity`.`role` AS `UserEntity_role`,
+    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
+    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`,
     `UserEntity`.`accountStatus` AS `UserEntity_accountStatus`,
     `UserEntity`.`comments` AS `UserEntity_comments`,
-    `UserEntity`.`age` AS `UserEntity_age`,
-    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
-    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`
+    `UserEntity`.`age` AS `UserEntity_age`
 FROM `UserEntity`
 LEFT JOIN `RoleEntity` ON `UserEntity`.`role` = `RoleEntity`.`roleId`
 WHERE `UserEntity`.`userFirstName` NOT LIKE ?
@@ -276,11 +276,11 @@ SELECT
     `UserEntity`.`userLastName` AS `UserEntity_userLastName`,
     `UserEntity`.`lastVisitDate` AS `UserEntity_lastVisitDate`,
     `UserEntity`.`role` AS `UserEntity_role`,
+    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
+    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`,
     `UserEntity`.`accountStatus` AS `UserEntity_accountStatus`,
     `UserEntity`.`comments` AS `UserEntity_comments`,
-    `UserEntity`.`age` AS `UserEntity_age`,
-    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
-    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`
+    `UserEntity`.`age` AS `UserEntity_age`
 FROM `UserEntity`
 LEFT JOIN `RoleEntity` ON `UserEntity`.`role` = `RoleEntity`.`roleId`
 WHERE `UserEntity`.`userFirstName` NOT LIKE ?
@@ -292,11 +292,11 @@ SELECT
     `UserEntity`.`userLastName` AS `UserEntity_userLastName`,
     `UserEntity`.`lastVisitDate` AS `UserEntity_lastVisitDate`,
     `UserEntity`.`role` AS `UserEntity_role`,
+    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
+    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`,
     `UserEntity`.`accountStatus` AS `UserEntity_accountStatus`,
     `UserEntity`.`comments` AS `UserEntity_comments`,
-    `UserEntity`.`age` AS `UserEntity_age`,
-    `RoleEntity`.`roleId` AS `RoleEntity_roleId`,
-    `RoleEntity`.`roleDescription` AS `RoleEntity_roleDescription`
+    `UserEntity`.`age` AS `UserEntity_age`
 FROM `UserEntity`
 LEFT JOIN `RoleEntity` ON `UserEntity`.`role` = `RoleEntity`.`roleId`
 WHERE `UserEntity`.`userFirstName` NOT LIKE ?
