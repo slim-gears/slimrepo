@@ -1,11 +1,5 @@
 buildscript {
     apply from: "$projectDir/gradle/buildscript.gradle", to: it
-    repositories {
-        google()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.0'
-    }
 }
 
 apply from: "$projectDir/gradle/root.gradle"
